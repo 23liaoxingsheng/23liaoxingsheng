@@ -3,110 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>专属小测试</title>
+    <title>小问答</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:#fef2f6;
+            font-family:"微软雅黑";
         }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #ffe8e8, #fff0f5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.5s;
+        .box{
+            background:#fff;
+            padding:50px 40px;
+            border-radius:20px;
+            text-align:center;
+            box-shadow:0 0 20px #ffc9d9;
         }
-
-        .card {
-            background: white;
-            padding: 60px 40px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.2);
-            text-align: center;
-            max-width: 400px;
+        h1{
+            color:#ff6699;
+            margin-bottom:35px;
+            font-size:26px;
         }
-
-        .pig-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
+        .btns{
+            display:flex;
+            gap:25px;
+            justify-content:center;
         }
-
-        h1 {
-            color: #ff6b9d;
-            margin-bottom: 40px;
-            font-size: 28px;
+        button{
+            padding:12px 35px;
+            border:none;
+            border-radius:30px;
+            font-size:17px;
+            cursor:pointer;
         }
-
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
+        .yes{
+            background:#ff6699;
+            color:#fff;
         }
-
-        button {
-            padding: 15px 40px;
-            border: none;
-            border-radius: 30px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .no{
+            background:#eeeeee;
+            color:#333;
         }
-
-        .btn-yes {
-            background: linear-gradient(135deg, #ff6b9d, #ff477e);
-            color: white;
-        }
-
-        .btn-yes:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 71, 126, 0.4);
-        }
-
-        .btn-no {
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .btn-no:hover {
-            background: #e0e0e0;
-        }
-
-        .fail-message {
-            margin-top: 30px;
-            color: #ff477e;
-            font-size: 20px;
-            display: none;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        .tip{
+            margin-top:30px;
+            font-size:20px;
+            color:red;
+            display:none;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="pig-icon">🐷</div>
+    <div class="box">
         <h1>你是不是小猪？</h1>
-        <div class="btn-group">
-            <button class="btn-yes" onclick="window.location.href='love.html'">是！</button>
-            <button class="btn-no" onclick="showFail()">不是</button>
+        <div class="btns">
+            <!-- 选是：跳转到 guide.html -->
+            <button class="yes" onclick="location.href='guide.html'">是</button>
+            <!-- 选不是：弹出文字 -->
+            <button class="no" onclick="showText()">不是</button>
         </div>
-        <p class="fail-message" id="failText">没爱了，故障💔</p >
+        <div class="tip" id="msg">没爱了，故障</div>
     </div>
 
     <script>
-        function showFail() {
-            const text = document.getElementById('failText');
-            text.style.display = 'block';
-            // 改变背景颜色，增加氛围感
-            document.body.style.background = 'linear-gradient(135deg, #e0e0e0, #c0c0c0)';
+        function showText(){
+            document.getElementById("msg").style.display="block";
         }
     </script>
 </body>

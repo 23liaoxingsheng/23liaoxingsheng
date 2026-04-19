@@ -3,49 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>石家庄居民区火灾疏散系统</title>
+    <title>石家庄居民区火灾应急系统</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
         }
 
         body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #0a192f 100%);
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             overflow: hidden;
             position: relative;
         }
 
         /* 背景粒子效果 */
-        .particles {
+        #particles {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            z-index: 0;
+            z-index: 1;
         }
 
         .particle {
             position: absolute;
             width: 4px;
             height: 4px;
-            background: rgba(0, 200, 200, 0.6);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
-            animation: float 15s infinite linear;
-            opacity: 0;
+            animation: float linear infinite;
         }
 
         @keyframes float {
             0% {
-                transform: translateY(100vh) rotate(0deg);
+                transform: translateY(100vh) scale(0);
                 opacity: 0;
             }
             10% {
@@ -55,125 +53,74 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-100vh) rotate(720deg);
+                transform: translateY(-100vh) scale(1);
                 opacity: 0;
             }
         }
 
-        /* 登录卡片 */
-        .login-card {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 420px;
-            background: rgba(17, 34, 64, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 200, 200, 0.3);
-            border-radius: 16px;
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            box-shadow: 
-                0 0 40px rgba(0, 200, 200, 0.15),
-                inset 0 0 20px rgba(0, 200, 200, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            z-index: 10;
         }
 
-        /* 标题 */
-        .login-title {
+        h1 {
             text-align: center;
-            margin-bottom: 35px;
+            color: #1e3c72;
+            margin-bottom: 30px;
+            font-size: 24px;
         }
 
-        .login-title h1 {
-            color: #00e5e5;
-            font-size: 28px;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(0, 229, 229, 0.5);
-            letter-spacing: 2px;
-        }
-
-        .login-title p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        /* 表单组 */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
+        label {
             display: block;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 15px;
             margin-bottom: 8px;
-            padding-left: 4px;
+            color: #333;
+            font-weight: bold;
         }
 
-        .form-group input {
+        input {
             width: 100%;
-            padding: 14px 18px;
-            background: rgba(10, 25, 47, 0.6);
-            border: 1px solid rgba(0, 200, 200, 0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            transition: all 0.3s ease;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
         }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #00e5e5;
-            box-shadow: 0 0 15px rgba(0, 229, 229, 0.3);
-            background: rgba(10, 25, 47, 0.8);
-        }
-
-        /* 登录按钮 */
         .login-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, #00a8a8, #00e5e5);
+            padding: 12px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
             border: none;
-            border-radius: 8px;
-            color: #0a192f;
+            border-radius: 5px;
             font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: background 0.3s;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 229, 229, 0.4);
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
         }
 
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        /* 底部信息 */
         .footer-info {
             text-align: center;
-            margin-top: 25px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <!-- 背景粒子 -->
-    <div class="particles" id="particles"></div>
-
-    <!-- 登录卡片 -->
-    <div class="login-card">
-        <div class="login-title">
-            <h1>石家庄居民区火灾疏散系统</h1>
-            <p>Fire Evacuation System for Residential Areas</p >
-        </div>
+    <div id="particles"></div>
+    <div class="login-box">
+        <h1>石家庄居民区火灾应急系统</h1>
         <form>
             <div class="form-group">
                 <label>用户名</label>
@@ -183,7 +130,8 @@
                 <label>密码</label>
                 <input type="password" placeholder="请输入密码">
             </div>
-            <button type="submit" class="login-btn">登录系统</button>
+            <!-- 带跳转功能的登录按钮，点击会直接跳转到guide.html -->
+            <button type="button" class="login-btn" onclick="window.location.href='guide.html'">登录系统</button>
         </form>
         <div class="footer-info">
             © 2026 石家庄居民区火灾疏散系统 版权所有

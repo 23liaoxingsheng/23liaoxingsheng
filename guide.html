@@ -1,120 +1,127 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动态爱心</title>
+    <title>帅哥认证现场</title>
     <style>
-        * {
+        *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        body {
+        body{
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             min-height: 100vh;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            overflow: hidden;
-            position: relative;
+            justify-content: center;
+            font-family: "微软雅黑", sans-serif;
+            color: #fff;
+            padding: 20px;
         }
-
-        /* 主爱心 */
-        .heart {
-            width: 150px;
-            height: 150px;
-            background: #ff477e;
-            position: relative;
-            transform: rotate(-45deg);
-            animation: beat 1s infinite alternate;
-            box-shadow: 0 0 30px rgba(255, 71, 126, 0.6);
-        }
-
-        .heart::before,
-        .heart::after {
-            content: "";
-            width: 150px;
-            height: 150px;
-            background: #ff477e;
-            border-radius: 50%;
-            position: absolute;
-        }
-
-        .heart::before {
-            top: -75px;
-            left: 0;
-        }
-
-        .heart::after {
-            top: 0;
-            left: 75px;
-        }
-
-        /* 跳动动画 */
-        @keyframes beat {
-            0% {
-                transform: rotate(-45deg) scale(1);
-            }
-            100% {
-                transform: rotate(-45deg) scale(1.1);
-            }
-        }
-
-        /* 背景爱心雨 */
-        .heart-rain {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .box{
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 30px #4e6ef280;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 500px;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
         }
-
-        .mini-heart {
+        /* 图片容器+动态效果 */
+        .img-wrap{
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .avatar{
+            width: 100%;
+            max-width: 300px;
+            border-radius: 12px;
+            border: 3px solid #ff88cc;
+            box-shadow: 0 0 20px #ff88cc80;
+            /* 轻微晃动效果 */
+            animation: shake 2s ease-in-out infinite;
+        }
+        @keyframes shake{
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+        /* 周围发光星星效果 */
+        .star{
             position: absolute;
-            color: #ff477e;
-            font-size: 20px;
-            opacity: 0.7;
-            animation: fall linear infinite;
+            width: 12px;
+            height: 12px;
+            background: #ffdd55;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffdd55;
+            animation: twinkle 1s ease-in-out infinite alternate;
         }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-10vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.7;
-            }
-            90% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translateY(110vh) rotate(360deg);
-                opacity: 0;
-            }
+        .star1{ top: -10px; left: 10%; animation-delay: 0s; }
+        .star2{ top: 20%; right: -15px; animation-delay: 0.2s; }
+        .star3{ bottom: 10%; left: -15px; animation-delay: 0.4s; }
+        .star4{ bottom: -10px; right: 10%; animation-delay: 0.6s; }
+        @keyframes twinkle{
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+        .question{
+            font-size: 22px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 8px #ff88cc;
+        }
+        button{
+            border: none;
+            width: 130px;
+            height: 45px;
+            line-height: 45px;
+            border-radius: 50px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .btn1{
+            background: #48dbfb;
+            color: #000;
+        }
+        .btn2{
+            background: #ff6b81;
+            color: #fff;
+        }
+        button:hover{
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
         }
     </style>
 </head>
 <body>
-    <div class="heart-rain" id="rain"></div>
-    <div class="heart"></div>
+    <div class="box">
+        <div class="img-wrap">
+            <!-- 把你的图片改成这个名字，或者修改src里的文件名 -->
+            < img src="your-photo.jpg" alt="帅哥" class="avatar">
+            <!-- 周围星星 -->
+            <span class="star star1"></span>
+            <span class="star star2"></span>
+            <span class="star star3"></span>
+            <span class="star star4"></span>
+        </div>
+
+        <p class="question">帅吗？老铁</p >
+        <button class="btn1" onclick="no()">不帅</button>
+        <button class="btn2" onclick="yes()">帅</button>
+    </div>
 
     <script>
-        // 生成背景爱心雨
-        const rainContainer = document.getElementById('rain');
-        const heartCount = 30;
-
-        for (let i = 0; i < heartCount; i++) {
-            const miniHeart = document.createElement('div');
-            miniHeart.className = 'mini-heart';
-            miniHeart.innerHTML = '❤';
-            miniHeart.style.left = Math.random() * 100 + '%';
-            miniHeart.style.animationDuration = (Math.random() * 5 + 5) + 's';
-            miniHeart.style.animationDelay = Math.random() * 10 + 's';
-            rainContainer.appendChild(miniHeart);
+        function no(){
+            alert("你够懂的");
+        }
+        function yes(){
+            alert("这么帅？真蠢");
         }
     </script>
 </body>

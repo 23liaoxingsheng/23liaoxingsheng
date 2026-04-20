@@ -3,73 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小问答</title>
+    <title>动漫风首页</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body{
-            height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            background:#fef2f6;
-            font-family:"微软雅黑";
+            /* 动漫渐变背景 */
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: "微软雅黑",sans-serif;
+            color: #fff;
         }
         .box{
-            background:#fff;
-            padding:50px 40px;
-            border-radius:20px;
-            text-align:center;
-            box-shadow:0 0 20px #ffc9d9;
+            background: rgba(255,255,255,0.1);
+            padding: 50px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 30px #4e6ef280;
+            backdrop-filter: blur(10px);
+            text-align: center;
         }
-        h1{
-            color:#ff6699;
-            margin-bottom:35px;
-            font-size:26px;
-        }
-        .btns{
-            display:flex;
-            gap:25px;
-            justify-content:center;
+        .question{
+            font-size: 26px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 8px #ff88cc;
+            letter-spacing: 2px;
         }
         button{
-            padding:12px 35px;
-            border:none;
-            border-radius:30px;
-            font-size:17px;
-            cursor:pointer;
+            border: none;
+            width: 140px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50px;
+            font-size: 17px;
+            margin: 0 15px;
+            cursor: pointer;
+            transition: 0.3s ease;
         }
-        .yes{
-            background:#ff6699;
-            color:#fff;
+        .btn1{
+            background: #ff6b81;
+            color: #fff;
         }
-        .no{
-            background:#eeeeee;
-            color:#333;
+        .btn2{
+            background: #48dbfb;
+            color: #000;
         }
-        .tip{
-            margin-top:30px;
-            font-size:20px;
-            color:red;
-            display:none;
+        button:hover{
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
         }
     </style>
 </head>
 <body>
+
     <div class="box">
-        <h1>你是不是小猪？</h1>
-        <div class="btns">
-            <!-- 选是：跳转到 guide.html -->
-            <button class="yes" onclick="location.href='guide.html'">是</button>
-            <!-- 选不是：弹出文字 -->
-            <button class="no" onclick="showText()">不是</button>
-        </div>
-        <div class="tip" id="msg">没爱了，故障</div>
+        <p class="question">你想看世界上最帅的帅哥哥嘛？</p >
+        <button class="btn1" onclick="noLook()">不想看</button>
+        <button class="btn2" onclick="yesLook()">想看</button>
     </div>
 
     <script>
-        function showText(){
-            document.getElementById("msg").style.display="block";
+        function noLook(){
+            alert("别不识趣哈，老弟");
+        }
+        function yesLook(){
+            location.href = "guide.html";
         }
     </script>
+
 </body>
 </html>

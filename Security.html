@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安保监控员界面 - 小学火灾疏散系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .top-nav {
+            height: 60px;
+            background-color: #2b549c;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 60px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 0 10px;
+            line-height: 60px;
+        }
+
+        .nav-menu a.active {
+            border-bottom: 3px solid white;
+        }
+
+        .back-login-btn {
+            background-color: #1f4480;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            position: relative;
+            z-index: 9999;
+        }
+        .back-login-btn:hover {
+            background-color: #183666;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .left-sidebar {
+            width: 200px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e5eb;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            color: #555;
+            cursor: default;
+        }
+
+        .sidebar-item.active {
+            background-color: #e8f0fc;
+            color: #2b549c;
+            font-weight: bold;
+            border-left: 3px solid #2b549c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            background-color: #f5f7fa;
+        }
+
+        .page-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 25px;
+        }
+
+        .monitor-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .filter-select select {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* 监控框样式，只放文字 */
+        .monitor-item {
+            background-color: #f0f2f5;
+            border-radius: 6px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .monitor-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+        }
+
+        .right-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .info-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+
+        .info-card h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .command-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80%;
+            color: #666;
+        }
+
+        .map-area {
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            height: 70%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .map-desc {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="logo-text">小学火灾疏散系统 — 安保监控员</div>
+        <div class="nav-menu">
+            首页
+            实时监控
+            预警信息
+            应急指令
+            历史记录
+        </div>
+        <button class="back-login-btn" onclick="window.location.href='login.html'">
+            返回登录页
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="left-sidebar">
+            <div class="sidebar-item active">监控大屏</div>
+            <div class="sidebar-item">预警管理</div>
+            <div class="sidebar-item">疏散调度</div>
+            <div class="sidebar-item">危险上报</div>
+            <div class="sidebar-item">系统日志</div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-title">校园实时监控面板</div>
+            <div class="content-grid">
+                <div class="monitor-card">
+                    <div class="card-header">
+                        <div class="card-title">校园监测监控大屏</div>
+                        <div class="filter-select">
+                            <select>
+                                <option>全部区域</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="monitor-grid">
+                        <div class="monitor-item">校园监控</div>
+                        <div class="monitor-item">校园监控</div>
+                        <div class="monitor-item">校园监控</div>
+                        <div class="monitor-item">校园监控</div>
+                    </div>
+                    <div class="monitor-controls">
+                        <div class="control-btn">←</div>
+                        <div class="control-btn">1</div>
+                        <div class="control-btn">→</div>
+                    </div>
+                </div>
+
+                <div class="right-cards">
+                    <div class="info-card">
+                        <h4>应急指令接收状态</h4>
+                        <div class="command-status">
+                            <div style="font-size:18px; font-weight:bold;">指令接收中</div>
+                            <div style="margin-top:10px; font-size:16px;">指令已下发</div>
+                            <div style="margin-top:20px; color:#999;">等待校领导调度指令</div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h4>疏散人员位置状态</h4>
+                        <div class="map-area">
+                            <span style="color:#999; font-size:16px;">校园疏散路线示意图</span>
+                        </div>
+                        <div class="map-desc">
+                            <div style="font-size:16px;">当前重点监控：教学楼A栋3楼</div>
+                            <div style="margin-top:8px; font-size:16px;">疏散路线：向东至操场集合点</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理员界面 - 小学火灾疏散系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        /* 顶部导航 和你校领导页面结构一致 */
+        .top-nav {
+            height: 60px;
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 60px;
+        }
+
+        .nav-menu a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 0 10px;
+            line-height: 60px;
+        }
+
+        .nav-menu a.active {
+            border-bottom: 3px solid #38bdf8;
+            color: #38bdf8;
+        }
+
+        /* 完全照搬你校领导的按钮样式 + 可点击 */
+        .back-login-btn {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            position: relative;
+            z-index: 9999;
+        }
+        .back-login-btn:hover {
+            background-color: #0284c7;
+        }
+
+        /* 主容器 */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* 左侧菜单 */
+        .left-sidebar {
+            width: 200px;
+            background-color: #1e293b;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            color: #94a3b8;
+                       cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-item.active {
+            background-color: #334155;
+            color: #38bdf8;
+            border-left: 3px solid #38bdf8;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            background-color: #0f172a;
+        }
+
+        .page-title {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* 2x2网格布局 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* 卡片科技风 */
+        .card {
+            background-color: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+
+        .card-content {
+            height: 250px;
+            background-color: #111827;
+            border-radius: 6px;
+            border: 1px dashed #38bdf8;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="logo-text">小学火灾疏散系统 — 系统管理员控制台</div>
+        <div class="nav-menu">
+            用户管理
+            角色权限
+            基础数据
+            系统设置
+        </div>
+        <!-- 和你校领导页面一模一样的写法：button + onclick -->
+        <button class="back-login-btn" onclick="window.location.href='login.html'">
+            返回登录页
+        </button>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <div class="left-sidebar">
+            <div class="sidebar-item active">
+                <span>👤</span> 用户账号管理
+            </div>
+            <div class="sidebar-item">
+                <span>🔐</span> 角色权限配置
+            </div>
+            <div class="sidebar-item">
+                <span>🏫</span> 班级信息管理
+            </div>
+            <div class="sidebar-item">
+                <span>📜</span> 系统日志查看
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-title">系统管理员 - 后台管理总览</div>
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">所有角色账号列表</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="card-content"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">角色权限分配设置</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="card-content"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">班级基础数据维护</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="card-content"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">系统操作日志记录</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="card-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

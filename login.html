@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小学火灾疏散系统 - 登录</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+body {
+    background: #0a1629;
+    background-image: radial-gradient(circle at center, #13294f, #070e1f);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-container {
+    width: 420px;
+    padding: 45px 35px;
+    background: rgba(18, 36, 65, 0.85);
+    border: 1px solid #285493;
+    border-radius: 14px;
+    box-shadow: 0 0 30px rgba(44, 110, 212, 0.35);
+}
+.system-title {
+    text-align: center;
+    color: #5cd0ff;
+    font-size: 28px;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+}
+.form-item {
+    margin-bottom: 22px;
+}
+.form-item label {
+    display: block;
+    color: #b8e0ff;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+.form-item input,
+.form-item select {
+    width: 100%;
+    padding: 13px 16px;
+    background: #0f203d;
+    border: 1px solid #3262a8;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+}
+.form-item input:focus,
+.form-item select:focus {
+    border-color: #49b8ff;
+    box-shadow: 0 0 8px #2978c2;
+}
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #1f6ed8, #2793eb);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+.login-btn:hover {
+    box-shadow: 0 0 15px #2793eb;
+}
+.tip-text {
+    margin-top: 25px;
+    color: #7aa6d8;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.8;
+}
+</style>
+</head>
+<body>
+<div class="login-container">
+    <h2 class="system-title">小学火灾疏散系统</h2>
+
+    <div class="form-item">
+        <label>选择登录角色</label>
+        <select id="roleSelect">
+            <option value="">请选择角色</option>
+            <option value="admin">系统管理员</option>
+            <option value="leader">校领导</option>
+            <option value="security">安保监控员</option>
+            <option value="teacher">班主任/老师</option>
+        </select>
+    </div>
+
+    <div class="form-item">
+        <label>账号</label>
+        <input type="text" id="username" placeholder="请输入账号">
+    </div>
+
+    <div class="form-item">
+        <label>密码</label>
+        <input type="password" id="pwd" placeholder="请输入密码">
+    </div>
+
+    <button class="login-btn" onclick="loginCheck()">立即登录</button>
+
+    <div class="tip-text">
+        管理员：admin / 123456<br>
+        校领导：leader / 123456<br>
+        安保：security / 123456<br>
+        班主任：teacher / 123456
+    </div>
+</div>
+
+<script>
+function loginCheck(){
+    let role = document.getElementById("roleSelect").value;
+    let user = document.getElementById("username").value;
+    let pwd = document.getElementById("pwd").value;
+
+    if(!role){
+        alert("请选择登录角色！");
+        return;
+    }
+    if(user=="" || pwd==""){
+        alert("请输入账号和密码！");
+        return;
+    }
+
+    if(role==="admin" && user==="admin" && pwd==="123456"){
+        window.location.href = "admin.html";
+    }
+    else if(role==="leader" && user==="leader" && pwd==="123456"){
+        window.location.href = "leader.html";
+    }
+    else if(role==="security" && user==="security" && pwd==="123456"){
+        window.location.href = "security.html";
+    }
+    else if(role==="teacher" && user==="teacher" && pwd==="123456"){
+        window.location.href = "teacher.html";
+    }
+    else{
+        alert("账号、密码或角色错误！");
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校领导界面 - 小学火灾疏散系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            height: 60px;
+            background-color: #2b549c;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 60px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 0 10px;
+            line-height: 60px;
+        }
+
+        .nav-menu a.active {
+            border-bottom: 3px solid white;
+        }
+
+        .back-login-btn {
+            background-color: #1f4480;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            position: relative;
+            z-index: 9999;
+        }
+        .back-login-btn:hover {
+            background-color: #183666;
+        }
+
+        /* 主容器 */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* 左侧菜单 */
+        .left-sidebar {
+            width: 200px;
+            background-color: #2b354a;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            color: #c5cddb;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-item.active {
+            background-color: #3a4760;
+            color: white;
+            border-left: 3px solid white;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            background-color: #f5f7fa;
+        }
+
+        .page-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 2x2网格布局 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* 卡片内容占位 */
+        .card-content {
+            display: flex;
+            gap: 20px;
+            height: 250px;
+        }
+
+        .map-area {
+            flex: 2;
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .info-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-item {
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        /* 指令卡片 */
+        .command-content {
+            display: flex;
+            gap: 20px;
+            height: 250px;
+        }
+
+        .command-editor {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .command-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: default;
+        }
+
+        .tab-btn.active {
+            background-color: #2b549c;
+            color: white;
+            border-color: #2b549c;
+        }
+
+        .command-input {
+            flex: 1;
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .command-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .send-btn {
+            background-color: #2b549c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: default;
+        }
+
+        .command-list {
+            flex: 1;
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        /* 进度卡片 */
+        .progress-content {
+            height: 250px;
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        /* 历史数据卡片 */
+        .history-content {
+            height: 250px;
+            background-color: #f0f4f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="logo-text">小学火灾疏散系统 — 校领导控制台</div>
+        <div class="nav-menu">
+            系统总览
+            全校监控
+            预警管理
+            应急指令
+            事件复盘
+        </div>
+        <button class="back-login-btn" onclick="window.location.href='login.html'">
+            返回登录页
+        </button>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 左侧菜单（深色风格，和参考图一致） -->
+        <div class="left-sidebar">
+            <div class="sidebar-item active">
+                <span>🏠</span> 全局安全态势
+            </div>
+            <div class="sidebar-item">
+                <span>📋</span> 应急指令查看
+            </div>
+            <div class="sidebar-item">
+                <span>👥</span> 疏散进度总览
+            </div>
+            <div class="sidebar-item">
+                <span>📊</span> 班级人员清点
+            </div>
+            <div class="sidebar-item">
+                <span>📅</span> 历史演练记录
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="page-title">全校安全态势总览与应急指挥</div>
+            <div class="content-grid">
+                <!-- 1. 全校安全态势总览 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">全校安全态势总览</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="map-area">校园地图/安全点位监控</div>
+                        <div class="info-panel">
+                            <div class="info-item">实时信息状态</div>
+                            <div class="info-item">重点区域监控</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 应急指令下发 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">应急指令下发</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="command-content">
+                        <div class="command-editor">
+                            <div class="command-tabs">
+                                <div class="tab-btn active">发送给安保</div>
+                                <div class="tab-btn">发送给班主任</div>
+                            </div>
+                            <div class="command-input">指令编辑区域</div>
+                            <div class="command-buttons">
+                                <div class="send-btn">发送指令</div>
+                                <div class="tab-btn">发送给安保</div>
+                            </div>
+                        </div>
+                        <div class="command-list">历史指令列表</div>
+                    </div>
+                </div>
+
+                <!-- 3. 疏散进度实时汇总 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">疏散进度实时汇总</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="progress-content">班级疏散进度条形图（安全人数/应到人数）</div>
+                </div>
+
+                <!-- 4. 历史事件与演练数据 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">历史事件与演练数据</div>
+                        <div>⋮</div>
+                    </div>
+                    <div class="history-content">历史隐患记录与演练完成情况柱状图</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

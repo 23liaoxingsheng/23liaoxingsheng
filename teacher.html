@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班主任界面 - 小学火灾疏散系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            height: 60px;
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-tabs a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 0 10px;
+            line-height: 60px;
+            position: relative;
+        }
+
+        .nav-tabs a.active {
+            color: #38bdf8;
+        }
+
+        .nav-tabs a.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #38bdf8;
+        }
+
+        .back-login-btn {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .back-login-btn:hover {
+            background-color: #0284c7;
+        }
+
+        /* 主容器 */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* 左侧菜单 */
+        .left-sidebar {
+            width: 200px;
+            background-color: #1e293b;
+            border-right: 1px solid #334155;
+            padding-top: 20px;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            color: #94a3b8;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-item.active {
+            background-color: #0f172a;
+            color: #38bdf8;
+            border-left-color: #38bdf8;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+        }
+
+        /* 左侧学生列表 */
+        .student-list-card {
+            background-color: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        .student-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .student-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #64748b;
+            border-radius: 3px;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+
+        .student-status {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* 右侧内容区 */
+        .right-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* 疏散路线卡片 */
+        .evacuation-route-card {
+            background-color: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .route-map-placeholder {
+            height: 100%;
+            background-color: #0f172a;
+            border-radius: 6px;
+            border: 1px dashed #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+        }
+
+        /* 人员清点卡片 */
+        .roll-call-card {
+            background-color: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            padding: 20px;
+        }
+
+        .roll-call-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .roll-call-table th,
+        .roll-call-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+            color: #94a3b8;
+        }
+
+        .roll-call-table th {
+            background-color: #0f172a;
+            color: #38bdf8;
+        }
+
+        /* 底部通知栏 */
+        .notification-bar {
+            background-color: #0ea5e9;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="logo-text">小学火灾疏散系统 — 班主任端</div>
+        <div class="nav-tabs">
+            我的班级
+            疏散路线
+            人员清点
+            预警接收
+        </div>
+        <button class="back-login-btn" onclick="window.location.href='login.html'">
+            返回登录页
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- 左侧菜单 -->
+        <div class="left-sidebar">
+            <div class="sidebar-item">
+                <span>🏫</span> 班级信息
+            </div>
+            <div class="sidebar-item">
+                <span>👥</span> 学生列表
+            </div>
+            <div class="sidebar-item">
+                <span>🚶</span> 疏散路线
+            </div>
+            <div class="sidebar-item active">
+                <span>📋</span> 人员清点
+            </div>
+            <div class="sidebar-item">
+                <span>📜</span> 历史记录
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧学生列表 -->
+            <div class="student-list-card">
+                <div class="card-header">
+                    <h3>本班学生</h3>
+                    <span>⋮</span>
+                </div>
+                <div class="student-list">
+                    <div class="student-item">
+                        <div class="student-checkbox"></div>
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <div class="student-name">学生姓名</div>
+                            <div class="student-status">点名 | 状态：已到/未到</div>
+                        </div>
+                    </div>
+                    <div class="student-item">
+                        <div class="student-checkbox"></div>
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <div class="student-name">学生姓名</div>
+                            <div class="student-status">点名 | 状态：已到/未到</div>
+                        </div>
+                    </div>
+                    <div class="student-item">
+                        <div class="student-checkbox"></div>
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <div class="student-name">学生姓名</div>
+                            <div class="student-status">点名 | 状态：已到/未到</div>
+                        </div>
+                    </div>
+                    <div class="student-item">
+                        <div class="student-checkbox"></div>
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <div class="student-name">学生姓名</div>
+                            <div class="student-status">点名 | 状态：已到/未到</div>
+                        </div>
+                    </div>
+                    <div class="student-item">
+                        <div class="student-checkbox"></div>
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <div class="student-name">学生姓名</div>
+                            <div class="student-status">点名 | 状态：已到/未到</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧内容区 -->
+            <div class="right-content">
+                <!-- 疏散路线卡片 -->
+                <div class="evacuation-route-card">
+                    <div class="card-header">
+                        <h3>班级专属疏散路线</h3>
+                        <span>⋮</span>
+                    </div>
+                    <div class="route-map-placeholder">班级疏散路线地图（科技风占位）</div>
+                </div>
+
+                <!-- 人员清点卡片 -->
+                <div class="roll-call-card">
+                    <div class="card-header">
+                        <h3>人员清点</h3>
+                        <span>⋮</span>
+                    </div>
+                    <table class="roll-call-table">
+                        <thead>
+                            <tr>
+                                <th>应到单号</th>
+                                <th>实到号</th>
+                                <th>姓名</th>
+                                <th>班级/人员</th>
+                                <th>表情/状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>核对单号</td>
+                                <td>2</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>本班应到人数</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>29/31</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>实到人数</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="notification-bar">实时预警与指令通知栏</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

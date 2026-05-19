@@ -1,356 +1,275 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>火灾安防监控系统-安保端</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:微软雅黑;}
-body{background:#0a101f;color:#e6edf7;}
-.top-nav{
-  height:60px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;background:linear-gradient(90deg,#0b2447,#19376d);
-  box-shadow:0 0 15px #00aaff55;border-bottom:1px solid #00aaff44;
-}
-.top-nav h3{text-shadow:0 0 6px #00ccff;}
-.back-login-btn{
-  background:linear-gradient(135deg,#0077cc,#00aaff);border:none;
-  padding:6px 14px;border-radius:5px;color:#fff;cursor:pointer;
-}
-.sidebar{
-  width:160px;height:calc(100vh - 60px);background:#0c162e;
-  float:left;border-right:1px solid #00aaff33;padding-top:15px;
-}
-.side-item{
-  height:48px;line-height:48px;text-align:center;margin:6px 10px;
-  border-radius:7px;color:#94b8e8;cursor:pointer;
-}
-.side-item.active{background:#0066aa44;border:1px solid #00aaff77;color:#00ddff;}
-.main{margin-left:160px;padding:20px;}
-.fire-info,.success-tip,.error-tip{
-  width:100%;padding:18px;border-radius:8px;text-align:center;
-  display:none;margin-bottom:15px;border:1px solid #00aaff44;
-}
-.fire-info{background:#ff335522;}
-.success-tip{background:#00ee8822;}
-.error-tip{background:#ffaa0022;}
-.btn{padding:8px 20px;border:none;border-radius:5px;margin:0 8px;cursor:pointer;}
-.btn-yes{background:linear-gradient(#009966,#00cc88);color:#fff;}
-.btn-no{background:#667788;color:#fff;}
-.btn-reset{background:#cc4444;color:#fff;}
-.monitor-box{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0;}
-.monitor-box.focus{grid-template-columns:2fr 1fr;}
-.monitor-box.focus .monitor-screen.main{grid-row:1/3;}
-.monitor-screen{
-  height:180px;background:#0f1a33;border:1px solid #00aaff33;
-  border-radius:8px;position:relative;cursor:pointer;transition:0.4s;
-}
-.monitor-screen.main{border:1px solid #ff4466;box-shadow:0 0 15px #ff446666;}
-.monitor-screen.gray{opacity:0.6;}
-.screen-text{position:absolute;top:10px;left:10px;background:#0007;padding:3px 8px;border-radius:3px;color:#00eeff;font-size:12px;}
-.live-icon{position:absolute;top:10px;right:10px;color:#ff3355;font-size:12px;}
-.right-info{width:300px;float:right;}
-.info-card{background:#0c162e;border:1px solid #00aaff44;padding:18px;border-radius:8px;}
-/*大屏弹窗*/
-.big-monitor-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:#000d;display:none;z-index:999;}
-.big-monitor-box{width:70%;height:70%;background:#0f1a33;border:2px solid #ff4466;border-radius:10px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:15px;}
-.big-monitor-content{width:100%;height:calc(100% - 50px);border-radius:6px;position:relative;overflow:hidden;background:#222;}
-.close-big-monitor{background:#ff4466;border:none;color:#fff;padding:5px 10px;border-radius:4px;cursor:pointer;}
-/* --- 教室走廊监控场景 --- */
-.classroom-scene{
-  width:100%;height:100%;position:relative;
-  background:linear-gradient(#333 0%,#111 100%);
-}
-.classroom-door{
-  position:absolute;bottom:15%;left:50%;transform:translateX(-50%);
-  width:100px;height:180px;background:#444;border:2px solid #555;
-}
-.fire-glow{
-  position:absolute;bottom:10%;left:50%;transform:translateX(-50%);
-  width:150px;height:150px;
-  background:radial-gradient(circle, rgba(255,100,0,0.7), rgba(255,50,0,0.3), transparent);
-  border-radius:50%;
-  animation:firePulse 1s infinite alternate;
-}
-@keyframes firePulse{
-  0%{transform:translateX(-50%) scale(0.9);opacity:0.8;}
-  100%{transform:translateX(-50%) scale(1.1);opacity:1;}
-}
-.smoke{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  background:radial-gradient(circle at 50% 30%, rgba(100,100,100,0.5), transparent 70%);
-  filter:blur(10px);
-  animation:smokeMove 3s infinite ease-in-out;
-}
-@keyframes smokeMove{
-  0%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
-  100%{transform:translateY(0);}
-}
-.corridor-line{
-  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:300px;height:300px;border-left:2px solid #444;border-right:2px solid #444;
-  opacity:0.3;
-}
-.normal-scene{
-  width:100%;height:100%;position:relative;background:#222;
-}
-.floor{position:absolute;bottom:0;width:100%;height:20%;background:#333;}
-.wall{position:absolute;top:0;width:100%;height:80%;background:#333;}
-.canteen-scene{
-  width:100%;height:100%;position:relative;background:#222;
-}
-.stove{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);width:80px;height:50px;background:#444;}
-.canteen-smoke{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  background:radial-gradient(circle at 50% 20%, rgba(150,150,150,0.4), transparent 60%);
-  filter:blur(8px);
-  animation:canteenSmoke 2s infinite;
-}
-@keyframes canteenSmoke{
-  50%{transform:translateY(-5px);}
-}
-.pop-mask{position:fixed;top:0;left:0;width:100%;height:100%;background:#0008;display:none;}
-.pop-box{width:420px;background:#0c162e;border:1px solid #00aaff66;border-radius:10px;padding:25px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-select{width:100%;padding:8px;background:#0f1a33;border:1px solid #00aaff55;color:#fff;border-radius:5px;margin:8px 0;}
-</style>
+    <meta charset="UTF-8">
+    <title>校园火灾智能安防监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #0b1020;
+            color: #fff;
+        }
+        /* 顶部导航 */
+        .top-bar {
+            height: 50px;
+            background-color: #10254a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.3);
+        }
+        .top-bar .title {
+            color: #00d4ff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .top-bar .right-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .top-bar .status {
+            color: #fff;
+        }
+        .top-bar .login-btn {
+            background-color: #0099ff;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* 整体布局 */
+        .container {
+            display: flex;
+        }
+
+        /* 左侧导航 */
+        .sidebar {
+            width: 100px;
+            background-color: #0b152b;
+            height: calc(100vh - 50px);
+            border-right: 1px solid rgba(0, 180, 255, 0.2);
+            padding-top: 20px;
+        }
+        .sidebar .menu-item {
+            display: block;
+            padding: 12px 15px;
+            color: #a0d8ff;
+            text-decoration: none;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .sidebar .menu-item.active {
+            background-color: rgba(0, 150, 220, 0.2);
+            color: #00d4ff;
+            border-left: 2px solid #00d4ff;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 15px;
+        }
+
+        /* 火情预警栏 */
+        .fire-alert {
+            background-color: #2b1520;
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .fire-alert p {
+            margin: 5px 0;
+        }
+        .fire-alert .btn-group {
+            margin-top: 10px;
+        }
+        .fire-alert .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .fire-alert .btn.confirm {
+            background-color: #00b866;
+            color: #fff;
+        }
+        .fire-alert .btn.false {
+            background-color: #666;
+            color: #fff;
+        }
+
+        /* 全域监控布局 */
+        .monitor-area {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+        .monitor-card {
+            background-color: #0b152b;
+            border: 1px solid rgba(0, 180, 255, 0.2);
+            border-radius: 6px;
+            padding: 10px;
+            position: relative;
+        }
+        /* 火情监控卡片红色边框 */
+        .monitor-card.fire-active {
+            border: 1px solid rgba(255, 80, 80, 0.6);
+            box-shadow: 0 0 10px rgba(255, 80, 80, 0.3);
+        }
+        .monitor-card .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .monitor-card .name {
+            color: #00d4ff;
+            background-color: rgba(0, 150, 220, 0.15);
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+        .monitor-card .status {
+            color: #ff6666;
+        }
+        /* 视频框 */
+        .video-box {
+            width: 100%;
+            height: 180px;
+            background-color: #1a2035;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* 占位框 */
+        .placeholder-box {
+            width: 100%;
+            height: 100%;
+            background-color: #2a3045;
+            border-radius: 4px;
+        }
+
+        /* 右侧运行状态 */
+        .status-panel {
+            background-color: #0b152b;
+            border: 1px solid rgba(0, 180, 255, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .status-panel h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.2);
+            padding-bottom: 5px;
+        }
+        .status-panel p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-<div class="top-nav">
-<h3>校园火灾智能安防监控系统</h3>
-<div><span style="color:#88ccff">运行正常</span>
-<!-- 这里加了onclick -->
-<button class="back-login-btn" onclick="goToLogin()">返回登录</button>
-</div>
-</div>
-<div class="sidebar">
-<div class="side-item active">监控大厅</div>
-<div class="side-item">火情预警</div>
-<div class="side-item">设备状态</div>
-<div class="side-item">值班日志</div>
-</div>
-<div class="main">
-<div class="fire-info" id="fireInfo">
-系统检测火情信号<br>
-起火位置：<span id="firePlace">一号教学楼二层教室</span><br>
-危险等级：<span id="fireLevel">2级：中度火情</span>
-<div class="btn-group" style="margin-top:12px;">
-<button class="btn btn-yes" onclick="confirmByMonitor()">已核实确认火情</button>
-<button class="btn btn-no" onclick="cancelWarn()">火情误报</button>
-</div>
-</div>
-<div class="success-tip" id="successTip">
-✅ 火情核实完毕，已上报校领导指挥中心<br>静待应急指令
-<div class="btn-group" style="margin-top:12px;">
-<button class="btn btn-no" onclick="goBack()">返回确认界面</button>
-</div>
-</div>
-<div class="error-tip" id="errorTip">
-⚠️ 复核判定为误报，恢复正常监测
-<div class="btn-group" style="margin-top:12px;">
-<button class="btn btn-no" onclick="backNormal()">返回确认界面</button>
-</div>
-</div>
-<div style="display:flex;justify-content:space-between;">
-<div style="flex:1;margin-right:20px;">
-<h4 style="color:#00ccff;margin-bottom:10px;">全域实时监控</h4>
-<div class="monitor-box" id="monitorBox">
-<div class="monitor-screen" id="cam1" onclick="openBig('教学楼')">
-<div class="screen-text">一号教学楼</div>
-<div class="live-icon">在线监测</div>
-<div style="width:70%;height:80px;background:#333b4d;margin:45px auto;border-radius:2px;"></div>
-</div>
-<div class="monitor-screen" id="cam2" onclick="openBig('二号教学楼')">
-<div class="screen-text">二号教学楼</div>
-<div class="live-icon">在线监测</div>
-<div style="width:75%;height:40px;background:#3a4254;margin:65px auto;"></div>
-</div>
-<div class="monitor-screen" id="cam3" onclick="openBig('食堂')">
-<div class="screen-text">校园食堂</div>
-<div class="live-icon">在线监测</div>
-<div style="display:flex;gap:15px;justify-content:center;margin-top:80px;">
-<div style="width:30px;height:25px;background:#40485a;"></div>
-</div>
-</div>
-<div class="monitor-screen" id="cam4" onclick="openBig('操场')">
-<div class="screen-text">室外疏散通道</div>
-<div class="live-icon">在线监测</div>
-<div style="width:85%;height:30px;border:2px solid #555;margin:70px auto;border-radius:50px;"></div>
-</div>
-</div>
-<div style="text-align:center;margin:15px 0;">
-<button class="btn btn-yes" onclick="openPop()">手动上报火情</button>
-<button class="btn btn-reset" onclick="allReset()">险情解除重置</button>
-</div>
-</div>
-<div class="right-info">
-<div class="info-card">
-<h4 style="color:#00ccff;margin-bottom:10px;border-bottom:1px solid #00aaff33;padding-bottom:5px;">运行状态</h4>
-<p style="margin:6px 0;">监控设备：全部在线</p >
-<p style="margin:6px 0;">传感模块：正常启用</p >
-<p style="margin:6px 0;">数据状态：待人工核实推送</p >
-</div>
-</div>
-</div>
+    <!-- 顶部导航 -->
+    <div class="top-bar">
+        <div class="title">校园火灾智能安防监控系统</div>
+        <div class="right-info">
+            <span class="status">运行正常</span>
+            <button class="login-btn">返回登录</button>
+        </div>
+    </div>
 
-<!-- 监控大屏弹窗 -->
-<div class="big-monitor-mask" id="bigMask">
-<div class="big-monitor-box">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-<span id="bigTitle" style="color:#00eeff;font-size:16px;">全屏监控画面</span>
-<button class="close-big-monitor" onclick="closeBig()">关闭</button>
-</div>
-<div class="big-monitor-content" id="bigContent">
-</div>
-<div style="text-align:center;margin-top:10px;">
-<button class="btn btn-yes" onclick="confirmByMonitor();closeBig();">核实确认火情</button>
-<button class="btn btn-no" onclick="cancelWarn();closeBig();">判定为误报</button>
-</div>
-</div>
-</div>
+    <div class="container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <a href="#" class="menu-item active">监控大厅</a>
+            <a href="#" class="menu-item">火情预警</a>
+            <a href="#" class="menu-item">设备状态</a>
+            <a href="#" class="menu-item">值班日志</a>
+        </div>
 
-<!--手动上报弹窗-->
-<div class="pop-mask" id="popMask">
-<div class="pop-box">
-<h3 style="text-align:center;color:#00ccff;margin-bottom:15px;">手动火情上报</h3>
-<p>选择起火点位</p >
-<select id="placeSel">
-<option value="">请选择</option>
-<option value="一号教学楼二层教室">一号教学楼二层教室</option>
-<option value="二号教学楼三层楼道">二号教学楼三层楼道</option>
-<option value="学校食堂后厨">食堂后厨</option>
-<option value="操场西侧配电室">操场配电室</option>
-</select>
-<p>选择危险等级</p >
-<select id="levelSel">
-<option value="">请选择</option>
-<option>1级：轻度火情</option>
-<option>2级：中度火情</option>
-<option>3级：重度火情</option>
-</select>
-<div style="text-align:center;margin-top:20px;">
-<button class="btn btn-yes" onclick="submitMan()">确认上报</button>
-<button class="btn btn-no" onclick="closePop()">取消</button>
-</div>
-</div>
-</div>
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 火情预警栏 -->
+            <div class="fire-alert">
+                <p>系统检测火情信号</p>
+                <p>起火位置：一号教学楼二层教室</p>
+                <p>危险等级：2级：中度火情</p>
+                <div class="btn-group">
+                    <button class="btn confirm">已核实确认火情</button>
+                    <button class="btn false">火情误报</button>
+                </div>
+            </div>
 
-<script>
-// 三级火情
-const levelArr=["1级：轻度火情","2级：中度火情","3级：重度火情"];
+            <h3 style="color:#00d4ff; margin-bottom:10px;">全域实时监控</h3>
+            <div class="monitor-area">
+                <!-- 一号教学楼（视频框） -->
+                <div class="monitor-card fire-active">
+                    <div class="header">
+                        <span class="name">一号教学楼</span>
+                        <span class="status">在线监测</span>
+                    </div>
+                    <div class="video-box">
+                        <!-- 这里是视频标签，替换src为你的视频路径即可 -->
+                        <video src="your-video.mp4" autoplay muted loop playsinline>
+                            您的浏览器不支持视频播放
+                        </video>
+                    </div>
+                </div>
 
-window.onload=function(){
-  setTimeout(()=>{
-    focusCamera("一号教学楼二层教室");
-    document.getElementById('fireLevel').innerText=levelArr[1];
-    document.getElementById('fireInfo').style.display='block';
-  },2000);
-}
+                <!-- 右侧区域 -->
+                <div style="display:flex; flex-direction:column; gap:15px;">
+                    <!-- 二号教学楼 -->
+                    <div class="monitor-card">
+                        <div class="header">
+                            <span class="name">二号教学楼</span>
+                            <span class="status">在线监测</span>
+                        </div>
+                        <div class="placeholder-box" style="height:80px;"></div>
+                    </div>
 
-// 返回登录页跳转函数
-function goToLogin(){
-  // 把这里换成你实际的登录页地址
-  window.location.href="login.html";
-}
+                    <!-- 校园食堂 -->
+                    <div class="monitor-card">
+                        <div class="header">
+                            <span class="name">校园食堂</span>
+                            <span class="status">在线监测</span>
+                        </div>
+                        <div class="placeholder-box" style="height:80px;"></div>
+                    </div>
 
-function getRandomLevel(){
-  let i=Math.floor(Math.random()*3);
-  return levelArr[i];
-}
+                    <!-- 运行状态 -->
+                    <div class="status-panel">
+                        <h3>运行状态</h3>
+                        <p>监控设备：全部在线</p>
+                        <p>传感模块：正常启用</p>
+                        <p>数据状态：待人工核实推送</p>
+                    </div>
+                </div>
 
-function focusCamera(place){
-  document.getElementById('monitorBox').classList.remove('focus');
-  document.querySelectorAll('.monitor-screen').forEach(item=>item.classList.remove('main','gray'));
-  let id;
-  if(place.includes("一号教学楼"))id="cam1";
-  else if(place.includes("二号教学楼"))id="cam2";
-  else if(place.includes("食堂"))id="cam3";
-  else id="cam4";
-  document.getElementById('monitorBox').classList.add('focus');
-  document.getElementById(id).classList.add('main');
-  ['cam1','cam2','cam3','cam4'].forEach(v=>{if(v!=id)document.getElementById(v).classList.add('gray')});
-}
-
-function openBig(type){
-  document.getElementById('bigTitle').innerText=type+"全屏监控";
-  let con=document.getElementById('bigContent');
-  if(type=="教学楼"){
-    con.innerHTML=`
-      <div class="classroom-scene">
-        <div class="corridor-line"></div>
-        <div class="classroom-door"></div>
-        <div class="fire-glow"></div>
-        <div class="smoke"></div>
-      </div>
-    `;
-  }else if(type=="食堂"){
-    con.innerHTML=`
-      <div class="canteen-scene">
-        <div class="stove"></div>
-        <div class="canteen-smoke"></div>
-      </div>
-    `;
-  }else{
-    con.innerHTML=`
-      <div class="normal-scene">
-        <div class="wall"></div>
-        <div class="floor"></div>
-      </div>
-    `;
-  }
-  document.getElementById('bigMask').style.display='block';
-}
-
-function closeBig(){document.getElementById('bigMask').style.display='none';}
-
-function confirmByMonitor(){
-  let p=document.getElementById('firePlace').innerText;
-  let l=document.getElementById('fireLevel').innerText;
-  localStorage.setItem("fireData",JSON.stringify({pos:p,lev:l,time:new Date().toLocaleString()}));
-  document.getElementById('fireInfo').style.display='none';
-  document.getElementById('errorTip').style.display='none';
-  document.getElementById('successTip').style.display='block';
-}
-
-function cancelWarn(){
-  document.getElementById('fireInfo').style.display='none';
-  document.getElementById('successTip').style.display='none';
-  document.getElementById('errorTip').style.display='block';
-}
-
-function goBack(){
-  document.getElementById('successTip').style.display='none';
-  document.getElementById('fireLevel').innerText=getRandomLevel();
-  document.getElementById('fireInfo').style.display='block';
-}
-
-function backNormal(){
-  document.getElementById('errorTip').style.display='none';
-  document.getElementById('fireLevel').innerText=getRandomLevel();
-  document.getElementById('fireInfo').style.display='block';
-}
-
-function allReset(){
-  document.getElementById('fireInfo').style.display='none';
-  document.getElementById('successTip').style.display='none';
-  document.getElementById('errorTip').style.display='none';
-  document.getElementById('monitorBox').classList.remove('focus');
-  document.querySelectorAll('.monitor-screen').forEach(i=>i.classList.remove('main','gray'));
-}
-
-function openPop(){document.getElementById('popMask').style.display='block';}
-function closePop(){document.getElementById('popMask').style.display='none';}
-
-function submitMan(){
-  let p=document.getElementById('placeSel').value;
-  let l=document.getElementById('levelSel').value;
-  if(!p||!l)return alert("请选择完整信息");
-  focusCamera(p);
-  document.getElementById('firePlace').innerText=p;
-  document.getElementById('fireLevel').innerText=l;
-  closePop();
-  document.getElementById('fireInfo').style.display='block';
-}
-</script>
+                <!-- 室外疏散通道 -->
+                <div class="monitor-card" style="grid-column:1 / -1;">
+                    <div class="header">
+                        <span class="name">室外疏散通道</span>
+                        <span class="status">在线监测</span>
+                    </div>
+                    <div class="placeholder-box" style="height:50px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

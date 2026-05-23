@@ -65,290 +65,56 @@
             animation: flash 1s infinite;
         }
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 8px; height: 8px;
             border-radius: 50%;
             box-shadow: 0 0 8px currentColor;
             animation: blink 1.5s infinite;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        @keyframes flash {
-            0%,100%{opacity:1;}
-            50%{opacity:0.3;}
-        }
+        @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.5;} }
+        @keyframes flash {0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-        .alarm-modal{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .alarm-box{
-            background: linear-gradient(145deg, #2b1010, #441818);
-            border: 2px solid #ff4444;
-            border-radius: 15px;
-            width: 500px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 0 30px #ff4444;
-        }
-        .alarm-box h2{
-            color: #ff4444;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        .alarm-box p{
-            font-size: 18px;
-            line-height: 2;
-            color: #fff;
-        }
-        .jump-btn{
-            margin-top: 30px;
-            padding: 15px 40px;
-            background: #ff4444;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .jump-btn:hover{
-            background: #dd2222;
-        }
+        .alarm-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;}
+        .alarm-box{background:linear-gradient(145deg,#2b1010,#441818);border:2px solid #ff4444;border-radius:15px;width:500px;padding:40px 30px;text-align:center;box-shadow:0 0 30px #ff4444;}
+        .alarm-box h2{color:#ff4444;font-size:28px;margin-bottom:20px;}
+        .alarm-box p{font-size:18px;line-height:2;color:#fff;}
+        .jump-btn{margin-top:30px;padding:15px 40px;background:#ff4444;color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;}
+        .jump-btn:hover{background:#dd2222;}
 
-        .main-container {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-        }
+        .main-container{flex:1;padding:25px;overflow-y:auto;}
+        .layout-wrap{display:flex;gap:20px;width:100%;}
+        .monitor-name-sidebar{width:220px;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:15px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
+        .monitor-name-sidebar h4{font-size:16px;color:#4dd0e1;margin-bottom:12px;text-align:center;}
+        .monitor-name-item{font-size:17px;padding:12px 10px;margin-bottom:8px;color:#eee;background:#080e1b;border-radius:8px;cursor:pointer;transition:0.2s;}
+        .monitor-name-item:hover{background:#142544;}
+        .monitor-name-item.active{background:#2986cc;color:#fff;font-weight:bold;}
 
-        .layout-wrap{
-            display:flex;
-            gap:20px;
-            width:100%;
-        }
-        .monitor-name-sidebar{
-            width:220px;
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 12px;
-            padding:15px;
-            border: 1px solid #1f3a6b;
-            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
-        }
-        .monitor-name-sidebar h4{
-            font-size:16px;
-            color:#4dd0e1;
-            margin-bottom:12px;
-            text-align:center;
-        }
-        .monitor-name-item{
-            font-size:17px;
-            padding:12px 10px;
-            margin-bottom:8px;
-            color:#eee;
-            background:#080e1b;
-            border-radius:8px;
-            cursor:pointer;
-            transition:0.2s;
-        }
-        .monitor-name-item:hover{
-            background:#142544;
-        }
-        .monitor-name-item.active{
-            background:#2986cc;
-            color:#fff;
-            font-weight:bold;
-        }
+        .monitor-section{flex:1;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:20px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
+        .monitor-card{width:100%;aspect-ratio:16/9;background:#080e1b;border:1px solid #1f3a6b;border-radius:8px;overflow:hidden;box-shadow:0 0 15px rgba(0,100,255,0.1);transition:all 0.3s;position:relative;}
+        .monitor-status{position:absolute;right:12px;top:12px;width:10px;height:10px;background:#4ade80;border-radius:50%;box-shadow:0 0 5px #4ade80;}
+        .monitor-status.danger{background:#ff4444;box-shadow:0 0 5px #ff4444;}
+        .monitor-screen{width:100%;height:100%;background:#050d1b;position:relative;}
+        .monitor-screen.warn-bg{background:#1a0808;}
+        .monitor-video{width:100%;height:100%;object-fit:cover;}
+        .page-btn-group{margin-top:15px;display:flex;justify-content:center;gap:15px;}
+        .page-btn{padding:8px 22px;background:linear-gradient(135deg,#2986cc,#40a9ff);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:15px;}
+        .page-btn:disabled{background:#444;cursor:not-allowed;}
 
-        .monitor-section {
-            flex:1;
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #1f3a6b;
-            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
-        }
-        .monitor-card {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #080e1b;
-            border: 1px solid #1f3a6b;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 100, 255, 0.1);
-            transition: all 0.3s;
-            position: relative;
-        }
-        .monitor-status {
-            position: absolute;
-            right: 12px;
-            top: 12px;
-            width: 10px;
-            height: 10px;
-            background: #4ade80;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #4ade80;
-        }
-        .monitor-status.danger{
-            background:#ff4444;
-            box-shadow:0 0 5px #ff4444;
-        }
-        .monitor-screen {
-            width: 100%;
-            height: 100%;
-            background: #050d1b;
-            position: relative;
-        }
-        .monitor-screen.warn-bg{
-            background:#1a0808;
-        }
-        .monitor-video{
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        .page-btn-group{
-            margin-top:15px;
-            display:flex;
-            justify-content:center;
-            gap:15px;
-        }
-        .page-btn{
-            padding:8px 22px;
-            background:linear-gradient(135deg,#2986cc,#40a9ff);
-            border:none;
-            border-radius:6px;
-            color:#fff;
-            cursor:pointer;
-            font-size:15px;
-        }
-        .page-btn:disabled{
-            background:#444;
-            cursor:not-allowed;
-        }
-
-        .report-section {
-            margin-top:20px;
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #1f3a6b;
-            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
-        }
-        .section-title {
-            font-size: 18px;
-            color: #4dd0e1;
-            font-weight: 500;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .report-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .form-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .form-item-full{
-            grid-column: span 2;
-        }
-        .form-label {
-            font-size: 14px;
-            color: #a5b4d3;
-        }
-        .form-select,.form-textarea {
-            background: #080e1b;
-            border: 1px solid #2a4b8d;
-            border-radius: 6px;
-            padding: 10px;
-            color: #fff;
-            outline: none;
-        }
-        .form-textarea {
-            resize: none;
-        }
-
-        <!-- 火情方案展示区域样式 -->
-        .plan-box{
-            grid-column: span 2;
-            background:#080e1b;
-            border:1px solid #2a4b8d;
-            border-radius:6px;
-            padding:15px;
-            line-height:1.8;
-            font-size:14px;
-            color:#e0eaff;
-        }
-        .plan-box h4{
-            color:#4dd0e1;
-            margin-bottom:8px;
-            font-size:15px;
-        }
-
-        .btn-group{
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:12px;
-            grid-column:span 2;
-            margin-top:8px;
-        }
-        .btn-verify{
-            padding: 12px;
-            background: linear-gradient(135deg,#2986cc,#40a9ff);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-reject{
-            padding: 12px;
-            background: linear-gradient(135deg,#996633,#cc8844);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-start-plan{
-            padding: 12px;
-            background: linear-gradient(135deg,#e64340,#ff7875);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-reset{
-            padding: 12px;
-            background: linear-gradient(135deg,#555,#777);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        button:disabled{
-            background:#444;
-            cursor:not-allowed;
-            opacity:0.7;
-        }
+        .report-section{margin-top:20px;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:20px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
+        .section-title{font-size:18px;color:#4dd0e1;font-weight:500;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+        .report-form{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+        .form-item{display:flex;flex-direction:column;gap:6px;}
+        .form-item-full{grid-column:span 2;}
+        .form-label{font-size:14px;color:#a5b4d3;}
+        .form-select,.form-textarea{background:#080e1b;border:1px solid #2a4b8d;border-radius:6px;padding:10px;color:#fff;outline:none;}
+        .form-textarea{resize:none;}
+        .plan-box{grid-column:span 2;background:#080e1b;border:1px solid #2a4b8d;border-radius:6px;padding:15px;line-height:1.8;font-size:14px;color:#e0eaff;}
+        .plan-box h4{color:#4dd0e1;margin-bottom:8px;font-size:15px;}
+        .btn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;grid-column:span 2;margin-top:8px;}
+        .btn-verify{padding:12px;background:linear-gradient(135deg,#2986cc,#40a9ff);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
+        .btn-reject{padding:12px;background:linear-gradient(135deg,#996633,#cc8844);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
+        .btn-start-plan{padding:12px;background:linear-gradient(135deg,#e64340,#ff7875);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
+        .btn-reset{padding:12px;background:linear-gradient(135deg,#555,#777);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
+        button:disabled{background:#444;cursor:not-allowed;opacity:0.7;}
     </style>
 </head>
 <body>
@@ -364,7 +130,7 @@
 </div>
 
 <div class="top-header">
-    <button class="back-btn" onclick="location.href='login.html'">返回登录页</button>
+    <button class="back-btn" onclick="location.href='../login.html'">返回登录页</button>
     <div class="header-title">校园监控及上报平台</div>
     <div class="status-indicator" id="systemStatus">
         <div class="status-dot"></div>
@@ -383,7 +149,7 @@
             <div class="monitor-card" id="monitorCard">
                 <div class="monitor-status" id="monitorStatus"></div>
                 <div class="monitor-screen" id="monitorScreen">
-                    <video class="monitor-video" id="monitorVideo" muted loop autoplay></video>
+                    <video class="monitor-video" id="monitorVideo" muted loop autoplay controls></video>
                 </div>
             </div>
             <div class="page-btn-group">
@@ -416,13 +182,11 @@
                 </select>
             </div>
 
-            <!-- 原：现场情况描述 → 已改成：应急预案 -->
             <div class="form-item form-item-full">
                 <label class="form-label">应急预案</label>
                 <textarea class="form-textarea" id="fireDesc" rows="3" placeholder="填写对应火情应急补充说明"></textarea>
             </div>
 
-            <!-- 动态展示对应等级的处置方案（你给的原版文案） -->
             <div class="form-item-full plan-box" id="planBox">
                 <h4>二级中度火情处置方案</h4>
                 <p>1.火势具备蔓延趋势，系统升级预警等级，暂停事发区域教学活动<br/>
@@ -450,12 +214,12 @@
         "宿舍楼楼道监控"
     ];
     const videoSrcArr = [
-        "your-video.mp4",
-        "shiyanshi.mp4",
-        "shitang.mp4",
-        "jiaoshi.mp4",
-        "chuwujian.mp4",
-        "sushe.mp4"
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shitang.mp4",
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/jiaoshi.mp4",
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/chuwujian.mp4",
+        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/sushe.mp4"
     ];
     const alarmIndex = 2;
     let currentPage = 0;
@@ -466,7 +230,6 @@
     const verifyBtn = document.getElementById('verifyBtn');
     const rejectBtn = document.getElementById('rejectBtn');
 
-    // 三级预案内容（完全使用你提供的文案）
     const planData = {
         1:{
             title:"一级轻度火情处置方案",
@@ -482,7 +245,6 @@
         }
     };
 
-    // 切换等级自动更换预案
     function changePlan(){
         let level = document.getElementById("fireLevel").value;
         document.getElementById("planBox").innerHTML = `<h4>${planData[level].title}</h4><p>${planData[level].content}</p>`;

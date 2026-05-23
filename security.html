@@ -2,274 +2,580 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>校园火灾智能安防监控系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园监控及上报平台</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
         body {
-            background-color: #0b1020;
+            background: #050d1b;
             color: #fff;
-        }
-        /* 顶部导航 */
-        .top-bar {
-            height: 50px;
-            background-color: #10254a;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 150, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(0, 150, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .top-header {
+            background: linear-gradient(90deg, #0a1427, #0d1b36);
+            padding: 15px 30px;
+            border-bottom: 1px solid #1f3a6b;
+            box-shadow: 0 0 20px rgba(0, 100, 255, 0.2);
+            display: flex;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            border-bottom: 1px solid rgba(0, 180, 255, 0.3);
-        }
-        .top-bar .title {
-            color: #00d4ff;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .top-bar .right-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .top-bar .status {
-            color: #fff;
-        }
-        .top-bar .login-btn {
-            background-color: #0099ff;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        /* 整体布局 */
-        .container {
-            display: flex;
-        }
-
-        /* 左侧导航 */
-        .sidebar {
-            width: 100px;
-            background-color: #0b152b;
-            height: calc(100vh - 50px);
-            border-right: 1px solid rgba(0, 180, 255, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar .menu-item {
-            display: block;
-            padding: 12px 15px;
-            color: #a0d8ff;
-            text-decoration: none;
-            font-size: 15px;
-            margin-bottom: 5px;
-        }
-        .sidebar .menu-item.active {
-            background-color: rgba(0, 150, 220, 0.2);
-            color: #00d4ff;
-            border-left: 2px solid #00d4ff;
-        }
-
-        /* 主内容区 */
-        .main-content {
-            flex: 1;
-            padding: 15px;
-        }
-
-        /* 火情预警栏 */
-        .fire-alert {
-            background-color: #2b1520;
-            border: 1px solid rgba(255, 80, 80, 0.3);
-            border-radius: 4px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .fire-alert p {
-            margin: 5px 0;
-        }
-        .fire-alert .btn-group {
-            margin-top: 10px;
-        }
-        .fire-alert .btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-            margin: 0 5px;
-            cursor: pointer;
-        }
-        .fire-alert .btn.confirm {
-            background-color: #00b866;
-            color: #fff;
-        }
-        .fire-alert .btn.false {
-            background-color: #666;
-            color: #fff;
-        }
-
-        /* 全域监控布局 */
-        .monitor-area {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
-        }
-        .monitor-card {
-            background-color: #0b152b;
-            border: 1px solid rgba(0, 180, 255, 0.2);
-            border-radius: 6px;
-            padding: 10px;
             position: relative;
         }
-        /* 火情监控卡片红色边框 */
-        .monitor-card.fire-active {
-            border: 1px solid rgba(255, 80, 80, 0.6);
-            box-shadow: 0 0 10px rgba(255, 80, 80, 0.3);
+        .back-btn{
+            position: absolute;
+            left:20px;
+            top:50%;
+            transform: translateY(-50%);
+            padding:6px 14px;
+            background:linear-gradient(135deg,#2986cc,#40a9ff);
+            border:none;
+            border-radius:6px;
+            color:#fff;
+            cursor:pointer;
+            font-size:14px;
         }
-        .monitor-card .header {
+        .back-btn:hover{
+            box-shadow:0 0 10px #2070ff60;
+        }
+        .header-title {
+            font-size: 22px;
+            color: #4dd0e1;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(77, 208, 225, 0.5);
+            letter-spacing: 2px;
+        }
+        .status-indicator {
+            position: absolute;
+            right: 30px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 13px;
+            align-items: center;
+            gap: 8px;
+            color: #4ade80;
+            font-size: 14px;
         }
-        .monitor-card .name {
-            color: #00d4ff;
-            background-color: rgba(0, 150, 220, 0.15);
-            padding: 3px 8px;
-            border-radius: 3px;
+        .alarm-status{
+            color:#ff4444;
+            animation: flash 1s infinite;
         }
-        .monitor-card .status {
-            color: #ff6666;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+            animation: blink 1.5s infinite;
         }
-        /* 视频框 */
-        .video-box {
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes flash {
+            0%,100%{opacity:1;}
+            50%{opacity:0.3;}
+        }
+
+        .alarm-modal{
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 180px;
-            background-color: #1a2035;
-            border-radius: 4px;
-            overflow: hidden;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .video-box video {
+        .alarm-box{
+            background: linear-gradient(145deg, #2b1010, #441818);
+            border: 2px solid #ff4444;
+            border-radius: 15px;
+            width: 500px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 0 30px #ff4444;
+        }
+        .alarm-box h2{
+            color: #ff4444;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .alarm-box p{
+            font-size: 18px;
+            line-height: 2;
+            color: #fff;
+        }
+        .jump-btn{
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .jump-btn:hover{
+            background: #dd2222;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .layout-wrap{
+            display:flex;
+            gap:20px;
+            width:100%;
+        }
+        .monitor-name-sidebar{
+            width:220px;
+            background: linear-gradient(145deg, #0a1427, #0d1b36);
+            border-radius: 12px;
+            padding:15px;
+            border: 1px solid #1f3a6b;
+            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
+        }
+        .monitor-name-sidebar h4{
+            font-size:16px;
+            color:#4dd0e1;
+            margin-bottom:12px;
+            text-align:center;
+        }
+        .monitor-name-item{
+            font-size:17px;
+            padding:12px 10px;
+            margin-bottom:8px;
+            color:#eee;
+            background:#080e1b;
+            border-radius:8px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .monitor-name-item:hover{
+            background:#142544;
+        }
+        .monitor-name-item.active{
+            background:#2986cc;
+            color:#fff;
+            font-weight:bold;
+        }
+
+        .monitor-section {
+            flex:1;
+            background: linear-gradient(145deg, #0a1427, #0d1b36);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1f3a6b;
+            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
+        }
+        .monitor-card {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #080e1b;
+            border: 1px solid #1f3a6b;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 100, 255, 0.1);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .monitor-status {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #4ade80;
+        }
+        .monitor-status.danger{
+            background:#ff4444;
+            box-shadow:0 0 5px #ff4444;
+        }
+        .monitor-screen {
+            width: 100%;
+            height: 100%;
+            background: #050d1b;
+            position: relative;
+        }
+        .monitor-screen.warn-bg{
+            background:#1a0808;
+        }
+        .monitor-video{
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: none;
         }
-        /* 占位框 */
-        .placeholder-box {
-            width: 100%;
-            height: 100%;
-            background-color: #2a3045;
-            border-radius: 4px;
+        .page-btn-group{
+            margin-top:15px;
+            display:flex;
+            justify-content:center;
+            gap:15px;
+        }
+        .page-btn{
+            padding:8px 22px;
+            background:linear-gradient(135deg,#2986cc,#40a9ff);
+            border:none;
+            border-radius:6px;
+            color:#fff;
+            cursor:pointer;
+            font-size:15px;
+        }
+        .page-btn:disabled{
+            background:#444;
+            cursor:not-allowed;
         }
 
-        /* 右侧运行状态 */
-        .status-panel {
-            background-color: #0b152b;
-            border: 1px solid rgba(0, 180, 255, 0.2);
-            border-radius: 6px;
-            padding: 15px;
+        .report-section {
+            margin-top:20px;
+            background: linear-gradient(145deg, #0a1427, #0d1b36);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1f3a6b;
+            box-shadow: 0 4px 20px rgba(0, 100, 255, 0.15);
         }
-        .status-panel h3 {
-            color: #00d4ff;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(0, 180, 255, 0.2);
-            padding-bottom: 5px;
+        .section-title {
+            font-size: 18px;
+            color: #4dd0e1;
+            font-weight: 500;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .status-panel p {
-            margin: 8px 0;
+        .report-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-item-full{
+            grid-column: span 2;
+        }
+        .form-label {
             font-size: 14px;
+            color: #a5b4d3;
+        }
+        .form-select,.form-textarea {
+            background: #080e1b;
+            border: 1px solid #2a4b8d;
+            border-radius: 6px;
+            padding: 10px;
+            color: #fff;
+            outline: none;
+        }
+        .form-textarea {
+            resize: none;
+        }
+
+        <!-- 火情方案展示区域样式 -->
+        .plan-box{
+            grid-column: span 2;
+            background:#080e1b;
+            border:1px solid #2a4b8d;
+            border-radius:6px;
+            padding:15px;
+            line-height:1.8;
+            font-size:14px;
+            color:#e0eaff;
+        }
+        .plan-box h4{
+            color:#4dd0e1;
+            margin-bottom:8px;
+            font-size:15px;
+        }
+
+        .btn-group{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:12px;
+            grid-column:span 2;
+            margin-top:8px;
+        }
+        .btn-verify{
+            padding: 12px;
+            background: linear-gradient(135deg,#2986cc,#40a9ff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-reject{
+            padding: 12px;
+            background: linear-gradient(135deg,#996633,#cc8844);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-start-plan{
+            padding: 12px;
+            background: linear-gradient(135deg,#e64340,#ff7875);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-reset{
+            padding: 12px;
+            background: linear-gradient(135deg,#555,#777);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:disabled{
+            background:#444;
+            cursor:not-allowed;
+            opacity:0.7;
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
-    <div class="top-bar">
-        <div class="title">校园火灾智能安防监控系统</div>
-        <div class="right-info">
-            <span class="status">运行正常</span>
-            <button class="login-btn">返回登录</button>
-        </div>
+
+<div class="alarm-modal" id="alarmModal">
+    <div class="alarm-box">
+        <h2>⚠️ AI检测到火情</h2>
+        <p>事发地点：食堂后厨监控</p>
+        <p>火情状态：明火燃烧</p>
+        <p>危险等级：二级一般火情</p>
+        <button class="jump-btn" onclick="jumpToAlarmMonitor()">跳转到事发地监控</button>
     </div>
+</div>
 
-    <div class="container">
-        <!-- 左侧导航栏 -->
-        <div class="sidebar">
-            <a href="#" class="menu-item active">监控大厅</a>
-            <a href="#" class="menu-item">火情预警</a>
-            <a href="#" class="menu-item">设备状态</a>
-            <a href="#" class="menu-item">值班日志</a>
+<div class="top-header">
+    <button class="back-btn" onclick="location.href='login.html'">返回登录页</button>
+    <div class="header-title">校园监控及上报平台</div>
+    <div class="status-indicator" id="systemStatus">
+        <div class="status-dot"></div>
+        <span>AI智能监控正常运行</span>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="layout-wrap">
+        <div class="monitor-name-sidebar">
+            <h4>监控点位</h4>
+            <div id="nameListWrap"></div>
         </div>
 
-        <!-- 主内容区 -->
-        <div class="main-content">
-            <!-- 火情预警栏 -->
-            <div class="fire-alert">
-                <p>系统检测火情信号</p>
-                <p>起火位置：一号教学楼二层教室</p>
-                <p>危险等级：2级：中度火情</p>
-                <div class="btn-group">
-                    <button class="btn confirm">已核实确认火情</button>
-                    <button class="btn false">火情误报</button>
+        <div class="monitor-section">
+            <div class="monitor-card" id="monitorCard">
+                <div class="monitor-status" id="monitorStatus"></div>
+                <div class="monitor-screen" id="monitorScreen">
+                    <video class="monitor-video" id="monitorVideo" muted loop autoplay></video>
                 </div>
             </div>
-
-            <h3 style="color:#00d4ff; margin-bottom:10px;">全域实时监控</h3>
-            <div class="monitor-area">
-                <!-- 一号教学楼（视频框） -->
-                <div class="monitor-card fire-active">
-                    <div class="header">
-                        <span class="name">一号教学楼</span>
-                        <span class="status">在线监测</span>
-                    </div>
-                    <div class="video-box">
-                        <!-- 这里是视频标签，替换src为你的视频路径即可 -->
-                        <video src="your-video.mp4" autoplay muted loop playsinline>
-                            您的浏览器不支持视频播放
-                        </video>
-                    </div>
-                </div>
-
-                <!-- 右侧区域 -->
-                <div style="display:flex; flex-direction:column; gap:15px;">
-                    <!-- 二号教学楼 -->
-                    <div class="monitor-card">
-                        <div class="header">
-                            <span class="name">二号教学楼</span>
-                            <span class="status">在线监测</span>
-                        </div>
-                        <div class="placeholder-box" style="height:80px;"></div>
-                    </div>
-
-                    <!-- 校园食堂 -->
-                    <div class="monitor-card">
-                        <div class="header">
-                            <span class="name">校园食堂</span>
-                            <span class="status">在线监测</span>
-                        </div>
-                        <div class="placeholder-box" style="height:80px;"></div>
-                    </div>
-
-                    <!-- 运行状态 -->
-                    <div class="status-panel">
-                        <h3>运行状态</h3>
-                        <p>监控设备：全部在线</p>
-                        <p>传感模块：正常启用</p>
-                        <p>数据状态：待人工核实推送</p>
-                    </div>
-                </div>
-
-                <!-- 室外疏散通道 -->
-                <div class="monitor-card" style="grid-column:1 / -1;">
-                    <div class="header">
-                        <span class="name">室外疏散通道</span>
-                        <span class="status">在线监测</span>
-                    </div>
-                    <div class="placeholder-box" style="height:50px;"></div>
-                </div>
+            <div class="page-btn-group">
+                <button class="page-btn" id="prevBtn" onclick="prevPage()">上一页</button>
+                <button class="page-btn" id="nextBtn" onclick="nextPage()">下一页</button>
             </div>
         </div>
     </div>
+
+    <div class="report-section">
+        <div class="section-title">火情核查、人工上报与应急处置</div>
+        <div class="report-form">
+            <div class="form-item">
+                <label class="form-label">事发位置</label>
+                <select class="form-select" id="firePos">
+                    <option>教学楼楼道区域监控</option>
+                    <option>实验室监控</option>
+                    <option>食堂后厨监控</option>
+                    <option>教室监控</option>
+                    <option>储物间监控</option>
+                    <option>宿舍楼楼道监控</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label">火情等级</label>
+                <select class="form-select" id="fireLevel" onchange="changePlan()">
+                    <option value="1">一级轻微火情</option>
+                    <option value="2" selected>二级一般火情</option>
+                    <option value="3">三级重大火情</option>
+                </select>
+            </div>
+
+            <!-- 原：现场情况描述 → 已改成：应急预案 -->
+            <div class="form-item form-item-full">
+                <label class="form-label">应急预案</label>
+                <textarea class="form-textarea" id="fireDesc" rows="3" placeholder="填写对应火情应急补充说明"></textarea>
+            </div>
+
+            <!-- 动态展示对应等级的处置方案（你给的原版文案） -->
+            <div class="form-item-full plan-box" id="planBox">
+                <h4>二级中度火情处置方案</h4>
+                <p>1.火势具备蔓延趋势，系统升级预警等级，暂停事发区域教学活动<br/>
+                2.安保团队协同控火，封闭周边通道，防止烟雾与火势向外扩散<br/>
+                3.为各个位置老师生成最佳疏散路线，随时根据指令准备局部人员疏散</p>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-verify" id="verifyBtn" onclick="confirmAlarm()">核实火情上报</button>
+                <button class="btn-reject" id="rejectBtn" onclick="cancelAlarm()">判定误报解除</button>
+                <button class="btn-start-plan" id="planBtn" onclick="manualReport()">手动提交上报记录</button>
+                <button class="btn-reset" onclick="resetForm()">重置表单状态</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const monitorList = [
+        "教学楼楼道区域监控",
+        "实验室监控",
+        "食堂后厨监控",
+        "教室监控",
+        "储物间监控",
+        "宿舍楼楼道监控"
+    ];
+    const videoSrcArr = [
+        "your-video.mp4",
+        "shiyanshi.mp4",
+        "shitang.mp4",
+        "jiaoshi.mp4",
+        "chuwujian.mp4",
+        "sushe.mp4"
+    ];
+    const alarmIndex = 2;
+    let currentPage = 0;
+    const videoEle = document.getElementById('monitorVideo');
+    const posSelect = document.getElementById('firePos');
+    const nameListWrap = document.getElementById('nameListWrap');
+    const alarmModal = document.getElementById('alarmModal');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+
+    // 三级预案内容（完全使用你提供的文案）
+    const planData = {
+        1:{
+            title:"一级轻度火情处置方案",
+            content:"1.智能监控识别轻微火情隐患，仅触发局部预警，不启动全校警报<br/>2.安保人员立即前往事发点位，取用就近灭火器、消防栓开展初期灭火<br/>3.实时监控火势变化，阻断火源扩散，周边区域人员正常待命<br/>4.火情扑灭后核查现场，确认无复燃风险，记录隐患信息存档"
+        },
+        2:{
+            title:"二级中度火情处置方案",
+            content:"1.火势具备蔓延趋势，系统升级预警等级，暂停事发区域教学活动<br/>2.安保团队协同控火，封闭周边通道，防止烟雾与火势向外扩散<br/>3.为各个位置老师生成最佳疏散路线，随时根据指令准备局部人员疏散"
+        },
+        3:{
+            title:"三级重度火情处置方案",
+            content:"1.火势无法人为控制，立刻触发全校应急警报，终止所有校内活动<br/>2.为各班级教师生成疏散路线，带领学生弯腰捂口鼻有序撤离<br/>3.全员快速撤离至室外操场安全集结点，教师清点本班人数并上报<br/>4.校领导统筹现场救援，同步联系消防部门，配合专业人员开展灭火救援<br/>5.排查教学楼剩余滞留人员，全程把控现场秩序，杜绝二次安全事故"
+        }
+    };
+
+    // 切换等级自动更换预案
+    function changePlan(){
+        let level = document.getElementById("fireLevel").value;
+        document.getElementById("planBox").innerHTML = `<h4>${planData[level].title}</h4><p>${planData[level].content}</p>`;
+    }
+
+    function renderNameList(){
+        nameListWrap.innerHTML = "";
+        monitorList.forEach((name,idx)=>{
+            const item = document.createElement("div");
+            item.className = "monitor-name-item";
+            item.innerText = name;
+            item.onclick = ()=>{
+                currentPage = idx;
+                renderMonitor();
+            };
+            nameListWrap.appendChild(item);
+        });
+    }
+
+    window.onload = function(){
+        renderNameList();
+        posSelect.value = monitorList[alarmIndex];
+        document.getElementById("fireLevel").value = 2;
+        changePlan();
+        document.getElementById("fireDesc").value = "监控画面发现明火燃烧，存在蔓延风险，需立即启动对应等级应急处置流程";
+        document.getElementById("monitorStatus").classList.add("danger");
+        document.getElementById("monitorScreen").classList.add("warn-bg");
+        verifyBtn.disabled = false;
+        rejectBtn.disabled = false;
+        renderMonitor();
+    }
+
+    function jumpToAlarmMonitor(){
+        currentPage = alarmIndex;
+        renderMonitor();
+        alarmModal.style.display = "none";
+    }
+
+    function renderMonitor(){
+        const items = nameListWrap.querySelectorAll(".monitor-name-item");
+        items.forEach((it,idx)=>{
+            it.classList.toggle("active", idx === currentPage);
+        });
+        posSelect.value = monitorList[currentPage];
+        document.getElementById("prevBtn").disabled = currentPage === 0;
+        document.getElementById("nextBtn").disabled = currentPage === monitorList.length - 1;
+
+        const src = videoSrcArr[currentPage];
+        if(src){
+            videoEle.src = src;
+            videoEle.style.display = "block";
+        }else{
+            videoEle.style.display = "none";
+        }
+    }
+
+    function prevPage(){
+        if(currentPage > 0){
+            currentPage--;
+            renderMonitor();
+        }
+    }
+    function nextPage(){
+        if(currentPage < monitorList.length - 1){
+            currentPage++;
+            renderMonitor();
+        }
+    }
+
+    function confirmAlarm(){
+        alert("已上报校领导并启动应急预案，相关处置指令下发执行");
+        verifyBtn.disabled = true;
+        rejectBtn.disabled = true;
+    }
+    function cancelAlarm(){
+        alert("已判定为AI误报，火情告警解除，恢复常规监控");
+        verifyBtn.disabled = true;
+        rejectBtn.disabled = true;
+        document.getElementById("monitorStatus").classList.remove("danger");
+        document.getElementById("monitorScreen").classList.remove("warn-bg");
+    }
+    function manualReport(){
+        let area = document.getElementById("firePos").value;
+        let level = document.getElementById("fireLevel").options[document.getElementById("fireLevel").selectedIndex].text;
+        alert(`已保存${area}${level}上报记录，存档完成`);
+    }
+    function resetForm(){
+        document.getElementById("fireDesc").value = "";
+        verifyBtn.disabled = false;
+        rejectBtn.disabled = false;
+        alert("表单与操作状态已重置，可重新核查上报");
+    }
+</script>
+
 </body>
 </html>

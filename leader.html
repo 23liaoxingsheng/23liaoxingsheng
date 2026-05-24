@@ -259,12 +259,44 @@
             color:#ffb400;
         }
 
+        /* 应急指令优化样式 */
         .command-wrap {
             background: linear-gradient(145deg, #0a1427, #0d1b36);
             border-radius: 10px;
             padding: 20px;
             border: 1px solid #1f3a6b;
             height: 100%;
+            display: grid;
+            grid-template-columns: 280px 1fr 260px;
+            gap: 20px;
+        }
+        .cmd-left-panel{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .cmd-middle-panel{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .cmd-right-panel{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .cmd-block{
+            background:#080e1b;
+            border:1px solid #1f3a6b;
+            border-radius:8px;
+            padding:15px;
+        }
+        .cmd-block h4{
+            color:#4dd0e1;
+            margin-bottom:12px;
+            font-size:15px;
+            border-bottom:1px solid #1f3a6b;
+            padding-bottom:8px;
         }
         .alert-bar {
             background: rgba(255, 180, 0, 0.15);
@@ -272,23 +304,36 @@
             border-radius: 6px;
             padding: 10px;
             color: #ffd042;
-            margin-bottom: 15px;
+        }
+        .template-item{
+            padding:8px 10px;
+            background:#10254b;
+            border-radius:4px;
+            margin-bottom:8px;
+            cursor:pointer;
+            font-size:14px;
+        }
+        .template-item:hover{
+            background:#1a3b7a;
+        }
+        .check-item{
+            margin:8px 0;
+            font-size:14px;
         }
         .command-content {
             background: #080e1b;
             border-radius: 6px;
             padding: 15px;
             border: 1px solid #1f3a6b;
-            margin-bottom: 15px;
             line-height: 1.8;
             color: #d0e8ff;
             font-size: 14px;
-            min-height:120px;
+            flex:1;
+            resize:none;
         }
         .cmd-select-area{
             display:flex;
             gap:15px;
-            margin-bottom:15px;
         }
         .cmd-select-area select{
             padding:8px 12px;
@@ -318,18 +363,32 @@
             background: #333;
             color: #fff;
         }
+        .btn-command.orange{
+            background:linear-gradient(135deg,#ff9500,#ffb400);
+            color:#fff;
+        }
         .dispatch-log{
-            margin-top:20px;
-            background:#080e1b;
-            border-radius:6px;
-            padding:12px;
-            border:1px solid #1f3a6b;
+            flex:1;
+            overflow-y:auto;
         }
         .log-item{
             font-size:13px;
             color:#a0c8ff;
-            padding:4px 0;
+            padding:8px 0;
             border-bottom:1px solid #1f3a6b;
+        }
+        .progress-line{
+            width:100%;
+            height:8px;
+            background:#10254b;
+            border-radius:4px;
+            margin:10px 0;
+        }
+        .progress-fill{
+            height:100%;
+            width:65%;
+            background:#4cd964;
+            border-radius:4px;
         }
 
         .progress-container{
@@ -378,6 +437,7 @@
             transition:all 0.8s ease;
         }
 
+        /* 修复弹窗样式 */
         .alarm-modal {
             position: fixed;
             top: 0;
@@ -388,40 +448,62 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999;
+            z-index: 9999; /* 提高层级，防止被遮挡 */
         }
         .alarm-box {
-            background: linear-gradient(145deg, #0d1b36, #1a3b7a);
-            border: 1px solid #ff4444;
+            background: linear-gradient(145deg, #1a3b7a, #0d2450);
+            border: 2px solid #ff4444;
             border-radius: 10px;
-            width: 350px;
+            width: 400px;
             padding: 30px;
-            box-shadow: 0 0 30px #ff444440;
+            box-shadow: 0 0 30px #ff444480;
+            position: relative;
+            z-index: 10000;
         }
         .alarm-title {
             color: #ff4444;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
         }
         .alarm-info {
-            line-height: 1.8;
-            color: #d0e8ff;
-            margin-bottom: 20px;
+            line-height: 2;
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 16px;
         }
         .btn-confirm {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: linear-gradient(135deg, #2986cc, #40a9ff);
             border: none;
             border-radius: 6px;
             color: #fff;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
+            z-index: 10001;
+        }
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #2070b0, #3388dd);
         }
     </style>
 </head>
 <body>
+    <!-- 修复弹窗 -->
+    <div class="alarm-modal" id="alarmModal">
+        <div class="alarm-box">
+            <div class="alarm-title">三级火情紧急告警</div>
+            <div class="alarm-info">
+                <p><strong>危险等级：</strong>三级火情</p>
+                <p><strong>起火地点：</strong>教学楼楼层区域</p>
+                <p><strong>现场情况：</strong>明火剧烈燃烧，浓烟快速扩散</p>
+                <p><strong>应急条件：</strong>校内消防器材可临时扑救，已申请外部救援</p>
+            </div>
+            <button class="btn-confirm" id="closeModalBtn">确认接收告警信息</button>
+        </div>
+    </div>
+
     <div class="top-header">
         <div class="title">校园火灾应急疏散管理系统 - 校领导端</div>
         <button class="back-btn" onclick="location.href='login.html'">返回登录页</button>
@@ -506,35 +588,71 @@
             </div>
         </div>
 
+        <!-- 应急指令页面 -->
         <div class="page-panel" id="page-command">
             <div class="page-title">应急指令智能调度中心</div>
             <div class="command-wrap">
-                <div class="alert-bar">【紧急预警：三级火情】教学楼楼层立即组织楼内人员分层有序撤离避险</div>
-                <div class="cmd-select-area">
-                    <select>
-                        <option>一级火情</option>
-                        <option>二级火情</option>
-                        <option selected>三级火情</option>
-                    </select>
-                    <select>
-                        <option>楼内授课师生</option>
-                        <option>楼层值班教职工</option>
-                        <option>现场救援安保队伍</option>
-                    </select>
+                <!-- 左侧：快捷指令模板+接收岗位 -->
+                <div class="cmd-left-panel">
+                    <div class="cmd-block">
+                        <h4>常用指令模板</h4>
+                        <div class="template-item" onclick="fillTemp(1)">全员紧急疏散指令</div>
+                        <div class="template-item" onclick="fillTemp(2)">现场灭火处置指令</div>
+                        <div class="template-item" onclick="fillTemp(3)">人员搜救排查指令</div>
+                        <div class="template-item" onclick="fillTemp(4)">外围警戒管控指令</div>
+                    </div>
+                    <div class="cmd-block">
+                        <h4>下发接收岗位</h4>
+                        <div class="check-item"><input type="checkbox" checked> 全体安保执勤人员</div>
+                        <div class="check-item"><input type="checkbox" checked> 各楼层值班教师</div>
+                        <div class="check-item"><input type="checkbox"> 后勤物资保障组</div>
+                        <div class="check-item"><input type="checkbox"> 医疗应急小组</div>
+                        <div class="check-item"><input type="checkbox"> 校门出入口管控岗</div>
+                    </div>
                 </div>
-                <div class="command-content" contenteditable="true">
-全体教学楼内人员保持冷静，听从现场指挥分层分批撤离，优先疏散低层人员，避开浓烟与明火区域，教职工负责引导本班学生有序离场，安保人员封堵危险楼层，严防人员折返。
+
+                <!-- 中间：指令编辑与操作区 -->
+                <div class="cmd-middle-panel">
+                    <div class="alert-bar">【紧急预警：三级火情】教学楼楼层立即组织楼内人员分层有序撤离避险</div>
+                    <div class="cmd-select-area">
+                        <select id="fireLevel">
+                            <option>一级火情</option>
+                            <option>二级火情</option>
+                            <option selected>三级火情</option>
+                        </select>
+                        <select id="targetArea">
+                            <option>教学楼全域</option>
+                            <option>实验室区域</option>
+                            <option>宿舍生活区</option>
+                        </select>
+                    </div>
+                    <textarea class="command-content" id="cmdText">全体教学楼内人员保持冷静，听从现场指挥分层分批撤离，优先疏散低层人员，避开浓烟与明火区域，教职工负责引导本班学生有序离场，安保人员封堵危险楼层，严防人员折返。</textarea>
+                    <div class="command-buttons">
+                        <button class="btn-command blue" onclick="sendOrder()">下发应急调度指令</button>
+                        <button class="btn-command grey" onclick="savePlan()">留存本次处置方案</button>
+                        <button class="btn-command grey" onclick="cancelOrder()">撤销已下发指令</button>
+                        <button class="btn-command orange" onclick="clearCmd()">清空编辑内容</button>
+                    </div>
                 </div>
-                <div class="command-buttons">
-                    <button class="btn-command blue" onclick="sendOrder()">下发应急调度指令</button>
-                    <button class="btn-command grey" onclick="savePlan()">留存本次处置方案</button>
-                    <button class="btn-command grey" onclick="cancelOrder()">撤销已下发指令</button>
-                </div>
-                <div class="dispatch-log">
-                    <h4 style="color:#4dd0e1;margin-bottom:8px;font-size:14px">应急指令下发记录</h4>
-                    <div class="log-item">2026-05-23 22:00 发布教学楼全员紧急疏散通知</div>
-                    <div class="log-item">2026-05-23 22:01 派遣安保队伍奔赴火场疏导人群</div>
-                    <div class="log-item">2026-05-23 22:02 向消防部门提交紧急救援申请</div>
+
+                <!-- 右侧：执行进度+操作日志 -->
+                <div class="cmd-right-panel">
+                    <div class="cmd-block">
+                        <h4>指令执行进度</h4>
+                        <div class="stat-item"><span>指令下发状态</span><span class="safe-text">已成功推送</span></div>
+                        <div class="stat-item"><span>已接收终端数</span><span>8/12台</span></div>
+                        <div class="stat-item"><span>现场执行进度</span></div>
+                        <div class="progress-line"><div class="progress-fill"></div></div>
+                        <div class="stat-item"><span>预计完成时长</span><span>8分钟</span></div>
+                    </div>
+                    <div class="cmd-block dispatch-log">
+                        <h4>实时操作日志</h4>
+                        <div class="log-item">2026-05-23 22:00 发布教学楼全员紧急疏散通知</div>
+                        <div class="log-item">2026-05-23 22:01 派遣安保队伍奔赴火场疏导人群</div>
+                        <div class="log-item">2026-05-23 22:02 向消防部门提交紧急救援申请</div>
+                        <div class="log-item">2026-05-23 22:03 医疗小组前往现场待命</div>
+                        <div class="log-item">2026-05-23 22:04 出入口通道完成封闭管控</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -576,7 +694,7 @@
 
         <div class="page-panel" id="page-record">
             <div class="page-title">校园火情应急处置历史台账</div>
-            <div class="command-wrap">
+            <div class="command-wrap" style="display:block">
                 <div class="stat-row">
                     <div class="stat-card">
                         <h4>年度演练整体概况</h4>
@@ -618,21 +736,7 @@
         </div>
     </div>
 
-    <div class="alarm-modal" id="alarmModal">
-        <div class="alarm-box">
-            <div class="alarm-title">三级火情紧急告警</div>
-            <div class="alarm-info">
-                <p><strong>危险等级：</strong>三级火情</p>
-                <p><strong>起火地点：</strong>教学楼楼层区域</p>
-                <p><strong>现场情况：</strong>明火剧烈燃烧，浓烟快速扩散</p>
-                <p><strong>应急条件：</strong>校内消防器材可临时扑救，已申请外部救援</p>
-            </div>
-            <button class="btn-confirm" id="closeModalBtn">确认接收告警信息</button>
-        </div>
-    </div>
-
     <script>
-        // 复用可播放视频地址
         const videoSrcArr = [
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
@@ -695,19 +799,33 @@
         }
         setInterval(updateTime, 1000);
 
-        // 弹窗操作
+        // 修复弹窗按钮事件
         const closeModalBtn = document.getElementById('closeModalBtn');
         const alarmModal = document.getElementById('alarmModal');
-        closeModalBtn.addEventListener('click',()=>{
+        closeModalBtn.addEventListener('click', function(){
             alarmModal.style.display = 'none';
-        })
+            alert("已确认接收三级火情告警信息！");
+        });
         document.getElementById('alarmBtn').addEventListener('click',()=>{
             alert("已同步启动三级火情全域应急处置预案！");
         });
 
-        // 应急指令按钮功能
+        // 指令模板填充
+        function fillTemp(type){
+            const txt = document.getElementById('cmdText');
+            if(type===1){
+                txt.value="立即组织教学楼全体师生有序撤离，远离起火楼层，严禁拥挤折返，各岗位人员即刻到岗疏导人流。";
+            }else if(type===2){
+                txt.value="安保消防小组携带灭火器材赶赴起火点位，优先压制明火，阻断火势蔓延，注意自身防护安全。";
+            }else if(type===3){
+                txt.value="分层逐间排查教室、走廊、楼梯间，确认有无滞留人员，发现被困立即开展搜救救助。";
+            }else{
+                txt.value="封锁起火建筑周边通道，禁止无关人员靠近，维护现场秩序，引导救援车辆通行。";
+            }
+        }
+        // 指令操作功能
         function sendOrder(){
-            alert("应急调度指令已成功下发至各岗位终端");
+            alert("应急调度指令已成功下发至勾选岗位终端");
         }
         function savePlan(){
             alert("当前处置方案已存档备份，可随时调取查看");
@@ -715,8 +833,11 @@
         function cancelOrder(){
             alert("已撤销下发指令，现场执行同步终止");
         }
+        function clearCmd(){
+            document.getElementById('cmdText').value="";
+        }
 
-        // 图表固定数据，保证正常显示
+        // 图表数据
         let totalPeople = 426;
         let safePeople = 148;
         let waitPeople = 265;

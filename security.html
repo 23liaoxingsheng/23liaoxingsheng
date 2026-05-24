@@ -130,7 +130,8 @@
 </div>
 
 <div class="top-header">
-    <button class="back-btn" onclick="location.href='../login.html'">返回登录页</button>
+    <!-- 这里我已经修好 → 跳回 index.html 登录页，不再404 -->
+    <button class="back-btn" onclick="location.href='index.html'">返回登录页</button>
     <div class="header-title">校园监控及上报平台</div>
     <div class="status-indicator" id="systemStatus">
         <div class="status-dot"></div>
@@ -197,7 +198,7 @@
             <div class="btn-group">
                 <button class="btn-verify" id="verifyBtn" onclick="confirmAlarm()">核实火情上报</button>
                 <button class="btn-reject" id="rejectBtn" onclick="cancelAlarm()">判定误报解除</button>
-                <button class="btn-start-plan" id="planBtn" onclick="manualReport()">手动提交上报记录</button>
+                <button class="btn-start-plan" onclick="manualReport()">手动提交上报记录</button>
                 <button class="btn-reset" onclick="resetForm()">重置表单状态</button>
             </div>
         </div>

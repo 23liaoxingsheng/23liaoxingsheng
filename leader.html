@@ -526,9 +526,9 @@
 全体教学楼内人员保持冷静，听从现场指挥分层分批撤离，优先疏散低层人员，避开浓烟与明火区域，教职工负责引导本班学生有序离场，安保人员封堵危险楼层，严防人员折返。
                 </div>
                 <div class="command-buttons">
-                    <button class="btn-command blue">下发应急调度指令</button>
-                    <button class="btn-command grey">留存本次处置方案</button>
-                    <button class="btn-command grey">撤销已下发指令</button>
+                    <button class="btn-command blue" onclick="sendOrder()">下发应急调度指令</button>
+                    <button class="btn-command grey" onclick="savePlan()">留存本次处置方案</button>
+                    <button class="btn-command grey" onclick="cancelOrder()">撤销已下发指令</button>
                 </div>
                 <div class="dispatch-log">
                     <h4 style="color:#4dd0e1;margin-bottom:8px;font-size:14px">应急指令下发记录</h4>
@@ -579,19 +579,39 @@
             <div class="command-wrap">
                 <div class="stat-row">
                     <div class="stat-card">
-                        <h4>历年应急演练次数</h4>
+                        <h4>年度演练整体概况</h4>
                         <div class="stat-item"><span>本年度组织演练</span><span>6次</span></div>
                         <div class="stat-item"><span>上季度实战演练</span><span>2次</span></div>
+                        <div class="stat-item"><span>上半年累计参与人次</span><span>2180人次</span></div>
+                        <div class="stat-item"><span>专职应急队员参训数</span><span>48人</span></div>
                     </div>
                     <div class="stat-card">
                         <h4>演练处置达标评价</h4>
                         <div class="stat-item"><span>处置流程合格场次</span><span class="safe-text">5场</span></div>
                         <div class="stat-item"><span>有待整改优化场次</span><span class="warn-text">1场</span></div>
+                        <div class="stat-item"><span>平均疏散完成时长</span><span>4分26秒</span></div>
+                        <div class="stat-item"><span>隐患整改完成率</span><span class="safe-text">92.3%</span></div>
                     </div>
                     <div class="stat-card">
                         <h4>演练场景类型划分</h4>
                         <div class="stat-item"><span>单体建筑火情演练</span><span>4次</span></div>
                         <div class="stat-item"><span>全校全域应急演练</span><span>2次</span></div>
+                        <div class="stat-item"><span>电气起火模拟场景</span><span>3次</span></div>
+                        <div class="stat-item"><span>杂物自燃模拟场景</span><span>3次</span></div>
+                    </div>
+                </div>
+                <div class="stat-row" style="margin-top:15px">
+                    <div class="stat-card">
+                        <h4>演练薄弱环节统计</h4>
+                        <div class="stat-item"><span>楼道拥堵疏导问题</span><span class="warn-text">出现2次</span></div>
+                        <div class="stat-item"><span>低年级学生行动迟缓</span><span class="warn-text">普遍存在</span></div>
+                        <div class="stat-item"><span>消防器材操作熟练度</span><span class="warn-text">有待提升</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>物资损耗与补给记录</h4>
+                        <div class="stat-item"><span>演练消耗灭火器材</span><span>12具</span></div>
+                        <div class="stat-item"><span>防护用品损耗数量</span><span>36套</span></div>
+                        <div class="stat-item"><span>下月计划增补物资</span><span class="safe-text">足额报备采购</span></div>
                     </div>
                 </div>
             </div>
@@ -612,7 +632,7 @@
     </div>
 
     <script>
-        // 复用可播放视频地址，和上报端一致
+        // 复用可播放视频地址
         const videoSrcArr = [
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
@@ -685,15 +705,26 @@
             alert("已同步启动三级火情全域应急处置预案！");
         });
 
-        // 图表数据
+        // 应急指令按钮功能
+        function sendOrder(){
+            alert("应急调度指令已成功下发至各岗位终端");
+        }
+        function savePlan(){
+            alert("当前处置方案已存档备份，可随时调取查看");
+        }
+        function cancelOrder(){
+            alert("已撤销下发指令，现场执行同步终止");
+        }
+
+        // 图表固定数据，保证正常显示
         let totalPeople = 426;
         let safePeople = 148;
         let waitPeople = 265;
         let stayPeople = 13;
         let timeArr = [0,2,4,6,8,10];
         let safeTrend = [0,32,59,91,124,148];
-        let areaLabel = ["一楼师生","二楼师生","三楼师生","四楼师生"];
-        let areaData = [41,38,36,33];
+        let areaLabel = ["一楼","二楼","三楼","四楼"];
+        let areaData = [36,42,35,38];
 
         let pieChart,barChart,lineChart;
         window.addEventListener('load',()=>{
@@ -711,7 +742,7 @@
             });
             barChart = new Chart(document.getElementById('barChart'),{
                 type:'bar',
-                data:{labels:areaLabel,datasets:[{label:'当前撤离人数',data:areaData,backgroundColor:'#41B3FF'}]},
+                data:{labels:areaLabel,datasets:[{label:'撤离人数',data:areaData,backgroundColor:'#41B3FF'}]},
                 options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
             });
             lineChart = new Chart(document.getElementById('lineChart'),{
@@ -726,11 +757,10 @@
                 safePeople++;
                 waitPeople--;
                 safeTrend[safeTrend.length-1] = safePeople;
-                areaData = areaData.map(item=>+(item+(Math.random()*0.2).toFixed(2)));
                 pieChart.data.datasets[0].data = [safePeople,waitPeople,stayPeople];
-                barChart.data.datasets[0].data = areaData;
                 lineChart.data.datasets[0].data = safeTrend;
-                pieChart.update();barChart.update();lineChart.update();
+                pieChart.update();
+                lineChart.update();
                 let rate = (safePeople / totalPeople * 100).toFixed(2);
                 document.querySelector('.info-card1 .person-item:last-child span').innerText = rate+"%";
             }

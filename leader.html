@@ -175,9 +175,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
+            background:#000;
         }
         .monitor-buttons {
             display: flex;
@@ -214,11 +212,13 @@
             border:1px solid #1f3a6b;
             border-radius:6px;
             overflow: hidden;
+            position: relative;
         }
         .mini-screen video{
-            width:100%;
-            height:100%;
-            object-fit:cover;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background:#000;
         }
         .mini-screen.warn{
             border:2px solid #ff4444;
@@ -435,7 +435,6 @@
     </div>
 
     <div class="main-content">
-        <!-- 监控大屏 -->
         <div class="page-panel show" id="page-monitor">
             <div class="page-title">全域实时火情监控中心</div>
             <div class="monitor-wrap">
@@ -449,18 +448,18 @@
                     <div class="pos-item" data-index="5">宿舍楼楼道区域</div>
                 </div>
                 <div class="monitor-main">
-                    <div class="center-title">火情实时画面</div>
+                    <div class="center-title">教学楼火情实时画面</div>
                     <div class="single-monitor-card fire" id="showMonitor">
-                        <div class="monitor-time" id="nowTime">05-24 11:20:54</div>
-                        <video class="monitor-video" id="mainVideo" muted loop autoplay playsinline></video>
+                        <div class="monitor-time" id="nowTime">05-23 22:00:00</div>
+                        <video class="monitor-video" id="mainVideo" autoplay muted loop playsinline controls></video>
                     </div>
                     <div class="multi-monitor-box" id="multiMonitor">
-                        <div class="mini-screen warn"><video muted loop autoplay playsinline></video></div>
-                        <div class="mini-screen"><video muted loop autoplay playsinline></video></div>
-                        <div class="mini-screen"><video muted loop autoplay playsinline></video></div>
-                        <div class="mini-screen"><video muted loop autoplay playsinline></video></div>
-                        <div class="mini-screen"><video muted loop autoplay playsinline></video></div>
-                        <div class="mini-screen"><video muted loop autoplay playsinline></video></div>
+                        <div class="mini-screen warn"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
+                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
+                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
+                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
+                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
+                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
                     </div>
 
                     <div class="monitor-buttons">
@@ -507,7 +506,6 @@
             </div>
         </div>
 
-        <!-- 应急指令 -->
         <div class="page-panel" id="page-command">
             <div class="page-title">应急指令智能调度中心</div>
             <div class="command-wrap">
@@ -541,7 +539,6 @@
             </div>
         </div>
 
-        <!-- 疏散进度 -->
         <div class="page-panel" id="page-progress">
             <div class="page-title">教学楼区域人员疏散动态统计</div>
             <div class="fire-info-bar">
@@ -577,7 +574,6 @@
             </div>
         </div>
 
-        <!-- 历史演练 -->
         <div class="page-panel" id="page-record">
             <div class="page-title">校园火情应急处置历史台账</div>
             <div class="command-wrap">
@@ -602,7 +598,6 @@
         </div>
     </div>
 
-    <!-- 告警弹窗 -->
     <div class="alarm-modal" id="alarmModal">
         <div class="alarm-box">
             <div class="alarm-title">三级火情紧急告警</div>
@@ -612,12 +607,12 @@
                 <p><strong>现场情况：</strong>明火剧烈燃烧，浓烟快速扩散</p>
                 <p><strong>应急条件：</strong>校内消防器材可临时扑救，已申请外部救援</p>
             </div>
-            <button class="btn-confirm" onclick="closeModal()">确认接收告警信息</button>
+            <button class="btn-confirm" id="closeModalBtn">确认接收告警信息</button>
         </div>
     </div>
 
     <script>
-        // OSS视频地址数组（按点位顺序）
+        // 复用可播放视频地址，和上报端一致
         const videoSrcArr = [
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
@@ -627,7 +622,7 @@
             "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/sushe.mp4"
         ];
 
-        // 侧边菜单切换
+        // 侧边栏切换
         const items = document.querySelectorAll('.sidebar-item');
         const panels = document.querySelectorAll('.page-panel');
         items.forEach(item=>{
@@ -640,42 +635,35 @@
             })
         });
 
-        // 监控点位切换
+        // 点位切换播放视频
         const posItems=document.querySelectorAll('.pos-item');
-        const mainVideo = document.getElementById('mainVideo');
-        let currentIndex = 0;
-
-        function switchVideo(idx){
-            currentIndex = idx;
-            mainVideo.src = videoSrcArr[idx];
-        }
-        posItems.forEach(item=>{
+        const mainVideo=document.getElementById('mainVideo');
+        posItems.forEach((item,idx)=>{
             item.addEventListener('click',()=>{
                 posItems.forEach(i=>i.classList.remove('active'));
                 item.classList.add('active');
-                let idx = parseInt(item.dataset.index);
-                switchVideo(idx);
+                mainVideo.src = videoSrcArr[idx];
             });
         });
 
-        // 六画面全开
+        // 六分屏
         const allScreenBtn = document.getElementById('allScreenBtn');
         const multiMonitor = document.getElementById('multiMonitor');
         const showMonitor = document.getElementById('showMonitor');
         allScreenBtn.addEventListener('click',()=>{
             multiMonitor.classList.toggle('show');
             if(multiMonitor.classList.contains('show')){
-                showMonitor.style.display = "none";
-                const miniVdos = multiMonitor.querySelectorAll('video');
-                miniVdos.forEach((v,idx)=>{
-                    v.src = videoSrcArr[idx];
+                showMonitor.style.display = 'none';
+                let frames = multiMonitor.querySelectorAll('video');
+                frames.forEach((frm,idx)=>{
+                    frm.src = videoSrcArr[idx];
                 })
             }else{
-                showMonitor.style.display = "flex";
+                showMonitor.style.display = 'flex';
             }
-        });
+        })
 
-        // 时间更新
+        // 时间刷新
         function updateTime() {
             const now = new Date();
             const m = String(now.getMonth()+1).padStart(2,'0');
@@ -687,9 +675,12 @@
         }
         setInterval(updateTime, 1000);
 
-        function closeModal() {
-            document.getElementById('alarmModal').style.display = 'none';
-        }
+        // 弹窗操作
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const alarmModal = document.getElementById('alarmModal');
+        closeModalBtn.addEventListener('click',()=>{
+            alarmModal.style.display = 'none';
+        })
         document.getElementById('alarmBtn').addEventListener('click',()=>{
             alert("已同步启动三级火情全域应急处置预案！");
         });
@@ -705,8 +696,8 @@
         let areaData = [41,38,36,33];
 
         let pieChart,barChart,lineChart;
-        window.addEventListener('load',function(){
-            switchVideo(0);
+        window.addEventListener('load',()=>{
+            mainVideo.src = videoSrcArr[0];
             initChart();
         });
         function initChart(){
@@ -726,7 +717,7 @@
             lineChart = new Chart(document.getElementById('lineChart'),{
                 type:'line',
                 data:{labels:timeArr.map(t=>t+"分"),datasets:[{label:'累计撤离人数',data:safeTrend,borderColor:'#41B3FF',fill:true,backgroundColor:'rgba(65,179,255,0.2)'}]},
-                options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{color:'#fff'}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
+                options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
             });
         }
 

@@ -212,9 +212,19 @@
             background:linear-gradient(135deg,#2986cc,#40a9ff);
             color:#fff;
             border:none;
-            padding:8px 16px;
+            padding:10px 20px;
             border-radius:6px;
             cursor:pointer;
+            font-size:14px;
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover {
+            background:linear-gradient(135deg,#2563eb,#3b82f6);
+            box-shadow: 0 0 10px rgba(64,169,255,0.5);
+        }
+        .btn-submit:disabled {
+            background: #334155;
+            cursor: not-allowed;
         }
 
         /* 疏散路线页 */
@@ -567,10 +577,10 @@
             <div class="card-title">撤离进度上报</div>
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                 <span style="color:#e2e8f0;">三年级（1）班</span>
-                <span style="color: #ffb400; font-weight: bold; margin-left: 10px;">撤离进行中</span>
+                <span style="color: #ffb400; font-weight: bold; margin-left: 10px;" id="progress-status">撤离进行中</span>
             </div>
-            <div class="progress-bar"><div class="progress"></div></div>
-            <button class="btn-submit">确认本班已安全撤离并上报</button>
+            <div class="progress-bar"><div class="progress" id="progress-fill"></div></div>
+            <button class="btn-submit" id="submit-btn" onclick="submitReport()">确认本班已安全撤离并上报</button>
         </div>
     </div>
 
@@ -674,6 +684,32 @@
         document.getElementById('page-'+page).classList.add('show')
         document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'))
         event.currentTarget.classList.add('active')
+    }
+
+    // 按钮点击上报功能
+    function submitReport() {
+        const btn = document.getElementById('submit-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const progressStatus = document.getElementById('progress-status');
+        
+        // 禁用按钮防止重复提交
+        btn.disabled = true;
+        btn.textContent = "上报中...";
+        
+        // 模拟上报过程
+        setTimeout(() => {
+            // 更新进度条和状态
+            progressFill.style.width = "100%";
+            progressStatus.textContent = "已安全撤离";
+            progressStatus.style.color = "#4cd964";
+            
+            // 按钮状态更新
+            btn.textContent = "已上报";
+            btn.style.background = "#4cd964";
+            
+            // 弹出提示
+            alert("✅ 上报成功！三年级（1）班已全部安全撤离，校端已收到通知。");
+        }, 1500);
     }
 </script>
 

@@ -438,7 +438,8 @@
 <!-- 顶部导航 -->
 <div class="top-header">
     <div class="title">校园火灾应急疏散管理系统 - 教师端</div>
-    <button class="back-btn">返回登录</button>
+    <!-- ✅ 这里修复了：加上 onclick 跳转 -->
+    <button class="back-btn" onclick="location.href='index.html'">返回登录</button>
 </div>
 
 <!-- 侧边栏 -->
@@ -654,7 +655,7 @@
                 <div class="map-point" style="top: 60%; left: 10%;">教</div>
                 <div class="map-point" style="top: 30%; left: 45%;">楼</div>
                 <div class="map-point" style="top: 50%; left: 85%;">出</div>
-                <div class="map-point fire" style="top: 20%; left: 80%;">火</div>
+                <div class="map-point.fire" style="top: 20%; left: 80%;">火</div>
                 
                 <!-- 标签 -->
                 <div class="map-label" style="top: 65%; left: 5%;">203教室</div>

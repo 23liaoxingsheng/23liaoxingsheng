@@ -3,342 +3,602 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校园监控及上报平台</title>
+    <title>校园安全智能监控系统</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
-        body {
-            background: #050d1b;
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 150, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 90% 80%, rgba(0, 150, 255, 0.05) 0%, transparent 50%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
         }
 
-        .top-header {
-            background: linear-gradient(90deg, #0a1427, #0d1b36);
-            padding: 15px 30px;
-            border-bottom: 1px solid #1f3a6b;
-            box-shadow: 0 0 20px rgba(0, 100, 255, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+        body {
+            background: linear-gradient(135deg, #051028 0%, #0a193d 50%, #071530 100%);
+            color: #e8edf7;
+            min-height: 100vh;
+            overflow-y: auto;
         }
-        .back-btn{
-            position: absolute;
-            left:20px;
-            top:50%;
-            transform: translateY(-50%);
-            padding:6px 14px;
-            background:linear-gradient(135deg,#2986cc,#40a9ff);
-            border:none;
-            border-radius:6px;
-            color:#fff;
-            cursor:pointer;
-            font-size:14px;
-        }
-        .back-btn:hover{
-            box-shadow:0 0 10px #2070ff60;
-        }
-        .header-title {
+
+        .header {
+            background: linear-gradient(90deg, #0f285f, #143475);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            padding: 18px 24px;
+            text-align: center;
             font-size: 22px;
-            color: #4dd0e1;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(77, 208, 225, 0.5);
+            font-weight: 600;
+            color: #7fc8ff;
+            border-bottom: 1px solid rgba(127, 200, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             letter-spacing: 2px;
         }
-        .status-indicator {
+
+        .back-btn {
             position: absolute;
-            right: 30px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #4ade80;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 7px 16px;
+            background: linear-gradient(135deg, #2364d2, #1e54b8);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
             font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(30, 84, 184, 0.4);
         }
-        .alarm-status{
-            color:#ff4444;
-            animation: flash 1s infinite;
+        .back-btn:hover {
+            background: linear-gradient(135deg, #2b72e8, #2364d2);
+            transform: translateY(-50%) scale(1.03);
         }
-        .status-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            box-shadow: 0 0 8px currentColor;
-            animation: blink 1.5s infinite;
+
+        .main-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            min-height: calc(100vh - 76px);
         }
-        @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.5;} }
-        @keyframes flash {0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-        .alarm-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;}
-        .alarm-box{background:linear-gradient(145deg,#2b1010,#441818);border:2px solid #ff4444;border-radius:15px;width:500px;padding:40px 30px;text-align:center;box-shadow:0 0 30px #ff4444;}
-        .alarm-box h2{color:#ff4444;font-size:28px;margin-bottom:20px;}
-        .alarm-box p{font-size:18px;line-height:2;color:#fff;}
-        .jump-btn{margin-top:30px;padding:15px 40px;background:#ff4444;color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;}
-        .jump-btn:hover{background:#dd2222;}
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 94px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-        .main-container{flex:1;padding:25px;overflow-y:auto;}
-        .layout-wrap{display:flex;gap:20px;width:100%;}
-        .monitor-name-sidebar{width:220px;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:15px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
-        .monitor-name-sidebar h4{font-size:16px;color:#4dd0e1;margin-bottom:12px;text-align:center;}
-        .monitor-name-item{font-size:17px;padding:12px 10px;margin-bottom:8px;color:#eee;background:#080e1b;border-radius:8px;cursor:pointer;transition:0.2s;}
-        .monitor-name-item:hover{background:#142544;}
-        .monitor-name-item.active{background:#2986cc;color:#fff;font-weight:bold;}
+        .card {
+            background: linear-gradient(145deg, #0e224e, #0b1c3f);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid rgba(127, 200, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+        }
 
-        .monitor-section{flex:1;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:20px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
-        .monitor-card{width:100%;aspect-ratio:16/9;background:#080e1b;border:1px solid #1f3a6b;border-radius:8px;overflow:hidden;box-shadow:0 0 15px rgba(0,100,255,0.1);transition:all 0.3s;position:relative;}
-        .monitor-status{position:absolute;right:12px;top:12px;width:10px;height:10px;background:#4ade80;border-radius:50%;box-shadow:0 0 5px #4ade80;}
-        .monitor-status.danger{background:#ff4444;box-shadow:0 0 5px #ff4444;}
-        .monitor-screen{width:100%;height:100%;background:#050d1b;position:relative;}
-        .monitor-screen.warn-bg{background:#1a0808;}
-        .monitor-video{width:100%;height:100%;object-fit:cover;display:none;}
-        .page-btn-group{margin-top:15px;display:flex;justify-content:center;gap:15px;}
-        .page-btn{padding:8px 22px;background:linear-gradient(135deg,#2986cc,#40a9ff);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:15px;}
-        .page-btn:disabled{background:#444;cursor:not-allowed;}
+        .card h3 {
+            color: #94d1ff;
+            margin-bottom: 18px;
+            text-align: center;
+            font-size: 17px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        .card h3::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7fc8ff, transparent);
+            margin: 8px auto 0;
+        }
 
-        .report-section{margin-top:20px;background:linear-gradient(145deg,#0a1427,#0d1b36);border-radius:12px;padding:20px;border:1px solid #1f3a6b;box-shadow:0 4px 20px rgba(0,100,255,0.15);}
-        .section-title{font-size:18px;color:#4dd0e1;font-weight:500;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
-        .report-form{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
-        .form-item{display:flex;flex-direction:column;gap:6px;}
-        .form-item-full{grid-column:span 2;}
-        .form-label{font-size:14px;color:#a5b4d3;}
-        .form-select,.form-textarea{background:#080e1b;border:1px solid #2a4b8d;border-radius:6px;padding:10px;color:#fff;outline:none;}
-        .form-textarea{resize:none;}
-        .plan-box{grid-column:span 2;background:#080e1b;border:1px solid #2a4b8d;border-radius:6px;padding:15px;line-height:1.8;font-size:14px;color:#e0eaff;}
-        .plan-box h4{color:#4dd0e1;margin-bottom:8px;font-size:15px;}
-        .btn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;grid-column:span 2;margin-top:8px;}
-        .btn-verify{padding:12px;background:linear-gradient(135deg,#2986cc,#40a9ff);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
-        .btn-reject{padding:12px;background:linear-gradient(135deg,#996633,#cc8844);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
-        .btn-start-plan{padding:12px;background:linear-gradient(135deg,#e64340,#ff7875);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
-        .btn-reset{padding:12px;background:linear-gradient(135deg,#555,#777);border:none;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;}
-        button:disabled{background:#444;cursor:not-allowed;opacity:0.7;}
+        .menu-item {
+            padding: 12px 14px;
+            background: rgba(25, 58, 120, 0.4);
+            margin-bottom: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .menu-item:hover {
+            background: rgba(40, 88, 172, 0.6);
+            border-color: rgba(127, 200, 255, 0.3);
+            transform: translateX(4px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+
+        .weather-tip {
+            font-size: 13px;
+            color: #a0b8e0;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .weather-icon {
+            font-size: 56px;
+            text-align: center;
+            margin: 12px 0;
+        }
+        .weather-desc {
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .weather-desc h4 {
+            color: #ffdd70;
+            margin: 10px 0 6px;
+            font-size: 15px;
+        }
+
+        .monitor-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .monitor-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .monitor-box {
+            background: #050e22;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(127, 200, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+        }
+        .monitor-box:hover {
+            border-color: rgba(127, 200, 255, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+        }
+        .monitor-title {
+            background: linear-gradient(90deg, #10295c, #0e234f);
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #c6e2ff;
+            border-bottom: 1px solid rgba(127, 200, 255, 0.15);
+        }
+        .monitor-screen {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+        .monitor-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .page-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 10px 0;
+        }
+        .page-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #2364d2, #1e54b8);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .page-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2b72e8, #2364d2);
+            transform: scale(1.04);
+        }
+        .page-btn:disabled {
+            background: #2a3b5f;
+            color: #8898b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 8, 22, 0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            width: 75vw;
+            max-width: 1100px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 12px;
+            border: 2px solid rgba(127, 200, 255, 0.4);
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .modal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .report-box {
+            margin: 30px 20px 40px 260px;
+            background: linear-gradient(145deg, #0e224e, #0b1c3f);
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid rgba(127, 200, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+        }
+        .report-title {
+            color: #94d1ff;
+            margin-bottom: 18px;
+            font-size: 17px;
+            position: relative;
+        }
+        .report-title::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7fc8ff, transparent);
+            margin: 8px 0 0;
+        }
+        .report-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .form-row {
+            display: flex;
+            width: 100%;
+            gap: 20px;
+        }
+        .form-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-item label {
+            font-size: 14px;
+            color: #b8d4f5;
+        }
+        .form-item select,
+        .form-item textarea {
+            background: rgba(25, 58, 120, 0.4);
+            border: 1px solid rgba(127, 200, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e8edf7;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .form-item select:focus,
+        .form-item textarea:focus {
+            outline: none;
+            border-color: rgba(127, 200, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(127, 200, 255, 0.15);
+        }
+        textarea {
+            resize: none;
+        }
+
+        .btn-group {
+            width: 100%;
+            display: flex;
+            gap: 14px;
+            margin-top: 12px;
+        }
+        .btn {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .btn-blue {
+            background: linear-gradient(135deg, #2364d2, #1e54b8);
+        }
+        .btn-blue:hover {
+            background: linear-gradient(135deg, #2b72e8, #2364d2);
+        }
+        .btn-orange {
+            background: linear-gradient(135deg, #d88a20, #c07718);
+        }
+        .btn-orange:hover {
+            background: linear-gradient(135deg, #e6972b, #d88a20);
+        }
+        .btn-red {
+            background: linear-gradient(135deg, #d63031, #b72021);
+        }
+        .btn-red:hover {
+            background: linear-gradient(135deg, #e84243, #d63031);
+        }
+        .btn-gray {
+            background: linear-gradient(135deg, #49566b, #3a4557);
+        }
+        .btn-gray:hover {
+            background: linear-gradient(135deg, #586780, #49566b);
+        }
     </style>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-
-<div class="alarm-modal" id="alarmModal">
-    <div class="alarm-box">
-        <h2>⚠️ AI检测到火情</h2>
-        <p>事发地点：食堂后厨监控</p>
-        <p>火情状态：明火燃烧</p>
-        <p>危险等级：二级一般火情</p>
-        <button class="jump-btn" onclick="jumpToAlarmMonitor()">跳转到事发地监控</button>
+    <div class="modal" id="imgModal" onclick="closeModal()">
+        <div class="modal-content">
+            <img id="bigImg" src="" alt="监控大图">
+        </div>
     </div>
-</div>
 
-<div class="top-header">
-    <!-- ✅ 修复点：把原来的 ../login.html 改成 index.html，直接回到登录页 -->
-    <button class="back-btn" onclick="location.href='index.html'">返回登录页</button>
-    <div class="header-title">校园监控及上报平台</div>
-    <div class="status-indicator" id="systemStatus">
-        <div class="status-dot"></div>
-        <span>AI智能监控正常运行</span>
+    <div class="header">
+        <button class="back-btn" onclick="location.href='login.html'">返回登录</button>
+        校园安全智能监控系统
     </div>
-</div>
 
-<div class="main-container">
-    <div class="layout-wrap">
-        <div class="monitor-name-sidebar">
-            <h4>监控点位</h4>
-            <div id="nameListWrap"></div>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="card">
+                <h3>📹 监控分类</h3>
+                <div class="menu-item" onclick="loadTeach()">教学楼区域</div>
+                <div class="menu-item" onclick="loadDorm()">宿舍楼区域</div>
+                <div class="menu-item" onclick="loadCanteen()">食堂区域</div>
+                <div class="menu-item" onclick="loadClass()">普通教室区域</div>
+                <div class="menu-item" onclick="loadLab()">实验室区域</div>
+                <div class="menu-item" onclick="loadPlayground()">操场&户外区域</div>
+                <div class="menu-item" onclick="loadGate()">校园大门区域</div>
+            </div>
+
+            <div class="card">
+                <h3>🌤 实时天气预报</h3>
+                <div class="weather-tip">系统自动预测 · 实时更新</div>
+                <div class="weather-icon" id="weatherIcon"></div>
+                <div class="weather-desc" id="weatherDesc"></div>
+            </div>
         </div>
 
-        <div class="monitor-section">
-            <div class="monitor-card" id="monitorCard">
-                <div class="monitor-status" id="monitorStatus"></div>
-                <div class="monitor-screen" id="monitorScreen">
-                    <video class="monitor-video" id="monitorVideo" muted loop autoplay controls></video>
+        <div class="monitor-wrap">
+            <div class="monitor-body" id="monitorList"></div>
+            <div class="page-bar" id="pageBar" style="display: none;">
+                <button class="page-btn" id="prevPage" onclick="prevPage()">上一页</button>
+                <button class="page-btn" id="nextPage" onclick="nextPage()">下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-box">
+        <h3 class="report-title">📝 安全事件上报</h3>
+        <div class="report-form">
+            <div class="form-row">
+                <div class="form-item">
+                    <label>监控位置</label>
+                    <select id="pos"></select>
+                </div>
+                <div class="form-item">
+                    <label>事件类型</label>
+                    <select id="eventType"></select>
                 </div>
             </div>
-            <div class="page-btn-group">
-                <button class="page-btn" id="prevBtn" onclick="prevPage()">上一页</button>
-                <button class="page-btn" id="nextBtn" onclick="nextPage()">下一页</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="report-section">
-        <div class="section-title">火情核查、人工上报与应急处置</div>
-        <div class="report-form">
             <div class="form-item">
-                <label class="form-label">事发位置</label>
-                <select class="form-select" id="firePos">
-                    <option>教学楼楼道区域监控</option>
-                    <option>实验室监控</option>
-                    <option>食堂后厨监控</option>
-                    <option>教室监控</option>
-                    <option>储物间监控</option>
-                    <option>宿舍楼楼道监控</option>
-                </select>
+                <label>事件描述</label>
+                <textarea rows="3"></textarea>
             </div>
-            <div class="form-item">
-                <label class="form-label">火情等级</label>
-                <select class="form-select" id="fireLevel" onchange="changePlan()">
-                    <option value="1">一级轻微火情</option>
-                    <option value="2" selected>二级一般火情</option>
-                    <option value="3">三级重大火情</option>
-                </select>
-            </div>
-
-            <div class="form-item form-item-full">
-                <label class="form-label">应急预案</label>
-                <textarea class="form-textarea" id="fireDesc" rows="3" placeholder="填写对应火情应急补充说明"></textarea>
-            </div>
-
-            <div class="form-item-full plan-box" id="planBox">
-                <h4>二级中度火情处置方案</h4>
-                <p>1.火势具备蔓延趋势，系统升级预警等级，暂停事发区域教学活动<br/>
-                2.安保团队协同控火，封闭周边通道，防止烟雾与火势向外扩散<br/>
-                3.为各个位置老师生成最佳疏散路线，随时根据指令准备局部人员疏散</p>
-            </div>
-
             <div class="btn-group">
-                <button class="btn-verify" id="verifyBtn" onclick="confirmAlarm()">核实火情上报</button>
-                <button class="btn-reject" id="rejectBtn" onclick="cancelAlarm()">判定误报解除</button>
-                <button class="btn-start-plan" id="planBtn" onclick="manualReport()">手动提交上报记录</button>
-                <button class="btn-reset" onclick="resetForm()">重置表单状态</button>
+                <button class="btn btn-blue" onclick="alert('上报成功')">确认上报</button>
+                <button class="btn btn-orange" onclick="alert('已标记误报')">误报</button>
+                <button class="btn btn-red" onclick="alert('已提交紧急上报')">紧急上报</button>
+                <button class="btn btn-gray" onclick="alert('内容已清空')">清空</button>
             </div>
         </div>
     </div>
-</div>
 
 <script>
-    const monitorList = [
-        "教学楼楼道区域监控",
-        "实验室监控",
-        "食堂后厨监控",
-        "教室监控",
-        "储物间监控",
-        "宿舍楼楼道监控"
-    ];
-    const videoSrcArr = [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shitang.mp4",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/jiaoshi.mp4",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/chuwujian.mp4",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/sushe.mp4"
-    ];
-    const alarmIndex = 2;
-    let currentPage = 0;
-    const videoEle = document.getElementById('monitorVideo');
-    const posSelect = document.getElementById('firePos');
-    const nameListWrap = document.getElementById('nameListWrap');
-    const alarmModal = document.getElementById('alarmModal');
-    const verifyBtn = document.getElementById('verifyBtn');
-    const rejectBtn = document.getElementById('rejectBtn');
+const imgModal = document.getElementById("imgModal");
+const bigImg = document.getElementById("bigImg");
+const posSelect = document.getElementById("pos");
+const eventSelect = document.getElementById("eventType");
+const monitorList = document.getElementById("monitorList");
+const pageBar = document.getElementById("pageBar");
+const prevPageBtn = document.getElementById("prevPage");
+const nextPageBtn = document.getElementById("nextPage");
+const weatherIcon = document.getElementById("weatherIcon");
+const weatherDesc = document.getElementById("weatherDesc");
 
-    const planData = {
-        1:{
-            title:"一级轻度火情处置方案",
-            content:"1.智能监控识别轻微火情隐患，仅触发局部预警，不启动全校警报<br/>2.安保人员立即前往事发点位，取用就近灭火器、消防栓开展初期灭火<br/>3.实时监控火势变化，阻断火源扩散，周边区域人员正常待命<br/>4.火情扑灭后核查现场，确认无复燃风险，记录隐患信息存档"
-        },
-        2:{
-            title:"二级中度火情处置方案",
-            content:"1.火势具备蔓延趋势，系统升级预警等级，暂停事发区域教学活动<br/>2.安保团队协同控火，封闭周边通道，防止烟雾与火势向外扩散<br/>3.为各个位置老师生成最佳疏散路线，随时根据指令准备局部人员疏散"
-        },
-        3:{
-            title:"三级重度火情处置方案",
-            content:"1.火势无法人为控制，立刻触发全校应急警报，终止所有校内活动<br/>2.为各班级教师生成疏散路线，带领学生弯腰捂口鼻有序撤离<br/>3.全员快速撤离至室外操场安全集结点，教师清点本班人数并上报<br/>4.校领导统筹现场救援，同步联系消防部门，配合专业人员开展灭火救援<br/>5.排查教学楼剩余滞留人员，全程把控现场秩序，杜绝二次安全事故"
-        }
-    };
+let currentKey = "";
+let currentPage = 1;
+const pageSize = 8;
 
-    function changePlan(){
-        let level = document.getElementById("fireLevel").value;
-        document.getElementById("planBox").innerHTML = `<h4>${planData[level].title}</h4><p>${planData[level].content}</p>`;
-    }
+// 已帮你设置好：教学楼1楼东走廊 = jiao1D.jpg
+const imgUrls = {
+    teach: [
+        "jiao1D.jpg",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450",
+        "https://picsum.photos/800/450"
+    ],
+    dorm: ["https://picsum.photos/800/450"],
+    canteen: ["https://picsum.photos/800/450"],
+    class: ["https://picsum.photos/800/450"],
+    lab: ["https://picsum.photos/800/450"],
+    playground: ["https://picsum.photos/800/450"],
+    gate: ["https://picsum.photos/800/450"]
+};
 
-    function renderNameList(){
-        nameListWrap.innerHTML = "";
-        monitorList.forEach((name,idx)=>{
-            const item = document.createElement("div");
-            item.className = "monitor-name-item";
-            item.innerText = name;
-            item.onclick = ()=>{
-                currentPage = idx;
-                renderMonitor();
-            };
-            nameListWrap.appendChild(item);
-        });
+const areaData = {
+    teach: {
+        points: [
+            "教学楼1楼东走廊",
+            "教学楼1楼西走廊",
+            "教学楼2楼走廊",
+            "教学楼3楼走廊",
+            "教学楼主楼梯口",
+            "教学楼侧楼梯口",
+            "教学楼正门入口",
+            "教学楼后侧通道"
+        ],
+        events: ["学生摔倒", "拥挤踩踏危险", "火情隐患", "高空坠物", "学生冲突"]
+    },
+    dorm: {
+        points: [
+            "1号宿舍1楼楼道",
+            "1号宿舍2楼楼道",
+            "2号宿舍1楼楼道",
+            "2号宿舍大门",
+            "宿舍园区主干道",
+            "宿舍楼下休闲区"
+        ],
+        events: ["学生摔倒", "火情隐患", "外来人员闯入", "电器类设施异常"]
+    },
+    canteen: {
+        points: [
+            "食堂正门入口",
+            "食堂打餐区1",
+            "食堂打餐区2",
+            "食堂就餐区",
+            "食堂后厨通道",
+            "食堂外侧走廊"
+        ],
+        events: ["人群拥挤", "地面湿滑摔倒", "火情隐患", "食材异常"]
+    },
+    class: {
+        points: [
+            "一年级1班教室",
+            "一年级2班教室",
+            "二年级1班教室",
+            "二年级2班教室",
+            "三年级1班教室",
+            "三年级2班教室",
+            "四年级1班教室",
+            "四年级2班教室",
+            "五年级1班教室",
+            "五年级2班教室",
+            "六年级1班教室",
+            "六年级2班教室",
+            "三楼公共教室",
+            "四楼多功能教室",
+            "教室外连廊东区",
+            "教室外连廊西区"
+        ],
+        events: ["学生打闹", "物品坠落", "电器故障", "火情隐患", "学生冲突"]
+    },
+    lab: {
+        points: [
+            "化学实验室",
+            "物理实验室",
+            "生物实验室",
+            "实验楼走廊",
+            "实验楼出入口"
+        ],
+        events: ["化学品泄漏", "仪器故障", "试剂倾倒", "火情隐患", "人员操作失误", "物品坠落"]
+    },
+    playground: {
+        points: [
+            "塑胶跑道区域",
+            "篮球场",
+            "足球场",
+            "操场看台",
+            "操场西侧小路",
+            "体育器材室门口"
+        ],
+        events: ["运动摔伤", "高空坠物", "人员聚集拥堵"]
+    },
+    gate: {
+        points: [
+            "学校正门",
+            "正门门卫室",
+            "大门左侧通道",
+            "大门右侧通道",
+            "校外路口监控"
+        ],
+        events: ["外来人员闯入", "人员拥堵", "门禁异常"]
     }
+};
 
-    window.onload = function(){
-        renderNameList();
-        posSelect.value = monitorList[alarmIndex];
-        document.getElementById("fireLevel").value = 2;
-        changePlan();
-        document.getElementById("fireDesc").value = "监控画面发现明火燃烧，存在蔓延风险，需立即启动对应等级应急处置流程";
-        document.getElementById("monitorStatus").classList.add("danger");
-        document.getElementById("monitorScreen").classList.add("warn-bg");
-        verifyBtn.disabled = false;
-        rejectBtn.disabled = false;
-        renderMonitor();
-    }
+const weatherList = [
+    { icon: '<i class="fas fa-sun" style="color:#ffd000"></i>', name: "晴天", prevent: "正常开展校园各项活动，提醒师生做好防晒、及时补水。", handle: "无特殊风险，安保人员执行常规巡逻即可。" },
+    { icon: '<i class="fas fa-cloud" style="color:#cccccc"></i>', name: "阴天", prevent: "气温舒适，可正常安排户外活动，持续监测天气变化。", handle: "加强室外区域巡检，提前排查道路、设施安全隐患。" },
+    { icon: '<i class="fas fa-cloud-rain" style="color:#74b9ff"></i>', name: "小雨", prevent: "关闭室外电器设备，提醒师生慢行防滑，备好雨具。", handle: "及时清理路面积水，检查屋檐、排水口是否堵塞。" },
+    { icon: '<i class="fas fa-cloud-showers-heavy" style="color:#0984e3"></i>', name: "暴雨", prevent: "立即停止一切室外活动，关闭门窗、切断室外电源；重点检查低洼区域、地下空间防水防护。", handle: "安排专人值守排水系统，发现积水、漏水第一时间处置；密切监测围墙、树木，防范坍塌倒伏。" },
+    { icon: '<i class="fas fa-bolt" style="color:#fdcb6e"></i>', name: "雷阵雨", prevent: "禁止师生在操场、大树、广告牌下逗留，远离金属设施，关闭户外用电设备。", handle: "雷电期间减少室外巡逻，雨停后全面检查电路、避雷装置是否完好。" },
+    { icon: '<i class="fas fa-wind" style="color:#b2bec3"></i>', name: "大风", prevent: "收好室外悬挂物、宣传栏，加固门窗，暂停高空作业与大型室外活动。", handle: "全面巡查树木、围栏、临时棚架，发现松动、倾斜立即加固或隔离警戒。" }
+];
 
-    function jumpToAlarmMonitor(){
-        currentPage = alarmIndex;
-        renderMonitor();
-        alarmModal.style.display = "none";
-    }
+function autoGetWeather(){
+    let randomIdx = Math.floor(Math.random() * weatherList.length);
+    let nowWeather = weatherList[randomIdx];
+    weatherIcon.innerHTML = nowWeather.icon;
+    weatherDesc.innerHTML = `<h4>当前天气：${nowWeather.name}</h4><p>预防措施：${nowWeather.prevent}</p><p>应急处理：${nowWeather.handle}</p>`;
+}
 
-    function renderMonitor(){
-        const items = nameListWrap.querySelectorAll(".monitor-name-item");
-        items.forEach((it,idx)=>{
-            it.classList.toggle("active", idx === currentPage);
-        });
-        posSelect.value = monitorList[currentPage];
-        document.getElementById("prevBtn").disabled = currentPage === 0;
-        document.getElementById("nextBtn").disabled = currentPage === monitorList.length - 1;
+function loadTeach() { renderArea("teach"); }
+function loadDorm() { renderArea("dorm"); }
+function loadCanteen() { renderArea("canteen"); }
+function loadClass() { renderArea("class"); }
+function loadLab() { renderArea("lab"); }
+function loadPlayground() { renderArea("playground"); }
+function loadGate() { renderArea("gate"); }
 
-        const src = videoSrcArr[currentPage];
-        if(src){
-            videoEle.src = src;
-            videoEle.style.display = "block";
-        }else{
-            videoEle.style.display = "none";
-        }
-    }
+function renderArea(key) {
+    currentKey = key; currentPage = 1;
+    const data = areaData[key];
+    pageBar.style.display = key === "class" ? "flex" : "none";
+    eventSelect.innerHTML = "";
+    data.events.forEach(ev => { let o = document.createElement("option"); o.innerText = ev; eventSelect.appendChild(o); });
+    renderPage(data.points);
+}
 
-    function prevPage(){
-        if(currentPage > 0){
-            currentPage--;
-            renderMonitor();
-        }
-    }
-    function nextPage(){
-        if(currentPage < monitorList.length - 1){
-            currentPage++;
-            renderMonitor();
-        }
-    }
+function renderPage(allPoints) {
+    monitorList.innerHTML = ""; posSelect.innerHTML = "";
+    const start = (currentPage-1)*pageSize;
+    const end = start + pageSize;
+    const pageData = allPoints.slice(start, end);
+    const imgList = imgUrls[currentKey].slice(start, end);
 
-    function confirmAlarm(){
-        alert("已上报校领导并启动应急预案，相关处置指令下发执行");
-        verifyBtn.disabled = true;
-        rejectBtn.disabled = true;
-    }
-    function cancelAlarm(){
-        alert("已判定为AI误报，火情告警解除，恢复常规监控");
-        verifyBtn.disabled = true;
-        rejectBtn.disabled = true;
-        document.getElementById("monitorStatus").classList.remove("danger");
-        document.getElementById("monitorScreen").classList.remove("warn-bg");
-    }
-    function manualReport(){
-        let area = document.getElementById("firePos").value;
-        let level = document.getElementById("fireLevel").options[document.getElementById("fireLevel").selectedIndex].text;
-        alert(`已保存${area}${level}上报记录，存档完成`);
-    }
-    function resetForm(){
-        document.getElementById("fireDesc").value = "";
-        verifyBtn.disabled = false;
-        rejectBtn.disabled = false;
-        alert("表单与操作状态已重置，可重新核查上报");
-    }
+    pageData.forEach((name, idx) => {
+        let opt = document.createElement("option"); opt.innerText = name; posSelect.appendChild(opt);
+        let box = document.createElement("div"); box.className = "monitor-box";
+        let imgSrc = imgList[idx] || imgList[0];
+        box.innerHTML = `<div class="monitor-title">${name}</div><div class="monitor-screen"><img src="${imgSrc}" alt="监控"></div>`;
+        box.onclick = () => { bigImg.src = imgSrc; imgModal.style.display = "flex"; };
+        monitorList.appendChild(box);
+    });
+
+    const total = Math.ceil(allPoints.length / pageSize);
+    prevPageBtn.disabled = currentPage <= 1;
+    nextPageBtn.disabled = currentPage >= total;
+}
+
+function prevPage() { if(currentPage>1){currentPage--; renderPage(areaData[currentKey].points);} }
+function nextPage() { const total=Math.ceil(areaData[currentKey].points.length/pageSize); if(currentPage<total){currentPage++; renderPage(areaData[currentKey].points);} }
+function closeModal(){ imgModal.style.display = "none"; }
+
+window.onload = function(){ loadTeach(); autoGetWeather(); };
 </script>
-
 </body>
 </html>

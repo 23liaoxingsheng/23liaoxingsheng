@@ -13,14 +13,14 @@
         }
 
         body {
-            background: linear-gradient(135deg, #051028 0%, #0a193d 50%, #071530 100%);
+            background: linear-gradient(135deg, #050228 0%, #0a033d 50%, #070333 100%);
             color: #e8edf7;
             min-height: 100vh;
             overflow-y: auto;
         }
 
         .header {
-            background: linear-gradient(90deg, #0f285f, #143475);
+            background: linear-gradient(90deg, #0f285f, #143d77);
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
             padding: 18px 24px;
             text-align: center;
@@ -49,7 +49,7 @@
             color: #fff;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             box-shadow: 0 2px 8px rgba(30, 84, 184, 0.4);
         }
         .back-btn:hover {
@@ -83,7 +83,7 @@
         }
 
         .card h3 {
-            color: #94d1ff;
+            color: #9fcfff;
             margin-bottom: 18px;
             text-align: center;
             font-size: 17px;
@@ -106,7 +106,7 @@
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             border: 1px solid transparent;
         }
         .menu-item:hover {
@@ -159,10 +159,18 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 14px rgba(0,0,0,0.3);
         }
+        /* 事故监控 红色高亮样式 */
+        .monitor-box.warn {
+            border: 2px solid #ff4757;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
         .monitor-box:hover {
             border-color: rgba(127, 200, 255, 0.5);
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+        }
+        .monitor-box.warn:hover {
+            border-color: #ff4757;
         }
         .monitor-title {
             background: linear-gradient(90deg, #10295c, #0e234f);
@@ -196,7 +204,7 @@
             border-radius: 8px;
             color: #fff;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
         .page-btn:hover:not(:disabled) {
@@ -210,6 +218,7 @@
             box-shadow: none;
         }
 
+        /* 监控大图弹窗 */
         .modal {
             position: fixed;
             top: 0;
@@ -248,7 +257,7 @@
             box-shadow: 0 4px 16px rgba(0,0,0,0.35);
         }
         .report-title {
-            color: #94d1ff;
+            color: #9fcfff;
             margin-bottom: 18px;
             font-size: 17px;
             position: relative;
@@ -315,7 +324,7 @@
             color: #fff;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
         .btn-blue {
@@ -336,17 +345,93 @@
         .btn-red:hover {
             background: linear-gradient(135deg, #e84243, #d63031);
         }
-        .btn-gray {
-            background: linear-gradient(135deg, #49566b, #3a4557);
+        /* 启动预案按钮样式 */
+        .btn-plan {
+            background: linear-gradient(135deg, #27ae60, #219653);
         }
-        .btn-gray:hover {
-            background: linear-gradient(135deg, #586780, #49566b);
+        .btn-plan:hover {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        /* AI事故提醒弹窗样式 */
+        .ai-alert-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .ai-alert-box {
+            background: #0b1c3f;
+            border: 2px solid #ff4757;
+            border-radius: 16px;
+            padding: 30px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255,71,87,0.4);
+        }
+        .ai-alert-title {
+            font-size: 20px;
+            color: #ff4757;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .ai-alert-desc {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            color: #e8edf7;
+        }
+        .ai-btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .ai-btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-jump {
+            background: linear-gradient(135deg, #ff4757, #e82c3c);
+            color: #fff;
+        }
+        .btn-jump:hover {
+            opacity: 0.9;
+        }
+        .btn-close {
+            background: #49566b;
+            color: #fff;
+        }
+        .btn-close:hover {
+            opacity: 0.9;
         }
     </style>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
+    <!-- AI智能事故提醒弹窗 -->
+    <div class="ai-alert-wrap" id="aiAlert">
+        <div class="ai-alert-box">
+            <div class="ai-alert-title">⚠️ AI智能监控 事故预警</div>
+            <div class="ai-alert-desc" id="alertText"></div>
+            <div class="ai-btn-group">
+                <button class="ai-btn btn-jump" id="jumpBtn">跳转事故监控画面</button>
+                <button class="ai-btn btn-close" id="closeAlert">关闭提醒</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 监控大图弹窗 -->
     <div class="modal" id="imgModal" onclick="closeModal()">
         <div class="modal-content">
             <img id="bigImg" src="" alt="监控大图">
@@ -366,7 +451,7 @@
                 <div class="menu-item" onclick="loadDorm()">宿舍楼区域</div>
                 <div class="menu-item" onclick="loadCanteen()">食堂区域</div>
                 <div class="menu-item" onclick="loadClass()">普通教室区域</div>
-                <div class="menu-item" onclick="loadLab()">实验室区域</div>
+                <div class="menu-item" onclick="loadLab()">实验区域</div>
                 <div class="menu-item" onclick="loadPlayground()">操场&户外区域</div>
                 <div class="menu-item" onclick="loadGate()">校园大门区域</div>
             </div>
@@ -407,9 +492,9 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-blue" onclick="alert('上报成功')">确认上报</button>
-                <button class="btn btn-orange" onclick="alert('已标记误报')">误报</button>
+                <button class="btn-orange" onclick="alert('已标记误报')">误报</button>
                 <button class="btn btn-red" onclick="alert('已提交紧急上报')">紧急上报</button>
-                <button class="btn btn-gray" onclick="alert('内容已清空')">清空</button>
+                <button class="btn btn-plan" onclick="alert('已启动对应应急预案，正在执行处置流程')">启动预案处理</button>
             </div>
         </div>
     </div>
@@ -426,30 +511,88 @@ const nextPageBtn = document.getElementById("nextPage");
 const weatherIcon = document.getElementById("weatherIcon");
 const weatherDesc = document.getElementById("weatherDesc");
 
+// AI事故弹窗元素
+const aiAlert = document.getElementById("aiAlert");
+const alertText = document.getElementById("alertText");
+const jumpBtn = document.getElementById("jumpBtn");
+const closeAlertBtn = document.getElementById("closeAlert");
+
 let currentKey = "";
 let currentPage = 1;
 const pageSize = 8;
 
-// 已帮你设置好：教学楼1楼东走廊 = jiao1D.jpg
+// AI模拟事故数据
+const accidentInfo = {
+    areaKey: "dorm",
+    areaName: "宿舍楼区域",
+    pointName: "2号宿舍1楼楼道",
+    accidentType: "学生摔倒事故"
+};
+
+// 图片配置
 const imgUrls = {
     teach: [
         "jiao1D.jpg",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450",
-        "https://picsum.photos/800/450"
+        "jiao2.jpg",
+        "jiao3.jpg",
+        "jiao4.jpg",
+        "jiao5.jpg",
+        "jiao6.jpg",
+        "jiao7.jpg",
+        "jiao8.jpg"
     ],
-    dorm: ["https://picsum.photos/800/450"],
-    canteen: ["https://picsum.photos/800/450"],
-    class: ["https://picsum.photos/800/450"],
-    lab: ["https://picsum.photos/800/450"],
-    playground: ["https://picsum.photos/800/450"],
-    gate: ["https://picsum.photos/800/450"]
+    dorm: [
+        "sushe1.jpg",
+        "sushe2.jpg",
+        "sushe3.jpg",
+        "sushe4.jpg",
+        "sushe5.jpg",
+        "sushe6.jpg"
+    ],
+    canteen: [
+        "shitang1.jpg",
+        "shitang2.jpg",
+        "shitang3.jpg",
+        "shitang4.jpg",
+        "shitang5.jpg",
+        "shitang6.jpg"
+    ],
+    class: [
+        "jiaoshi1.jpg",
+        "jiaoshi2.jpg",
+        "jiaoshi3.jpg",
+        "jiaoshi4.jpg",
+        "jiaoshi5.jpg",
+        "jiaoshi6.jpg",
+        "jiaoshi7.jpg",
+        "jiaoshi8.jpg"
+    ],
+    // 实验室：shiyanshi1 ~ shiyanshi5
+    lab: [
+        "shiyanshi1.jpg",
+        "shiyanshi2.jpg",
+        "shiyanshi3.jpg",
+        "shiyanshi4.jpg",
+        "shiyanshi5.jpg"
+    ],
+    playground: [
+        "caochang1.jpg",
+        "caochang2.jpg",
+        "caochang3.jpg",
+        "caochang4.jpg",
+        "caochang5.jpg",
+        "caochang6.jpg"
+    ],
+    gate: [
+        "xiaomen1.jpg",
+        "xiaomen2.jpg",
+        "xiaomen3.jpg",
+        "xiaomen4.jpg",
+        "xiaomen5.jpg"
+    ]
 };
 
+// 分区点位数据
 const areaData = {
     teach: {
         points: [
@@ -495,15 +638,7 @@ const areaData = {
             "三年级1班教室",
             "三年级2班教室",
             "四年级1班教室",
-            "四年级2班教室",
-            "五年级1班教室",
-            "五年级2班教室",
-            "六年级1班教室",
-            "六年级2班教室",
-            "三楼公共教室",
-            "四楼多功能教室",
-            "教室外连廊东区",
-            "教室外连廊西区"
+            "四年级2班教室"
         ],
         events: ["学生打闹", "物品坠落", "电器故障", "火情隐患", "学生冲突"]
     },
@@ -540,6 +675,7 @@ const areaData = {
     }
 };
 
+// 天气数据
 const weatherList = [
     { icon: '<i class="fas fa-sun" style="color:#ffd000"></i>', name: "晴天", prevent: "正常开展校园各项活动，提醒师生做好防晒、及时补水。", handle: "无特殊风险，安保人员执行常规巡逻即可。" },
     { icon: '<i class="fas fa-cloud" style="color:#cccccc"></i>', name: "阴天", prevent: "气温舒适，可正常安排户外活动，持续监测天气变化。", handle: "加强室外区域巡检，提前排查道路、设施安全隐患。" },
@@ -549,6 +685,7 @@ const weatherList = [
     { icon: '<i class="fas fa-wind" style="color:#b2bec3"></i>', name: "大风", prevent: "收好室外悬挂物、宣传栏，加固门窗，暂停高空作业与大型室外活动。", handle: "全面巡查树木、围栏、临时棚架，发现松动、倾斜立即加固或隔离警戒。" }
 ];
 
+// 自动天气
 function autoGetWeather(){
     let randomIdx = Math.floor(Math.random() * weatherList.length);
     let nowWeather = weatherList[randomIdx];
@@ -556,6 +693,7 @@ function autoGetWeather(){
     weatherDesc.innerHTML = `<h4>当前天气：${nowWeather.name}</h4><p>预防措施：${nowWeather.prevent}</p><p>应急处理：${nowWeather.handle}</p>`;
 }
 
+// 分区切换函数
 function loadTeach() { renderArea("teach"); }
 function loadDorm() { renderArea("dorm"); }
 function loadCanteen() { renderArea("canteen"); }
@@ -564,28 +702,48 @@ function loadLab() { renderArea("lab"); }
 function loadPlayground() { renderArea("playground"); }
 function loadGate() { renderArea("gate"); }
 
+// 渲染分区监控
 function renderArea(key) {
-    currentKey = key; currentPage = 1;
+    currentKey = key;
+    currentPage = 1;
     const data = areaData[key];
-    pageBar.style.display = key === "class" ? "flex" : "none";
+    pageBar.style.display = "none";
+
     eventSelect.innerHTML = "";
-    data.events.forEach(ev => { let o = document.createElement("option"); o.innerText = ev; eventSelect.appendChild(o); });
+    data.events.forEach(ev => {
+        let o = document.createElement("option");
+        o.innerText = ev;
+        eventSelect.appendChild(o);
+    });
     renderPage(data.points);
 }
 
+// 渲染单页监控 + 事故卡片标红
 function renderPage(allPoints) {
-    monitorList.innerHTML = ""; posSelect.innerHTML = "";
-    const start = (currentPage-1)*pageSize;
+    monitorList.innerHTML = "";
+    posSelect.innerHTML = "";
+    const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
     const pageData = allPoints.slice(start, end);
-    const imgList = imgUrls[currentKey].slice(start, end);
+    const imgList = imgUrls[currentKey];
 
     pageData.forEach((name, idx) => {
-        let opt = document.createElement("option"); opt.innerText = name; posSelect.appendChild(opt);
-        let box = document.createElement("div"); box.className = "monitor-box";
+        let opt = document.createElement("option");
+        opt.innerText = name;
+        posSelect.appendChild(opt);
+
+        let box = document.createElement("div");
+        box.className = "monitor-box";
+        // 判断是否为事故点位，添加红色高亮类名
+        if(currentKey === accidentInfo.areaKey && name === accidentInfo.pointName){
+            box.classList.add("warn");
+        }
         let imgSrc = imgList[idx] || imgList[0];
         box.innerHTML = `<div class="monitor-title">${name}</div><div class="monitor-screen"><img src="${imgSrc}" alt="监控"></div>`;
-        box.onclick = () => { bigImg.src = imgSrc; imgModal.style.display = "flex"; };
+        box.onclick = () => {
+            bigImg.src = imgSrc;
+            imgModal.style.display = "flex";
+        };
         monitorList.appendChild(box);
     });
 
@@ -594,11 +752,42 @@ function renderPage(allPoints) {
     nextPageBtn.disabled = currentPage >= total;
 }
 
-function prevPage() { if(currentPage>1){currentPage--; renderPage(areaData[currentKey].points);} }
-function nextPage() { const total=Math.ceil(areaData[currentKey].points.length/pageSize); if(currentPage<total){currentPage++; renderPage(areaData[currentKey].points);} }
-function closeModal(){ imgModal.style.display = "none"; }
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderPage(areaData[currentKey].points);
+    }
+}
+function nextPage() {
+    const total = Math.ceil(areaData[currentKey].points.length / pageSize);
+    if (currentPage < total) {
+        currentPage++;
+        renderPage(areaData[currentKey].points);
+    }
+}
+function closeModal() {
+    imgModal.style.display = "none";
+}
 
-window.onload = function(){ loadTeach(); autoGetWeather(); };
+// 关闭AI预警弹窗
+closeAlertBtn.addEventListener("click", () => {
+    aiAlert.style.display = "none";
+});
+
+// 跳转至事故对应监控画面
+jumpBtn.addEventListener("click", () => {
+    aiAlert.style.display = "none";
+    renderArea(accidentInfo.areaKey);
+});
+
+// 页面加载完成执行
+window.onload = function () {
+    loadTeach();
+    autoGetWeather();
+    // 页面载入后自动弹出AI事故提醒
+    alertText.innerText = `检测位置：${accidentInfo.areaName} → ${accidentInfo.pointName}\n事故类型：${accidentInfo.accidentType}`;
+    aiAlert.style.display = "flex";
+};
 </script>
 </body>
 </html>

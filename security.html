@@ -159,7 +159,6 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 14px rgba(0,0,0,0.3);
         }
-        /* 事故监控 红色高亮样式 */
         .monitor-box.warn {
             border: 2px solid #ff4757;
             box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
@@ -218,7 +217,6 @@
             box-shadow: none;
         }
 
-        /* 监控大图弹窗 */
         .modal {
             position: fixed;
             top: 0;
@@ -345,7 +343,6 @@
         .btn-red:hover {
             background: linear-gradient(135deg, #e84243, #d63031);
         }
-        /* 启动预案按钮样式 */
         .btn-plan {
             background: linear-gradient(135deg, #27ae60, #219653);
         }
@@ -353,7 +350,6 @@
             background: linear-gradient(135deg, #2ecc71, #27ae60);
         }
 
-        /* AI事故提醒弹窗样式 */
         .ai-alert-wrap {
             position: fixed;
             top: 0;
@@ -419,7 +415,6 @@
 </head>
 
 <body>
-    <!-- AI智能事故提醒弹窗 -->
     <div class="ai-alert-wrap" id="aiAlert">
         <div class="ai-alert-box">
             <div class="ai-alert-title">⚠️ AI智能监控 事故预警</div>
@@ -431,7 +426,6 @@
         </div>
     </div>
 
-    <!-- 监控大图弹窗 -->
     <div class="modal" id="imgModal" onclick="closeModal()">
         <div class="modal-content">
             <img id="bigImg" src="" alt="监控大图">
@@ -511,7 +505,6 @@ const nextPageBtn = document.getElementById("nextPage");
 const weatherIcon = document.getElementById("weatherIcon");
 const weatherDesc = document.getElementById("weatherDesc");
 
-// AI事故弹窗元素
 const aiAlert = document.getElementById("aiAlert");
 const alertText = document.getElementById("alertText");
 const jumpBtn = document.getElementById("jumpBtn");
@@ -521,7 +514,6 @@ let currentKey = "";
 let currentPage = 1;
 const pageSize = 8;
 
-// AI模拟事故数据
 const accidentInfo = {
     areaKey: "dorm",
     areaName: "宿舍楼区域",
@@ -529,7 +521,6 @@ const accidentInfo = {
     accidentType: "学生摔倒事故"
 };
 
-// 图片配置（已全部替换为阿里云地址）
 const imgUrls = {
     teach: [
         "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao1D.jpg",
@@ -567,7 +558,6 @@ const imgUrls = {
         "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi7.jpg",
         "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi8.jpg"
     ],
-    // 实验室：已替换阿里云
     lab: [
         "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi1.jpg",
         "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi2.jpg",
@@ -592,90 +582,37 @@ const imgUrls = {
     ]
 };
 
-// 分区点位数据
 const areaData = {
     teach: {
-        points: [
-            "教学楼1楼东走廊",
-            "教学楼1楼西走廊",
-            "教学楼2楼走廊",
-            "教学楼3楼走廊",
-            "教学楼主楼梯口",
-            "教学楼侧楼梯口",
-            "教学楼正门入口",
-            "教学楼后侧通道"
-        ],
-        events: ["学生摔倒", "拥挤踩踏危险", "火情隐患", "高空坠物", "学生冲突"]
+        points: ["教学楼1楼东走廊","教学楼1楼西走廊","教学楼2楼走廊","教学楼3楼走廊","教学楼主楼梯口","教学楼侧楼梯口","教学楼正门入口","教学楼后侧通道"],
+        events: ["学生摔倒","拥挤踩踏危险","火情隐患","高空坠物","学生冲突"]
     },
     dorm: {
-        points: [
-            "1号宿舍1楼楼道",
-            "1号宿舍2楼楼道",
-            "2号宿舍1楼楼道",
-            "2号宿舍大门",
-            "宿舍园区主干道",
-            "宿舍楼下休闲区"
-        ],
-        events: ["学生摔倒", "火情隐患", "外来人员闯入", "电器类设施异常"]
+        points: ["1号宿舍1楼楼道","1号宿舍2楼楼道","2号宿舍1楼楼道","2号宿舍大门","宿舍园区主干道","宿舍楼下休闲区"],
+        events: ["学生摔倒","火情隐患","外来人员闯入","电器类设施异常"]
     },
     canteen: {
-        points: [
-            "食堂正门入口",
-            "食堂打餐区1",
-            "食堂打餐区2",
-            "食堂就餐区",
-            "食堂后厨通道",
-            "食堂外侧走廊"
-        ],
-        events: ["人群拥挤", "地面湿滑摔倒", "火情隐患", "食材异常"]
+        points: ["食堂正门入口","食堂打餐区1","食堂打餐区2","食堂就餐区","食堂后厨通道","食堂外侧走廊"],
+        events: ["人群拥挤","地面湿滑摔倒","火情隐患","食材异常"]
     },
     class: {
-        points: [
-            "一年级1班教室",
-            "一年级2班教室",
-            "二年级1班教室",
-            "二年级2班教室",
-            "三年级1班教室",
-            "三年级2班教室",
-            "四年级1班教室",
-            "四年级2班教室"
-        ],
-        events: ["学生打闹", "物品坠落", "电器故障", "火情隐患", "学生冲突"]
+        points: ["一年级1班教室","一年级2班教室","二年级1班教室","二年级2班教室","三年级1班教室","三年级2班教室","四年级1班教室","四年级2班教室"],
+        events: ["学生打闹","物品坠落","电器故障","火情隐患","学生冲突"]
     },
     lab: {
-        points: [
-            "化学实验室",
-            "物理实验室",
-            "生物实验室",
-            "实验楼走廊",
-            "实验楼出入口"
-        ],
-        events: ["化学品泄漏", "仪器故障", "试剂倾倒", "火情隐患", "人员操作失误", "物品坠落"]
+        points: ["化学实验室","物理实验室","生物实验室","实验楼走廊","实验楼出入口"],
+        events: ["化学品泄漏","仪器故障","试剂倾倒","火情隐患","人员操作失误","物品坠落"]
     },
     playground: {
-        points: [
-            "塑胶跑道区域",
-            "篮球场",
-            "足球场",
-            "操场看台",
-            "操场西侧小路",
-            "体育器材室门口"
-        ],
-        events: ["运动摔伤", "高空坠物", "人员聚集拥堵"]
+        points: ["塑胶跑道区域","篮球场","足球场","操场看台","操场西侧小路","体育器材室门口"],
+        events: ["运动摔伤","高空坠物","人员聚集拥堵"]
     },
     gate: {
-        points: [
-            "学校正门",
-            "正门门卫室",
-            "大门左侧通道",
-            "大门右侧通道",
-            "校外路口监控"
-        ],
-        events: ["外来人员闯入", "人员拥堵", "门禁异常"]
+        points: ["学校正门","正门门卫室","大门左侧通道","大门右侧通道","校外路口监控"],
+        events: ["外来人员闯入","人员拥堵","门禁异常"]
     }
 };
 
-// 天气数据
 const weatherList = [
     { icon: '<i class="fas fa-sun" style="color:#ffd000"></i>', name: "晴天", prevent: "正常开展校园各项活动，提醒师生做好防晒、及时补水。", handle: "无特殊风险，安保人员执行常规巡逻即可。" },
     { icon: '<i class="fas fa-cloud" style="color:#cccccc"></i>', name: "阴天", prevent: "气温舒适，可正常安排户外活动，持续监测天气变化。", handle: "加强室外区域巡检，提前排查道路、设施安全隐患。" },
@@ -685,7 +622,6 @@ const weatherList = [
     { icon: '<i class="fas fa-wind" style="color:#b2bec3"></i>', name: "大风", prevent: "收好室外悬挂物、宣传栏，加固门窗，暂停高空作业与大型室外活动。", handle: "全面巡查树木、围栏、临时棚架，发现松动、倾斜立即加固或隔离警戒。" }
 ];
 
-// 自动天气
 function autoGetWeather(){
     let randomIdx = Math.floor(Math.random() * weatherList.length);
     let nowWeather = weatherList[randomIdx];
@@ -693,7 +629,6 @@ function autoGetWeather(){
     weatherDesc.innerHTML = `<h4>当前天气：${nowWeather.name}</h4><p>预防措施：${nowWeather.prevent}</p><p>应急处理：${nowWeather.handle}</p>`;
 }
 
-// 分区切换函数
 function loadTeach() { renderArea("teach"); }
 function loadDorm() { renderArea("dorm"); }
 function loadCanteen() { renderArea("canteen"); }
@@ -702,13 +637,11 @@ function loadLab() { renderArea("lab"); }
 function loadPlayground() { renderArea("playground"); }
 function loadGate() { renderArea("gate"); }
 
-// 渲染分区监控
 function renderArea(key) {
     currentKey = key;
     currentPage = 1;
     const data = areaData[key];
     pageBar.style.display = "none";
-
     eventSelect.innerHTML = "";
     data.events.forEach(ev => {
         let o = document.createElement("option");
@@ -718,7 +651,6 @@ function renderArea(key) {
     renderPage(data.points);
 }
 
-// 渲染单页监控 + 事故卡片标红
 function renderPage(allPoints) {
     monitorList.innerHTML = "";
     posSelect.innerHTML = "";
@@ -726,15 +658,12 @@ function renderPage(allPoints) {
     const end = start + pageSize;
     const pageData = allPoints.slice(start, end);
     const imgList = imgUrls[currentKey];
-
     pageData.forEach((name, idx) => {
         let opt = document.createElement("option");
         opt.innerText = name;
         posSelect.appendChild(opt);
-
         let box = document.createElement("div");
         box.className = "monitor-box";
-        // 判断是否为事故点位，添加红色高亮类名
         if(currentKey === accidentInfo.areaKey && name === accidentInfo.pointName){
             box.classList.add("warn");
         }
@@ -746,7 +675,6 @@ function renderPage(allPoints) {
         };
         monitorList.appendChild(box);
     });
-
     const total = Math.ceil(allPoints.length / pageSize);
     prevPageBtn.disabled = currentPage <= 1;
     nextPageBtn.disabled = currentPage >= total;
@@ -769,22 +697,18 @@ function closeModal() {
     imgModal.style.display = "none";
 }
 
-// 关闭AI预警弹窗
 closeAlertBtn.addEventListener("click", () => {
     aiAlert.style.display = "none";
 });
 
-// 跳转至事故对应监控画面
 jumpBtn.addEventListener("click", () => {
     aiAlert.style.display = "none";
     renderArea(accidentInfo.areaKey);
 });
 
-// 页面加载完成执行
 window.onload = function () {
     loadTeach();
     autoGetWeather();
-    // 页面载入后自动弹出AI事故提醒
     alertText.innerText = `检测位置：${accidentInfo.areaName} → ${accidentInfo.pointName}\n事故类型：${accidentInfo.accidentType}`;
     aiAlert.style.display = "flex";
 };

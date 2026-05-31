@@ -3,62 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校园火灾智能安防系统 - 教师值守终端</title>
+    <title>校园应急管理系统 - 教师端</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
         body {
-            background: #050d1b;
+            background: #00071a;
             color: #fff;
             height: 100vh;
             display: flex;
             overflow: hidden;
         }
 
-        /* 顶部导航 */
         .top-header {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
+            top: 0; left: 0; width: 100%; height: 50px;
             background: linear-gradient(90deg, #0a2463, #194080);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100;
             box-shadow: 0 2px 8px #0003;
         }
-        .top-header .title{color:#69d2ff;font-weight:bold;font-size:17px;}
+        .top-header .title{color:#69d2ff; font-weight:bold; font-size:17px;}
         .back-btn {
             background: linear-gradient(135deg, #2986cc, #40a9ff);
-            border: none;
-            border-radius: 6px;
-            padding: 6px 14px;
-            color: #fff;
-            cursor: pointer;
-            font-size:14px;
+            border: none; border-radius: 6px; padding: 6px 14px;
+            color: #fff; cursor: pointer; font-size:14px;
         }
 
-        /* 侧边栏 */
         .sidebar {
-            width: 140px;
+            width: 130px;
             background: #0a1427;
             border-right: 1px solid #1f3a6b;
-            padding-top: 60px;
+            padding-top: 50px;
             display: flex;
             flex-direction: column;
         }
         .sidebar-item {
-            padding: 12px 15px;
+            padding: 14px 8px;
             color: #a5b4d3;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             border-left: 3px solid transparent;
             transition: 0.2s;
-            margin:4px 8px;
-            border-radius:6px;
+            margin: 4px 6px;
+            border-radius: 6px;
+            text-align: center;
         }
         .sidebar-item.active {
             color: #40a9ff;
@@ -67,652 +56,517 @@
         }
         .sidebar-item:hover{background:rgba(64,169,255,0.08);}
 
-        /* 主内容区 */
         .main-content {
             flex: 1;
-            padding: 60px 20px 20px;
+            padding: 60px 15px 15px;
             overflow-y: auto;
             height: 100vh;
         }
         .page-title {
-            font-size: 20px;
+            font-size: 18px;
             color: #b0d4ff;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             border-left:4px solid #40a9ff;
-            padding-left:12px;
+            padding-left: 10px;
         }
-        .page-panel {
-            display: none;
-        }
-        .page-panel.show {
-            display: block;
-        }
+        .page-panel { display: none; }
+        .page-panel.show { display: block; }
 
-        /* 卡片通用样式 */
         .card {
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 10px;
-            border: 1px solid #1f3a6b;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(145deg, #0c1a33, #071226);
+            border: 1px solid #234886;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
         }
         .card-title {
-            color: #4dd0e1;
+            color: #5cd8ff;
             font-size: 16px;
             margin-bottom: 15px;
-            font-weight: bold;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #234886;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
         }
-        .card-title::before {
-            content: "📋";
-        }
-
-        /* 班级信息页 */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .info-item {
+        .cmd-item {
             background: #0f2242;
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid #234886;
-        }
-        .info-label {
-            color: #8fb8e6;
-            font-size: 13px;
-            margin-bottom: 5px;
-        }
-        .info-value {
-            color: #d0e8ff;
-            font-size: 15px;
-            font-weight: bold;
-        }
-        .rule-box {
-            border-left: 4px solid #ff4444;
-            padding: 12px 15px;
-            background: rgba(255,68,68,0.05);
-            margin-bottom: 10px;
+            border: 1px solid #2a4b80;
             border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
         }
-        .rule-title {
-            color: #ff7875;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .cmd-title { font-size:14px; font-weight:bold; color:#fff; margin-bottom:5px; }
+        .cmd-time { font-size:12px; color:#809dff; margin-bottom:6px; }
+        .cmd-content { font-size:13px; color:#c8d8ff; line-height:1.5; }
+        .cmd-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size:12px;
+            margin-right:5px;
         }
-        .rule-desc {
-            color: #c6e0ff;
-            font-size:13px;
-            line-height:1.5;
-        }
+        .tag-danger { background:#ff4444; color:#fff; }
+        .tag-warning { background:#ffbb33; color:#000; }
+        .tag-info { background:#33b5e5; color:#fff; }
+        .tag-normal { background:#2e7d32; color:#fff; }
 
-        /* 学生清点页 */
-        .student-table {
-            width: 100%;
-            border-collapse: collapse;
-            background:#0a1427;
-            border-radius:8px;
-            overflow:hidden;
-            margin-bottom: 20px;
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
         }
-        .student-table th, .student-table td {
+        .student-box {
+            background: #0f2242;
+            border: 1px solid #2a4b80;
+            border-radius: 6px;
+            padding: 10px 5px;
+            text-align: center;
+            font-size:13px;
+            cursor: pointer;
+            transition:0.2s;
+        }
+        .student-box.checked {
+            background: rgba(76, 217, 100, 0.15);
+            border-color: #4cd964;
+            color: #4cd964;
+        }
+        .form-group { margin-bottom:16px; }
+        .form-group label {
+            display:block;
+            font-size:14px;
+            color:#c0d8ff;
+            margin-bottom:8px;
+        }
+        .form-control {
+            width:100%;
+            padding:10px;
+            background:#0f2242;
+            border:1px solid #2a4b80;
+            border-radius:6px;
+            color:#fff;
+            font-size:14px;
+        }
+        textarea.form-control {
+            min-height:110px;
+            resize:none;
+        }
+        .btn {
+            padding:10px 20px;
+            border:none;
+            border-radius:6px;
+            color:#fff;
+            font-size:14px;
+            cursor:pointer;
+            background: linear-gradient(135deg, #2986cc, #40a9ff);
+            transition:0.2s;
+        }
+        .btn-success { background: linear-gradient(135deg, #2e7d32, #4cd964); }
+        .btn-warning { background: #ff8800; }
+        .btn-danger { background: #cc0000; }
+        .route-svg {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 8px;
+            border: 2px solid #40a9ff;
+            margin-top: 10px;
+            background: #081428;
+        }
+        .stats-row {
+            display: flex;
+            gap:15px;
+            margin-bottom:15px;
+        }
+        .stat-box {
+            flex:1;
+            background:#0f2242;
+            border:1px solid #2a4b80;
+            border-radius:6px;
             padding:12px;
             text-align:center;
-            border-bottom:1px solid #1f3a6b;
         }
-        .student-table th {
-            background:#0d1b36;
-            color:#40a9ff;
-            font-weight: bold;
-        }
-        .status-safe { color:#4cd964; font-weight:bold; }
-        .status-danger { color:#ff4444; font-weight:bold; }
-        .student-stats {
+        .stat-num { font-size:20px; font-weight:bold; color:#4cd964; margin-top:5px; }
+        .stat-label { font-size:13px; color:#a0c8ff; }
+        .row-two {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: #0f2242;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #234886;
-        }
-        .stat-num {
-            font-size: 24px;
-            font-weight: bold;
-            color: #40a9ff;
-            margin-bottom: 5px;
-        }
-        .stat-label {
-            color: #8fb8e6;
-            font-size: 13px;
-        }
-        .progress-bar {
-            width:100%;
-            height:10px;
-            background:#10254b;
-            border-radius:5px;
-            overflow:hidden;
-            margin:10px 0;
-        }
-        .progress {
-            height:100%;
-            background:linear-gradient(90deg,#41B3FF,#2D7DFF);
-            width:68%;
-        }
-        .btn-submit {
-            background:linear-gradient(135deg,#2986cc,#40a9ff);
-            color:#fff;
-            border:none;
-            padding:10px 20px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:14px;
-            transition: all 0.3s ease;
-        }
-        .btn-submit:hover {
-            background:linear-gradient(135deg,#2563eb,#3b82f6);
-            box-shadow: 0 0 10px rgba(64,169,255,0.5);
-        }
-        .btn-submit:disabled {
-            background: #334155;
-            cursor: not-allowed;
-        }
-
-        /* 疏散路线页 */
-        .fire-alert-bar {
-            background: rgba(255,68,68,0.1);
-            border: 1px solid #ff4444;
-            border-radius: 8px;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .fire-dot {
-            width:12px; height:12px; border-radius:50%;
-            background:#ff4444;
-            box-shadow:0 0 10px #ff4444;
-            animation:pulse 1s infinite alternate;
-        }
-        @keyframes pulse {
-            from{opacity:1;}
-            to{opacity:0.5;}
-        }
-
-        /* 步骤式路线 */
-        .path-steps {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 30px;
-        }
-        .step-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            width: 100px;
-        }
-        .step-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #40a9ff, #2986cc);
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(64,169,255,0.4);
-            position: relative;
-            z-index: 2;
-        }
-        .step-text {
-            color: #d0e8ff;
-            font-size: 13px;
-            text-align: center;
-            line-height: 1.4;
-        }
-        .step-line {
-            flex: 1;
-            height: 3px;
-            background: linear-gradient(90deg, #40a9ff, #4dd0e1);
-            position: relative;
-            z-index: 1;
-            margin-top: -25px;
-        }
-        .step-line::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: -4px;
-            width: 10px;
-            height: 10px;
-            background: #40a9ff;
-            border-radius: 50%;
-        }
-
-        /* 科技感平面疏散图 */
-        .evac-map-container {
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border: 1px solid #1f3a6b;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        .evac-map-title {
-            color: #4dd0e1;
-            font-size: 16px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .evac-map-title::before {
-            content: "🗺️";
-        }
-        .evac-map {
-            width: 100%;
-            height: 350px;
-            background: #050d1b;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #234886;
-        }
-        .map-grid {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                linear-gradient(rgba(64,169,255,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(64,169,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.3;
-        }
-        .map-floorplan {
-            position: absolute;
-            top: 20px; left: 20px; right: 20px; bottom: 20px;
-            border: 2px solid #40a9ff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(64,169,255,0.3);
-        }
-        .map-wall {
-            position: absolute;
-            background: rgba(64,169,255,0.3);
-            box-shadow: 0 0 5px rgba(64,169,255,0.5);
-        }
-        .map-wall-h {
-            height: 4px;
-            width: 100%;
-        }
-        .map-wall-v {
-            width: 4px;
-            height: 100%;
-        }
-        .map-path {
-            position: absolute;
-            height: 8px;
-            background: linear-gradient(90deg, #40a9ff, #4dd0e1);
-            border-radius: 4px;
-            box-shadow: 0 0 10px rgba(64,169,255,0.6);
-        }
-        .map-fire-path {
-            background: linear-gradient(90deg, #ff4444, #ff7875);
-            box-shadow: 0 0 10px rgba(255,68,68,0.6);
-        }
-        .map-point {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #40a9ff;
-            box-shadow: 0 0 10px rgba(64,169,255,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #fff;
-            font-weight: bold;
-        }
-        .map-point.fire {
-            background: #ff4444;
-            box-shadow: 0 0 10px rgba(255,68,68,0.8);
-        }
-        .map-label {
-            position: absolute;
-            color: #d0e8ff;
-            font-size: 12px;
-            background: rgba(0,0,0,0.7);
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .evac-rules {
-            background: rgba(64,169,255,0.05);
-            border: 1px solid #1f3a6b;
-            border-left: 4px solid #40a9ff;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .evac-rules h4 {
-            color: #40a9ff;
-            margin-bottom: 10px;
-        }
-        .evac-rules ul {
-            list-style: none;
-            padding: 0;
-        }
-        .evac-rules li {
-            color: #c6e0ff;
-            padding: 5px 0;
-            font-size: 13px;
-            position: relative;
-            padding-left: 15px;
-        }
-        .evac-rules li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: #40a9ff;
-            font-weight: bold;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
     </style>
 </head>
 <body>
 
-<!-- 顶部导航 -->
 <div class="top-header">
-    <div class="title">校园火灾应急疏散管理系统 - 教师端</div>
-    <!-- ✅ 这里修复了：加上 onclick 跳转 -->
-    <button class="back-btn" onclick="location.href='index.html'">返回登录</button>
+    <div class="title">校园应急管理系统 - 教师端</div>
+    <button class="back-btn" onclick="location.href='login.html'">返回登录</button>
 </div>
 
-<!-- 侧边栏 -->
 <div class="sidebar">
-    <div class="sidebar-item active" onclick="go('info')">班级信息</div>
-    <div class="sidebar-item" onclick="go('count')">学生清点</div>
-    <div class="sidebar-item" onclick="go('route')">疏散路线</div>
+    <div class="sidebar-item active" data-page="receive">指令接收</div>
+    <div class="sidebar-item" data-page="rollcall">学生点名</div>
+    <div class="sidebar-item" data-page="report">本班情况上报</div>
+    <div class="sidebar-item" data-page="route">疏散路线</div>
+    <div class="sidebar-item" data-page="hidden">隐患上报</div>
 </div>
 
-<!-- 主内容 -->
 <div class="main-content">
 
-    <!-- 班级信息页（扩容版） -->
-    <div class="page-panel show" id="page-info">
-        <div class="page-title">班级信息管理</div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">班级名称</div>
-                <div class="info-value">三年级（1）班</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">负责教师</div>
-                <div class="info-value">李老师</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">教室位置</div>
-                <div class="info-value">教学楼二楼东侧 203教室</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">班级总人数</div>
-                <div class="info-value">46人（男24/女22）</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">紧急集结点</div>
-                <div class="info-value">操场北侧安全区域</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">联系电话</div>
-                <div class="info-value">138-XXXX-XXXX</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">班主任</div>
-                <div class="info-value">张老师</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">辅导员</div>
-                <div class="info-value">王老师</div>
+    <!-- ========== 1. 指令接收 ========== -->
+    <div class="page-panel show" id="page-receive">
+        <div class="page-title">指令接收中心</div>
+        <div class="card">
+            <div class="card-title">最新紧急指令</div>
+            <div class="cmd-item">
+                <div class="cmd-title">【紧急疏散】教学楼区域火情预警</div>
+                <div class="cmd-time">2025-12-20 10:20:15</div>
+                <div class="cmd-content">请立即组织本班学生沿指定疏散路线撤离至操场安全区域，完成点名后第一时间上报本班情况。</div>
+                <span class="cmd-tag tag-danger">紧急</span>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">火情处置规则</div>
-            <div class="rule-box">
-                <div class="rule-title">一级火情 · 无需疏散</div>
-                <div class="rule-desc">教师使用就近灭火器初期处置，学生正常上课，保持秩序，听从统一指挥。</div>
+            <div class="card-title">历史指令记录</div>
+            
+            <div class="cmd-item">
+                <div class="cmd-title">【安全提醒】明日大暴雨预警</div>
+                <div class="cmd-time">2025-12-19 16:30:00</div>
+                <div class="cmd-content">请通知本班学生：明日暴雨天气，注意上下学安全，远离积水区域，不追逐打闹，按时到家报备平安。</div>
+                <span class="cmd-tag tag-warning">天气</span>
             </div>
-            <div class="rule-box">
-                <div class="rule-title">二级火情 · 戒备状态</div>
-                <div class="rule-desc">暂停教学活动，提醒学生做好防护戒备，教职工协同控火，严禁组织学生撤离。</div>
+
+            <div class="cmd-item">
+                <div class="cmd-title">【现场处置】三楼走廊学生意外摔倒</div>
+                <div class="cmd-time">2025-12-18 09:15:22</div>
+                <div class="cmd-content">请附近班级教师立即前往现场查看情况，维护秩序，联系校医，避免学生围观造成拥堵。</div>
+                <span class="cmd-tag tag-warning">处置</span>
             </div>
-            <div class="rule-box">
-                <div class="rule-title">三级火情 · 立即撤离</div>
-                <div class="rule-desc">立刻停止上课，按既定路线快速有序撤离至操场集结点，途中不打闹、不逆行、不折返。</div>
+
+            <div class="cmd-item">
+                <div class="cmd-title">【安全排查】教学楼附近高空坠物风险</div>
+                <div class="cmd-time">2025-12-17 14:10:05</div>
+                <div class="cmd-content">请提醒本班学生远离教学楼外墙区域，配合安保人员进行安全排查，禁止在危险区域逗留玩耍。</div>
+                <span class="cmd-tag tag-info">排查</span>
+            </div>
+
+            <div class="cmd-item">
+                <div class="cmd-title">【常规通知】课间安全纪律强调</div>
+                <div class="cmd-time">2025-12-16 08:30:00</div>
+                <div class="cmd-content">请加强课间管理，禁止攀爬、追逐、推搡，确保学生活动安全。</div>
+                <span class="cmd-tag tag-normal">常规</span>
             </div>
         </div>
     </div>
 
-    <!-- 学生清点页（丰富版） -->
-    <div class="page-panel" id="page-count">
-        <div class="page-title">本班学生清点</div>
-        <div class="student-stats">
-            <div class="stat-card">
-                <div class="stat-num">46</div>
-                <div class="stat-label">应到人数</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num">42</div>
-                <div class="stat-label">已安全撤离</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num">4</div>
-                <div class="stat-label">未清点</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num">0</div>
-                <div class="stat-label">滞留风险</div>
-            </div>
-        </div>
-
+    <!-- ========== 2. 学生点名 ========== -->
+    <div class="page-panel" id="page-rollcall">
+        <div class="page-title">本班学生点名确认</div>
         <div class="card">
-            <div class="card-title">学生安全状态列表</div>
-            <table class="student-table">
-                <thead>
-                    <tr>
-                        <th>序号</th>
-                        <th>姓名</th>
-                        <th>所在位置</th>
-                        <th>安全状态</th>
-                        <th>备注</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>张明</td>
-                        <td>操场</td>
-                        <td class="status-safe">安全</td>
-                        <td>已清点</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>李华</td>
-                        <td>操场</td>
-                        <td class="status-safe">安全</td>
-                        <td>已清点</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>王浩</td>
-                        <td>操场</td>
-                        <td class="status-safe">安全</td>
-                        <td>已清点</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>刘悦</td>
-                        <td>教学楼</td>
-                        <td class="status-danger">待确认</td>
-                        <td>需重点关注</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card">
-            <div class="card-title">撤离进度上报</div>
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <span style="color:#e2e8f0;">三年级（1）班</span>
-                <span style="color: #ffb400; font-weight: bold; margin-left: 10px;" id="progress-status">撤离进行中</span>
+            <div class="card-title">
+                <span>四年级3班 · 点名系统</span>
+                <span style="font-size:13px; color:#a0c8ff;">点击学生姓名标记已到</span>
             </div>
-            <div class="progress-bar"><div class="progress" id="progress-fill"></div></div>
-            <button class="btn-submit" id="submit-btn" onclick="submitReport()">确认本班已安全撤离并上报</button>
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label">总人数</div>
+                    <div class="stat-num">45</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">已点名</div>
+                    <div class="stat-num" id="checkedCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">未点名</div>
+                    <div class="stat-num" id="uncheckedCount">45</div>
+                </div>
+            </div>
+            <div class="student-grid" id="studentList"></div>
+            <button class="btn btn-success" onclick="completeRollcall()">✅ 确认点名完成并上报</button>
         </div>
     </div>
 
-    <!-- 疏散路线页（新增科技感地图版） -->
+    <!-- ========== 3. 本班情况上报（全面扩充版） ========== -->
+    <div class="page-panel" id="page-report">
+        <div class="page-title">本班应急情况上报</div>
+        <div class="card">
+            <div class="card-title">上报信息填写</div>
+
+            <div class="form-group">
+                <label>所在班级</label>
+                <select class="form-control">
+                    <option>四年级3班</option>
+                    <option>四年级1班</option>
+                    <option>四年级2班</option>
+                    <option>五年级1班</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>当前班级整体状态</label>
+                <select class="form-control">
+                    <option>已全部安全撤离至集结点</option>
+                    <option>撤离中，部分学生未到达</option>
+                    <option>有学生滞留教室/楼道</option>
+                    <option>通道受阻，无法正常撤离</option>
+                    <option>现场出现紧急异常情况</option>
+                </select>
+            </div>
+
+            <div class="row-two">
+                <div class="form-group">
+                    <label>班级总人数</label>
+                    <input type="number" class="form-control" value="45" readonly>
+                </div>
+                <div class="form-group">
+                    <label>已安全集结人数</label>
+                    <input type="number" class="form-control" placeholder="填写实到人数">
+                </div>
+            </div>
+
+            <div class="row-two">
+                <div class="form-group">
+                    <label>滞留/未到人数</label>
+                    <input type="number" class="form-control" value="0">
+                </div>
+                <div class="form-group">
+                    <label>滞留原因</label>
+                    <select class="form-control">
+                        <option>无滞留人员</option>
+                        <option>行动缓慢，落在后方</option>
+                        <option>身体不适无法走动</option>
+                        <option>现场拥堵无法通行</option>
+                        <option>其他原因</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row-two">
+                <div class="form-group">
+                    <label>是否有学生受伤</label>
+                    <select class="form-control">
+                        <option>无受伤人员</option>
+                        <option>轻微擦伤/磕碰</option>
+                        <option>扭伤/摔伤</option>
+                        <option>伤情较重，需紧急救治</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>受伤人数</label>
+                    <input type="number" class="form-control" value="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>现场临时处置措施</label>
+                <select class="form-control">
+                    <option>正常组织排队等候集合</option>
+                    <option>简单处理学生轻微伤势</option>
+                    <option>安排专人看护滞留学生</option>
+                    <option>临时隔离危险区域</option>
+                    <option>暂无处置动作</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>是否需要外部支援</label>
+                <select class="form-control">
+                    <option>不需要支援，本班可自行处理</option>
+                    <option>需要校医到场救助</option>
+                    <option>需要安保人员疏导秩序</option>
+                    <option>需要其他班级教师协助</option>
+                    <option>需要应急小组到场处置</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>详细情况补充说明</label>
+                <textarea class="form-control" placeholder="请详细描述现场环境、学生状态、遇到的困难、特殊情况等信息"></textarea>
+            </div>
+
+            <button class="btn">📤 提交上报信息至指挥中心</button>
+        </div>
+    </div>
+
+    <!-- ========== 4. 疏散路线（专业完整版教学楼疏散平面图） ========== -->
     <div class="page-panel" id="page-route">
-        <div class="page-title">班级疏散路线</div>
-
-        <div class="fire-alert-bar">
-            <div class="fire-dot"></div>
-            <div style="color:#ffdada">当前状态：三级火情 · 已启动紧急疏散流程</div>
-        </div>
-
-        <!-- 步骤式路线 -->
+        <div class="page-title">本班专属疏散路线图</div>
         <div class="card">
-            <div class="card-title">标准疏散流程</div>
-            <div class="path-steps">
-                <div class="step-box">
-                    <div class="step-icon">1</div>
-                    <div class="step-text">教室后门<br>集合整队</div>
-                </div>
-                <div class="step-line"></div>
+            <div class="card-title">路线示意图</div>
+            <svg class="route-svg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+                <!-- 箭头样式定义 -->
+                <defs>
+                    <marker id="arrowMain" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                        <path d="M0 0 L10 5 L0 10 z" fill="#ffcc00"/>
+                    </marker>
+                    <marker id="arrowSub" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M0 0 L10 5 L0 10 z" fill="#ff8800"/>
+                    </marker>
+                </defs>
 
-                <div class="step-box">
-                    <div class="step-icon">2</div>
-                    <div class="step-text">东侧楼梯<br>快速下楼</div>
-                </div>
-                <div class="step-line"></div>
+                <!-- 外框总区域 -->
+                <rect x="20" y="20" width="550" height="380" fill="none" stroke="#40a9ff" stroke-width="3" rx="4"/>
+                <text x="295" y="45" fill="#69d2ff" font-size="24" text-anchor="middle" font-weight="bold">综合教学楼 三层平面图</text>
 
-                <div class="step-box">
-                    <div class="step-icon">3</div>
-                    <div class="step-text">一楼出口<br>有序撤离</div>
-                </div>
-                <div class="step-line"></div>
+                <!-- 主走廊 -->
+                <rect x="120" y="80" width="350" height="40" fill="#1a2d52" stroke="#69d2ff"/>
+                <text x="295" y="108" fill="#fff" font-size="16" text-anchor="middle">主公共走廊</text>
 
-                <div class="step-box">
-                    <div class="step-icon">4</div>
-                    <div class="step-text">操场集结点<br>清点人数</div>
-                </div>
-            </div>
+                <!-- 左侧教室区 -->
+                <rect x="30" y="140" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="75" y="180" fill="#fff" font-size="14" text-anchor="middle">四年级1班</text>
+
+                <rect x="30" y="230" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="75" y="270" fill="#fff" font-size="14" text-anchor="middle">四年级2班</text>
+
+                <!-- 本班教室 重点标注 -->
+                <rect x="140" y="140" width="110" height="70" fill="#29528f" stroke="#ffcc00" stroke-width="2"/>
+                <text x="195" y="180" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">四年级3班（本班）</text>
+
+                <!-- 右侧教室区 -->
+                <rect x="270" y="140" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="315" y="180" fill="#fff" font-size="14" text-anchor="middle">五年级1班</text>
+
+                <rect x="380" y="140" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="425" y="180" fill="#fff" font-size="14" text-anchor="middle">五年级2班</text>
+
+                <rect x="270" y="230" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="315" y="270" fill="#fff" font-size="14" text-anchor="middle">教师办公室</text>
+
+                <rect x="380" y="230" width="90" height="70" fill="#234886" stroke="#69d2ff"/>
+                <text x="425" y="270" fill="#fff" font-size="14" text-anchor="middle">功能室</text>
+
+                <!-- 东侧主安全楼梯 主要疏散通道 -->
+                <rect x="480" y="80" width="70" height="140" fill="#2a4b80" stroke="#ffcc00" stroke-width="2"/>
+                <text x="515" y="155" fill="#ffcc00" font-size="15" text-anchor="middle" font-weight="bold">主安全楼梯</text>
+
+                <!-- 西侧备用楼梯 -->
+                <rect x="30" y="80" width="70" height="40" fill="#2a4b80" stroke="#ff8800"/>
+                <text x="65" y="108" fill="#ff8800" font-size="13" text-anchor="middle">备用楼梯</text>
+
+                <!-- 卫生间/辅助区域 -->
+                <rect x="140" y="230" width="110" height="70" fill="#1f3a6b" stroke="#69d2ff"/>
+                <text x="195" y="270" fill="#fff" font-size="14" text-anchor="middle">卫生间</text>
+
+                <!-- 楼外开阔通道 -->
+                <path d="M515 220 L515 400 L720 400" stroke="#ffcc00" stroke-width="5" fill="none" marker-end="url(#arrowMain)"/>
+                <path d="M65 120 L65 400 L720 400" stroke="#ff8800" stroke-width="3" fill="none" marker-end="url(#arrowSub)"/>
+
+                <!-- 操场集结区域 -->
+                <circle cx="800" cy="400" r="60" fill="#2e7d32" stroke="#4cd964" stroke-width="3"/>
+                <text x="800" y="390" fill="#fff" font-size="18" text-anchor="middle" font-weight="bold">操场</text>
+                <text x="800" y="415" fill="#fff" font-size="15" text-anchor="middle">应急集结点</text>
+
+                <!-- 本班完整疏散主路线 -->
+                <path d="M195 140 L195 120 L295 120 L515 120 L515 220" stroke="#ffcc00" stroke-width="4" fill="none" marker-end="url(#arrowMain)"/>
+
+                <!-- 路线文字标注 -->
+                <text x="220" y="115" fill="#ffcc00" font-size="14">出教室进入主走廊</text>
+                <text x="400" y="115" fill="#ffcc00" font-size="14">沿主走廊向东行进</text>
+                <text x="525" y="280" fill="#ffcc00" font-size="14">进入主楼梯下楼</text>
+                <text x="600" y="420" fill="#ffcc00" font-size="14">楼外通道直行</text>
+                <text x="740" y="380" fill="#4cd964" font-size="14">到达安全集结区</text>
+
+                <!-- 图例说明 -->
+                <rect x="20" y="420" width="550" height="70" fill="#0f2242" stroke="#2a4b80" rx="3"/>
+                <text x="40" y="448" fill="#a0c8ff" font-size="14">图例：</text>
+                <rect x="95" y="435" width="20" height="12" fill="#29528f" stroke="#ffcc00"/>
+                <text x="125" y="446" fill="#fff" font-size="13">本班教室</text>
+                <rect x="210" y="435" width="20" height="12" fill="#2a4b80" stroke="#ffcc00"/>
+                <text x="240" y="446" fill="#fff" font-size="13">主疏散楼梯</text>
+                <line x1="320" y1="441" x2="360" y2="441" stroke="#ffcc00" stroke-width="4"/>
+                <text x="370" y="446" fill="#fff" font-size="13">推荐疏散路线</text>
+                <circle cx="480" cy="441" r="8" fill="#2e7d32" stroke="#4cd964"/>
+                <text x="500" y="446" fill="#fff" font-size="13">安全集结点</text>
+            </svg>
         </div>
+    </div>
 
-        <!-- 科技感平面疏散图 -->
-        <div class="evac-map-container">
-            <div class="evac-map-title">203教室 楼层疏散平面图</div>
-            <div class="evac-map">
-                <div class="map-grid"></div>
-                <div class="map-floorplan"></div>
-                
-                <!-- 墙体 -->
-                <div class="map-wall map-wall-h" style="top: 20px; left: 20px; width: calc(100% - 40px);"></div>
-                <div class="map-wall map-wall-v" style="top: 20px; left: 20px; height: calc(100% - 40px);"></div>
-                <div class="map-wall map-wall-h" style="bottom: 20px; left: 20px; width: calc(100% - 40px);"></div>
-                <div class="map-wall map-wall-v" style="top: 20px; right: 20px; height: calc(100% - 40px);"></div>
-                
-                <!-- 教室区域 -->
-                <div class="map-wall map-wall-v" style="top: 20px; left: 20%; height: calc(100% - 40px);"></div>
-                <div class="map-wall map-wall-h" style="top: 40%; left: 20%; width: calc(100% - 40px - 20%);"></div>
-                
-                <!-- 疏散路线 -->
-                <div class="map-path" style="top: 60%; left: 10%; width: 15%;"></div>
-                <div class="map-path" style="top: 60%; left: 25%; width: 20%; transform: rotate(90deg);"></div>
-                <div class="map-path" style="top: 30%; left: 25%; width: 30%;"></div>
-                <div class="map-path" style="top: 30%; left: 55%; width: 20%; transform: rotate(90deg);"></div>
-                <div class="map-path" style="top: 50%; left: 55%; width: 35%;"></div>
-                
-                <!-- 起火点（红色路线） -->
-                <div class="map-path map-fire-path" style="top: 20%; left: 70%; width: 15%;"></div>
-                <div class="map-path map-fire-path" style="top: 20%; left: 70%; width: 20%; transform: rotate(90deg);"></div>
-                
-                <!-- 关键点 -->
-                <div class="map-point" style="top: 60%; left: 10%;">教</div>
-                <div class="map-point" style="top: 30%; left: 45%;">楼</div>
-                <div class="map-point" style="top: 50%; left: 85%;">出</div>
-                <div class="map-point.fire" style="top: 20%; left: 80%;">火</div>
-                
-                <!-- 标签 -->
-                <div class="map-label" style="top: 65%; left: 5%;">203教室</div>
-                <div class="map-label" style="top: 35%; left: 40%;">安全楼梯口</div>
-                <div class="map-label" style="top: 55%; left: 80%;">一楼出口</div>
-                <div class="map-label" style="top: 15%; left: 75%;">起火点</div>
+    <!-- ========== 5. 安全隐患上报 ========== -->
+    <div class="page-panel" id="page-hidden">
+        <div class="page-title">校园安全隐患上报</div>
+        <div class="card">
+            <div class="card-title">隐患信息填写</div>
+            <div class="form-group">
+                <label>隐患位置（精确到楼层/区域）</label>
+                <input type="text" class="form-control" placeholder="例：教学楼3楼东侧楼梯口">
             </div>
-        </div>
-
-        <!-- 疏散规则 -->
-        <div class="evac-rules">
-            <h4>疏散执行要求</h4>
-            <ul>
-                <li>立即停止上课，组织学生弯腰捂口鼻，保持低姿前进</li>
-                <li>全程不拥挤、不逆行、不返回教室取物，避免发生踩踏</li>
-                <li>保持安静有序，听从教师统一指挥，按预定路线撤离</li>
-                <li>到达操场集结点后，立即清点人数并上报「已安全撤离」状态</li>
-            </ul>
+            <div class="form-group">
+                <label>隐患类型</label>
+                <select class="form-control">
+                    <option>消防通道堵塞/关闭</option>
+                    <option>电路/电器/插座隐患</option>
+                    <option>墙体/地面/扶手破损</option>
+                    <option>消防设施过期/失效</option>
+                    <option>高空坠物风险</option>
+                    <option>学生活动区域危险</option>
+                    <option>其他安全隐患</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>紧急程度</label>
+                <select class="form-control">
+                    <option>一般隐患</option>
+                    <option>较重隐患</option>
+                    <option>紧急危险（立即处理）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>隐患详细描述</label>
+                <textarea class="form-control" placeholder="请详细描述隐患情况、危险程度、建议处理方式等"></textarea>
+            </div>
+            <div class="form-group">
+                <label>上传现场照片（可选）</label>
+                <input type="file" class="form-control" style="padding:5px;">
+            </div>
+            <button class="btn btn-warning">🚨 提交隐患上报</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    function go(page){
-        document.querySelectorAll('.page-panel').forEach(p=>p.classList.remove('show'))
-        document.getElementById('page-'+page).classList.add('show')
-        document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'))
-        event.currentTarget.classList.add('active')
+    // 页面切换
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const page = item.dataset.page;
+            document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('show'));
+            document.getElementById('page-' + page).classList.add('show');
+        });
+    });
+
+    // 45名学生姓名
+    const students = [
+        "李浩宇","王梓晨","张馨予","刘浩然","陈子涵","杨雨桐","黄俊豪","周欣悦","吴雨泽","郑欣怡",
+        "林宇轩","高雨萱","邓博文","钟欣妍","彭子豪","蒋欣悦","蔡宇恒","潘欣妍","余子涵","戴俊豪",
+        "方欣悦","宋宇轩","毛子涵","万俊豪","崔欣悦","熊子涵","江俊豪","侯欣悦","贺子轩","雷俊豪",
+        "龙欣悦","黎子涵","肖俊豪","钱欣悦","汤子涵","尹俊豪","易欣悦","常子涵","武俊豪","乔欣悦",
+        "贺子轩","龚俊豪","文欣悦","樊子涵","牛俊豪"
+    ];
+
+    const container = document.getElementById('studentList');
+    students.forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'student-box';
+        div.innerText = name;
+        div.onclick = () => {
+            div.classList.toggle('checked');
+            updateCount();
+        };
+        container.appendChild(div);
+    });
+
+    function updateCount(){
+        const total = students.length;
+        const checked = document.querySelectorAll('.student-box.checked').length;
+        document.getElementById('checkedCount').innerText = checked;
+        document.getElementById('uncheckedCount').innerText = total - checked;
     }
 
-    // 按钮点击上报功能
-    function submitReport() {
-        const btn = document.getElementById('submit-btn');
-        const progressFill = document.getElementById('progress-fill');
-        const progressStatus = document.getElementById('progress-status');
-        
-        // 禁用按钮防止重复提交
-        btn.disabled = true;
-        btn.textContent = "上报中...";
-        
-        // 模拟上报过程
-        setTimeout(() => {
-            // 更新进度条和状态
-            progressFill.style.width = "100%";
-            progressStatus.textContent = "已安全撤离";
-            progressStatus.style.color = "#4cd964";
-            
-            // 按钮状态更新
-            btn.textContent = "已上报";
-            btn.style.background = "#4cd964";
-            
-            // 弹出提示
-            alert("✅ 上报成功！三年级（1）班已全部安全撤离，校端已收到通知。");
-        }, 1500);
+    function completeRollcall(){
+        alert("✅ 点名完成，已自动上报至指挥中心");
     }
 </script>
-
 </body>
 </html>

@@ -8,7 +8,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
         body {
-            background: #050d1b;
+            background: #00071a;
             color: #fff;
             height: 100vh;
             display: flex;
@@ -18,47 +18,38 @@
         /* 顶部导航 */
         .top-header {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
+            top: 0; left: 0; width: 100%; height: 50px;
             background: linear-gradient(90deg, #0a2463, #194080);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100;
             box-shadow: 0 2px 8px #0003;
         }
-        .top-header .title{color:#69d2ff;font-weight:bold;font-size:17px;}
-        .top-header .back-btn {
+        .top-header .title{color:#69d2ff; font-weight:bold; font-size:17px;}
+        .back-btn {
             background: linear-gradient(135deg, #2986cc, #40a9ff);
-            border: none;
-            border-radius: 6px;
-            padding: 6px 14px;
-            color: #fff;
-            cursor: pointer;
-            font-size:14px;
+            border: none; border-radius: 6px; padding: 6px 14px;
+            color: #fff; cursor: pointer; font-size:14px;
         }
 
-        /* 侧边栏 */
+        /* 左侧主导航栏 */
         .sidebar {
-            width: 120px;
+            width: 110px;
             background: #0a1427;
             border-right: 1px solid #1f3a6b;
-            padding-top: 60px;
+            padding-top: 50px;
             display: flex;
             flex-direction: column;
         }
         .sidebar-item {
-            padding: 12px 15px;
+            padding: 12px 8px;
             color: #a5b4d3;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             border-left: 3px solid transparent;
             transition: 0.2s;
-            margin:4px 8px;
-            border-radius:6px;
+            margin: 4px 6px;
+            border-radius: 6px;
+            text-align: center;
         }
         .sidebar-item.active {
             color: #40a9ff;
@@ -70,989 +61,1255 @@
         /* 主内容区 */
         .main-content {
             flex: 1;
-            padding: 60px 20px 20px;
-            overflow-y: auto;
+            padding: 50px 8px 8px;
+            overflow: hidden;
             height: 100vh;
         }
         .page-title {
-            font-size: 20px;
+            font-size: 18px;
             color: #b0d4ff;
-            margin-bottom: 20px;
+            margin-bottom: 6px;
             border-left:4px solid #40a9ff;
-            padding-left:12px;
+            padding-left: 10px;
         }
         .page-panel {
             display: none;
-            height: calc(100% - 80px);
+            height: calc(100% - 30px);
         }
-        .page-panel.show {
-            display: block;
-        }
+        .page-panel.show { display: block; }
 
-        /* 监控大屏样式 */
+        /* 监控外层容器 */
         .monitor-wrap {
             display: flex;
-            gap: 20px;
+            gap: 8px;
             height: 100%;
         }
+
+        /* 左侧点位选择栏 */
         .monitor-select-box {
-            width: 200px;
+            width: 100px;
             background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 8px;
             border: 1px solid #1f3a6b;
         }
         .select-title {
-            font-size: 16px;
-            color: #4dd0e1;
-            margin-bottom: 15px;
+            font-size: 14px;
+            color: #69d2ff;
+            margin-bottom: 10px;
+            text-align: center;
         }
         .pos-item {
-            padding: 10px;
-            margin-bottom: 8px;
+            padding: 10px 4px;
+            margin-bottom: 6px;
             background: #080e1b;
             border-radius: 6px;
             cursor: pointer;
             border: 1px solid #1f3a6b;
             transition: 0.2s;
+            font-size: 12px;
+            text-align: center;
         }
         .pos-item.active {
             border-color: #40a9ff;
             background: rgba(64,169,255,0.15);
         }
-        .pos-item.fire-alarm {
-            border-color: #ff4444;
-            background: rgba(255,68,68,0.15);
-        }
+        .pos-item:hover{ background: rgba(64,169,255,0.08); }
 
+        /* 监控主容器 */
         .monitor-main {
             flex: 1;
-            background: linear-gradient(145deg, #0a1427, #0d1b36);
-            border-radius: 10px;
-            padding: 20px;
+            background: #0a1427;
+            border-radius: 8px;
+            padding: 6px;
             border: 1px solid #1f3a6b;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .center-title {
-            font-size: 18px;
+            font-size: 16px;
             color: #b0d4ff;
-            margin-bottom: 20px;
-        }
-        .single-monitor-card {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #080e1b;
-            border: 1px solid #1f3a6b;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .single-monitor-card.fire {
-            border: 2px solid #ff4444;
-            box-shadow: 0 0 15px #ff444460;
-        }
-        .monitor-time {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #4dd0e1;
-            font-size: 14px;
-            z-index: 2;
-        }
-        .monitor-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background:#000;
-        }
-        .monitor-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn-monitor {
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-monitor.blue {
-            background: linear-gradient(135deg, #2986cc, #40a9ff);
-            color: #fff;
-        }
-        .btn-monitor.red {
-            background: linear-gradient(135deg, #e64340, #ff7875);
-            color: #fff;
+            margin-bottom: 6px;
+            text-align: center;
         }
 
-        .multi-monitor-box{
-            display: none;
-            grid-template-columns: repeat(3,1fr);
-            grid-template-rows: repeat(2,1fr);
-            gap:10px;
-            width:100%;
-            aspect-ratio:16/9;
-        }
-        .multi-monitor-box.show{display:grid;}
-        .mini-screen{
-            background:#080e1b;
-            border:1px solid #1f3a6b;
-            border-radius:6px;
-            overflow: hidden;
-            position: relative;
-        }
-        .mini-screen video{
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background:#000;
-        }
-        .mini-screen.warn{
-            border:2px solid #ff4444;
-        }
-
-        .stat-row {
+        /* 监控网格 + 红色动态闪烁边框 */
+        .monitor-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-rows: repeat(2, 1fr);
+            gap: 6px;
+            width: 100%;
+            flex: 1;
         }
-        .stat-card {
-            background: #080e1b;
-            border: 1px solid #1f3a6b;
-            border-radius: 8px;
-            padding: 15px;
-            min-height: 150px;
+        .monitor-item {
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #2a4b80;
+            aspect-ratio: 16 / 9;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .stat-card h4 {
-            color: #4dd0e1;
-            margin-bottom: 10px;
-            font-size: 15px;
+        .monitor-item.alert-border {
+            animation: redFlash 1s infinite;
+            border-width: 3px;
         }
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 14px;
-            color: #d0e8ff;
+        @keyframes redFlash {
+            0% { border-color: #ff2222; box-shadow: 0 0 8px #ff2222; }
+            50% { border-color: #ff6666; box-shadow: 0 0 16px #ff6666; }
+            100% { border-color: #ff2222; box-shadow: 0 0 8px #ff2222; }
         }
-        .danger-text {
-            color: #ff5555;
-            font-weight: bold;
-        }
-        .safe-text {
-            color: #4cd964;
-        }
-        .warn-text{
-            color:#ffb400;
-        }
-
-        /* ========== 优化后应急指令页面 ========== */
-        .command-wrap {
-            display: grid;
-            grid-template-columns: 260px 1fr 280px;
-            gap: 20px;
+        .monitor-item img {
+            width: 100%;
             height: 100%;
+            object-fit: cover;
         }
-        .cmd-panel{
-            background: linear-gradient(145deg,#0c1a33,#071226);
-            border:1px solid #234886;
-            border-radius:12px;
-            padding:18px;
-            box-shadow:0 4px 12px rgba(0,40,100,0.15);
-        }
-        .panel-title{
-            color:#5cd8ff;
-            font-size:16px;
-            padding-bottom:10px;
-            margin-bottom:15px;
-            border-bottom:1px dashed #234886;
-            display:flex;
-            align-items:center;
-            gap:8px;
-        }
-        .panel-title i{color:#ffb84d;}
-
-        /* 左侧模板&下发对象 */
-        .temp-item{
-            background:#0f2242;
-            border-radius:6px;
-            padding:10px;
-            margin-bottom:8px;
-            cursor:pointer;
-            border:1px solid #234886;
-            transition:0.2s;
-            font-size:14px;
-        }
-        .temp-item:hover{border-color:#40a9ff;background:rgba(64,169,255,0.1);}
-        .check-row{
-            display:flex;
-            align-items:center;
-            padding:6px 0;
-            font-size:14px;
-            color:#c6e0ff;
-        }
-
-        /* 中间编辑区 */
-        .alert-notice{
-            background:linear-gradient(90deg,rgba(255,136,0,0.15),rgba(255,180,0,0.05));
-            border:1px solid #ffb400;
-            border-radius:8px;
-            padding:12px;
-            color:#ffdd70;
-            margin-bottom:15px;
-        }
-        .select-group{
-            display:flex;
-            gap:12px;
-            margin-bottom:15px;
-        }
-        .select-group select{
-            flex:1;
-            height:36px;
-            background:#0f2242;
-            border:1px solid #234886;
+        .monitor-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background:rgba(0,0,0,0.7);
             color:#fff;
-            border-radius:6px;
-            padding:0 10px;
-            outline:none;
-        }
-        .cmd-textarea{
-            width:100%;
-            height:160px;
-            background:#0f2242;
-            border:1px solid #234886;
-            border-radius:8px;
-            color:#e0edff;
-            padding:12px;
-            resize:none;
-            line-height:1.7;
-            font-size:14px;
-            margin-bottom:15px;
-        }
-        .btn-group{
-            display:flex;
-            gap:10px;
-            flex-wrap:wrap;
-        }
-        .cmd-btn{
-            padding:9px 16px;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:14px;
-            transition:0.2s;
-        }
-        .btn-send{background:linear-gradient(135deg,#2986cc,#40a9ff);color:#fff;}
-        .btn-save{background:#324b77;color:#fff;}
-        .btn-cancel{background:#6b3838;color:#fff;}
-        .btn-clear{background:#444;color:#fff;}
-
-        /* 右侧进度&日志 */
-        .progress-item{
-            display:flex;
-            justify-content:space-between;
-            padding:8px 0;
-            font-size:14px;
-            color:#c6e0ff;
-        }
-        .progress-bar-bg{
-            width:100%;
-            height:8px;
-            background:#0f2242;
-            border-radius:4px;
-            margin:8px 0 12px;
-        }
-        .progress-bar-fill{
-            height:100%;
-            width:68%;
-            background:linear-gradient(90deg,#36d177,#4cd964);
-            border-radius:4px;
-        }
-        .log-list{
-            max-height:220px;
-            overflow-y:auto;
-        }
-        .log-line{
-            font-size:13px;
-            color:#a0c8ff;
-            padding:8px 0;
-            border-bottom:1px solid #1a3058;
-        }
-
-        /* 疏散进度页面 */
-        .progress-container{
-            display:grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap:18px;
-            height:calc(100% - 40px);
-        }
-        .chart-card{
-            background: linear-gradient(145deg, #081A3A, #0B2452);
-            border:1px solid #1A4088;
-            border-radius:10px;
-            padding:15px;
-            box-shadow:0 0 12px rgba(30,90,180,0.2);
-        }
-        .chart-card h4{
-            color:#64B5FF;
-            margin-bottom:12px;
-            text-align:center;
-            font-size:15px;
-        }
-        .pie-card{grid-column:1/2;grid-row:1/2;}
-        .bar-card{grid-column:2/3;grid-row:1/2;}
-        .line-card{grid-column:3/4;grid-row:1/2;}
-        .info-card1{grid-column:1/4;grid-row:2/3;}
-        canvas{width:100%!important;height:200px!important;}
-        .person-item{
-            display:flex;
-            justify-content:space-between;
-            padding:8px 0;
-            font-size:14px;
-            color:#d0e8ff;
-        }
-        .progress-bar-box{
-            width:100%;
-            height:12px;
-            background:#10254b;
-            border-radius:6px;
-            margin:10px 0;
-            overflow:hidden;
-        }
-        .progress-bar-fill{
-            height:100%;
-            background:linear-gradient(90deg,#41B3FF,#2D7DFF);
-            transition:all 0.8s ease;
-        }
-
-        /* ========== 升级后历史演练台账页面 ========== */
-        .record-wrap {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            height: 100%;
-        }
-        .record-panel{
-            background: linear-gradient(145deg,#0c1a33,#071226);
-            border:1px solid #234886;
-            border-radius:12px;
-            padding:18px;
-            box-shadow:0 4px 12px rgba(0,40,100,0.15);
-        }
-        .record-list{
-            height:100%;
-            display:flex;
-            flex-direction:column;
-            gap:12px;
-        }
-        .record-item{
-            background:#0f2242;
-            border:1px solid #234886;
-            border-radius:8px;
-            padding:14px;
-            cursor:pointer;
-            transition:0.2s;
-        }
-        .record-item:hover{border-color:#40a9ff;background:rgba(64,169,255,0.1);}
-        .record-title{
-            font-size:15px;
-            color:#fff;
-            margin-bottom:6px;
-            display:flex;
-            justify-content:space-between;
-        }
-        .record-date{font-size:13px;color:#a0c8ff;}
-        .record-status{
             font-size:12px;
-            padding:2px 8px;
-            border-radius:10px;
-            background:#1a3b7a;
-            color:#69d2ff;
-        }
-        .record-status.completed{background:#1a4b3a;color:#4cd964;}
-        .record-status.running{background:#5c481a;color:#ffb400;}
-
-        .detail-panel{
-            display:flex;
-            flex-direction:column;
-            gap:15px;
-        }
-        .detail-header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding-bottom:12px;
-            border-bottom:1px dashed #234886;
-        }
-        .detail-title{font-size:18px;color:#5cd8ff;}
-        .detail-btn{
-            padding:6px 12px;
-            background:#324b77;
-            border:none;
-            border-radius:6px;
-            color:#fff;
-            cursor:pointer;
-            font-size:13px;
-        }
-        .detail-info{
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:12px;
-        }
-        .info-block{
-            background:#0f2242;
-            border-radius:8px;
-            padding:12px;
-        }
-        .info-row{
-            display:flex;
-            justify-content:space-between;
-            padding:6px 0;
-            font-size:14px;
-            color:#c6e0ff;
-        }
-        .info-row .label{color:#8fb8e6;}
-        .detail-stats{
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:12px;
-        }
-        .stat-block{
-            background:#0f2242;
-            border-radius:8px;
-            padding:14px;
+            padding: 4px 0;
             text-align:center;
         }
-        .stat-num{
-            font-size:24px;
-            font-weight:bold;
-            color:#40a9ff;
-            margin-bottom:4px;
-        }
-        .stat-label{font-size:13px;color:#a0c8ff;}
-        .detail-log{
-            background:#0f2242;
-            border-radius:8px;
-            padding:14px;
-            flex:1;
-            overflow-y:auto;
-        }
-        .log-title{
-            color:#5cd8ff;
-            font-size:15px;
-            margin-bottom:10px;
-            border-bottom:1px solid #234886;
-            padding-bottom:8px;
-        }
-        .log-item{
-            font-size:13px;
-            color:#a0c8ff;
-            padding:8px 0;
-            border-bottom:1px solid #1a3058;
-        }
 
-        /* 弹窗样式 */
-        .alarm-modal {
+        /* 监控大图弹窗 */
+        .monitor-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
+            background: rgba(0,0,0,0.85);
+            z-index: 9998;
+            display: none;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            padding: 20px;
         }
-        .alarm-box {
-            background: linear-gradient(145deg, #1a3b7a, #0d2450);
-            border: 2px solid #ff4444;
-            border-radius: 10px;
-            width: 400px;
-            padding: 30px;
-            box-shadow: 0 0 30px #ff444480;
+        .modal-content {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #40a9ff;
         }
-        .alarm-title {
-            color: #ff4444;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
+        .modal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 32px;
             text-align: center;
         }
-        .alarm-info {
-            line-height: 2;
-            color: #fff;
-            margin-bottom: 25px;
-            font-size: 16px;
+
+        /* 事件上报弹窗 */
+        .alert-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            background: #0f1a33;
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            z-index: 9999;
+            padding: 20px;
+            display: none;
         }
-        .btn-confirm {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #2986cc, #40a9ff);
+        .alert-popup h3 {
+            color: #ff4444;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .alert-content {
+            line-height: 1.8;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background: #081022;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .alert-btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .alert-btn {
+            padding: 8px 18px;
             border: none;
             border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-jump {
+            background: #ff3333;
             color: #fff;
-            font-size: 16px;
+        }
+        .btn-close {
+            background: #4466aa;
+            color: #fff;
+        }
+
+        /* 指令模块布局 */
+        .command-wrap {
+            display: grid;
+            grid-template-columns: 240px 1fr 280px;
+            gap: 8px;
+            height: 100%;
+        }
+        .cmd-panel{
+            background: linear-gradient(145deg,#0c1a33,#071226);
+            border:1px solid #234886;
+            border-radius: 6px;
+            padding:12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-title{
+            color:#5cd8ff;
+            font-size:15px;
+            padding-bottom:6px;
+            margin-bottom:10px;
+            border-bottom:1px dashed #234886;
+        }
+        /* 操作台按钮 */
+        .leader-btn {
+            background:#1a3058;
+            border-radius:4px;
+            padding:9px;
+            margin-bottom:6px;
+            cursor:pointer;
+            border:1px solid #345899;
+            font-size:13px;
+            text-align:center;
+            transition: 0.2s;
+        }
+        .leader-btn:hover {
+            background: #254077;
+            border-color: #40a9ff;
+        }
+        /* 实时/历史消息 */
+        .real-msg {
+            flex: 1;
+            background: #081022;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 10px;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+        .msg-item {
+            font-size: 13px;
+            line-height: 1.6;
+            padding: 4px 0;
+            border-bottom: 1px solid #1f3a6b;
+        }
+        .msg-red { color: #ff6666; }
+        .history-msg {
+            flex: 1;
+            background: #081022;
+            border-radius: 4px;
+            padding: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        /* 丰富自定义指令区域样式 */
+        .cmd-desc {
+            font-size: 12px;
+            color: #a0c8ff;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .template-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .template-btn {
+            background: #1a3058;
+            border: 1px solid #345899;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
             cursor: pointer;
         }
+        .template-btn:hover {
+            background: #254077;
+            border-color: #40a9ff;
+        }
+        .cmd-textarea{
+            width:100%;
+            height:120px;
+            background:#0f2242;
+            border:1px solid #234886;
+            border-radius:4px;
+            color:#e0edff;
+            padding:8px;
+            resize:none;
+            font-size:13px;
+            margin-bottom:10px;
+        }
+        .btn-group{ display:flex; gap:6px; margin-bottom:10px; }
+        .cmd-btn{
+            padding:6px 12px;
+            border:none;
+            border-radius:4px;
+            color:#fff;
+            font-size:13px;
+            cursor:pointer;
+        }
+        .btn-send{background:linear-gradient(135deg,#2986cc,#40a9ff);}
+        .btn-clear{background:#444;}
+        .cmd-status {
+            font-size: 12px;
+            padding: 6px;
+            background: #081022;
+            border-radius: 4px;
+        }
+        .select-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .select-row select{
+            flex:1;
+            height:30px;
+            background:#0f2242;
+            border:1px solid #234886;
+            color:#fff;
+            border-radius:4px;
+            padding:0 6px;
+            font-size:13px;
+        }
+
+        /* 执行进度样式（迁移至处置进度页） */
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 4px 0;
+        }
+        .progress-bar-bg{
+            width:100%;
+            height:6px;
+            background:#0f2242;
+            border-radius:3px;
+            margin:8px 0;
+        }
+        .progress-bar-fill{
+            height:100%;
+            width:68%;
+            background:linear-gradient(90deg,#36d177,#4cd964);
+            border-radius:3px;
+        }
+        .log-list{max-height:180px;overflow-y:auto;}
+        .log-line{font-size:12px;color:#a0c8ff;padding:4px 0;border-bottom:1px solid #1a3058;}
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top:10px;
+        }
+        .stat-card {
+            background: #080e1b;
+            border: 1px solid #1f3a6b;
+            border-radius: 4px;
+            padding:10px;
+        }
+        .stat-card h4 {
+            color: #4dd0e1;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+            color: #d0e8ff;
+        }
+        .danger-text { color: #ff5555; }
+        .safe-text { color: #4cd964; }
+        .warn-text{ color:#ffb400; }
+
+        /* 处置进度页面布局 —— 已大幅充实 */
+        .progress-container{
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr 280px;
+            grid-template-rows: auto auto auto;
+            gap: 10px;
+            height:100%;
+        }
+        .chart-card{
+            background: linear-gradient(145deg, #081A3A, #0B2452);
+            border:1px solid #1A4088;
+            border-radius:8px;
+            padding:14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .chart-card h4{color:#64B5FF;margin-bottom:4px;text-align:center;font-size:15px;}
+        .chart-desc {
+            font-size: 12px;
+            color: #c0d8ff;
+            line-height: 1.5;
+            text-align: center;
+            padding: 4px 0;
+        }
+        .pie-card{grid-column:1/2;grid-row:1/2;}
+        .bar-card{grid-column:2/3;grid-row:1/2;}
+        .line-card{grid-column:3/4;grid-row:1/2;}
+        .info-card1{grid-column:1/4;grid-row:2/3;}
+        .info-card2{grid-column:1/4;grid-row:3/3;}
+
+        .progress-side{
+            grid-column:4/5;
+            grid-row:1/4;
+            background: linear-gradient(145deg,#0c1a33,#071226);
+            border:1px solid #234886;
+            border-radius:8px;
+            padding:14px;
+            display:flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        canvas{width:100%!important;height:160px!important;}
+        .person-item{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#d0e8ff;}
+        .progress-bar-box{width:100%;height:10px;background:#10254b;border-radius:4px;margin:8px 0;overflow:hidden;}
+        .progress-bar-fill{height:100%;background:linear-gradient(90deg,#41B3FF,#2D7DFF);}
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .data-card {
+            background: #0c1a33;
+            border: 1px solid #234886;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .data-card .num {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4cd964;
+            margin: 4px 0;
+        }
+        .data-card .label {
+            font-size: 12px;
+            color: #a0c8ff;
+        }
+
+        .record-wrap {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap:8px;
+            height:100%;
+        }
+        .record-panel{
+            background: linear-gradient(145deg,#0c1a33,#071226);
+            border:1px solid #234886;
+            border-radius:4px;
+            padding:10px;
+        }
+        .record-list{height:100%;display:flex;flex-direction:column;gap:6px;}
+        .record-item{
+            background:#0f2242;
+            border:1px solid #234886;
+            border-radius:4px;
+            padding:8px;
+            cursor:pointer;
+            font-size:13px;
+        }
+        .record-title{font-size:13px;color:#fff;margin-bottom:4px;display:flex;justify-content:space-between;}
+        .record-date{font-size:12px;color:#a0c8ff;}
+        .record-status{font-size:11px;padding:2px 6px;border-radius:3px;background:#1a3b7a;color:#69d2ff;}
+        .record-status.completed{background:#1a4b3a;color:#4cd964;}
+        .detail-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:6px;border-bottom:1px dashed #234886;margin-bottom:8px;}
+        .detail-title{font-size:16px;color:#5cd8ff;}
+        .detail-btn{padding:4px 8px;background:#324b77;border:none;border-radius:4px;color:#fff;font-size:12px;cursor:pointer;}
+        .detail-info{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+        .info-block{background:#0f2242;border-radius:4px;padding:8px;}
+        .detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+        .stat-block{background:#0f2242;border-radius:4px;padding:8px;text-align:center;}
+        .stat-num{font-size:18px;font-weight:bold;color:#40a9ff;margin-bottom:2px;}
+        .stat-label{font-size:12px;color:#a0c8ff;}
+        .detail-log{background:#0f2242;border-radius:4px;padding:8px;flex:1;overflow-y:auto;}
+        .log-title{color:#5cd8ff;font-size:14px;margin-bottom:6px;border-bottom:1px solid #234886;padding-bottom:6px;}
+        .log-item{font-size:12px;color:#a0c8ff;padding:4px 0;border-bottom:1px solid #1a3058;}
+
+        /* 二级选择弹窗 */
+        .sub-pop {
+            position: fixed;
+            background: #0f1a33;
+            border: 1px solid #40a9ff;
+            border-radius: 6px;
+            padding: 10px;
+            z-index: 10000;
+            display: none;
+            min-width: 180px;
+        }
+        .sub-pop-item {
+            padding: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .sub-pop-item:hover {
+            background: #1a3058;
+        }
+
+        /* ========= 【新加】应急指令下方饱满内容 ========= */
+        .cmd-extra-box {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .cmd-timer-bar {
+            height: 6px;
+            background: #10254b;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .cmd-timer-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #40a9ff, #2986cc);
+            transition: width 0.3s;
+        }
+        .cmd-history-box {
+            background: #081022;
+            border-radius: 4px;
+            padding: 8px;
+            max-height: 110px;
+            overflow-y: auto;
+        }
+        .cmd-history-item {
+            font-size: 12px;
+            color: #c0d8ff;
+            padding: 4px 0;
+            border-bottom: 1px solid #1a3058;
+            line-height: 1.4;
+        }
+        .cmd-tag-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .cmd-tag {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #1a3058;
+            color: #a0c8ff;
+        }
+        .cmd-tag.blue { background: #1a3b7a; color: #69d2ff; }
+        .cmd-tag.green { background: #1a4b3a; color: #4cd964; }
+        .cmd-tag.orange { background: #4b3a1a; color: #ffb400; }
+        .cmd-brief {
+            background: #081022;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 12px;
+            color: #c0d8ff;
+            line-height: 1.5;
+        }
+
     </style>
 </head>
 <body>
-    <!-- 告警弹窗 -->
-    <div class="alarm-modal" id="alarmModal">
-        <div class="alarm-box">
-            <div class="alarm-title">三级火情紧急告警</div>
-            <div class="alarm-info">
-                <p><strong>危险等级：</strong>三级火情</p>
-                <p><strong>起火地点：</strong>教学楼楼层区域</p>
-                <p><strong>现场情况：</strong>明火剧烈燃烧，浓烟快速扩散</p>
-                <p><strong>应急条件：</strong>校内消防器材可临时扑救，已申请外部救援</p>
+
+<!-- 二级选项弹窗 -->
+<div class="sub-pop" id="subPop"></div>
+
+<!-- 安保上报事件弹窗 -->
+<div class="alert-popup" id="alertPopup">
+    <h3>⚠️ 安保端紧急上报</h3>
+    <div class="alert-content" id="alertPopupContent">
+        上报时间：2026-05-30 10:20:15<br>
+        上报位置：教学楼1楼东走廊<br>
+        事件类型：烟雾异常告警<br>
+        上报人：安保执勤人员02号
+    </div>
+    <div class="alert-btn-group">
+        <button class="alert-btn btn-jump" id="jumpMonitorBtn">跳转至事发监控</button>
+        <button class="alert-btn btn-close" id="closePopupBtn">关闭</button>
+    </div>
+</div>
+
+<!-- 监控大图弹窗 -->
+<div class="monitor-modal" id="monitorModal">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <img id="modalImg" src="" alt="监控大图">
+    </div>
+</div>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="title">校园火灾应急疏散管理系统 - 校领导端</div>
+    <button class="back-btn" onclick="location.href='login.html'">返回登录页</button>
+</div>
+
+<!-- 左侧主导航 -->
+<div class="sidebar">
+    <div class="sidebar-item active" data-page="monitor">监控大屏</div>
+    <div class="sidebar-item" data-page="command">应急指令</div>
+    <div class="sidebar-item" data-page="progress">处置进度</div>
+    <div class="sidebar-item" data-page="record">历史演练</div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main-content">
+    <!-- 监控大屏 -->
+    <div class="page-panel show" id="page-monitor">
+        <div class="page-title">全域实时监控中心</div>
+        <div class="monitor-wrap">
+            <div class="monitor-select-box">
+                <div class="select-title">点位切换</div>
+                <div class="pos-item active" data-area="teach">教学楼</div>
+                <div class="pos-item" data-area="dorm">宿舍楼</div>
+                <div class="pos-item" data-area="canteen">食堂</div>
+                <div class="pos-item" data-area="class">教室</div>
+                <div class="pos-item" data-area="lab">实验室</div>
+                <div class="pos-item" data-area="play">操场</div>
+                <div class="pos-item" data-area="gate">校门</div>
             </div>
-            <button class="btn-confirm" id="closeModalBtn">确认接收告警信息</button>
+
+            <div class="monitor-main">
+                <div class="center-title" id="areaTitle">教学楼区域实时监控</div>
+                <div class="monitor-grid" id="monitorGrid"></div>
+            </div>
         </div>
     </div>
 
-    <!-- 顶部导航 -->
-    <div class="top-header">
-        <div class="title">校园火灾应急疏散管理系统 - 校领导端</div>
-        <button class="back-btn" onclick="location.href='login.html'">返回登录页</button>
+    <!-- 应急指令 → 已删除 上报上级主管部门 + 下方已饱满 -->
+    <div class="page-panel" id="page-command">
+        <div class="page-title">应急指令调度中心</div>
+        <div class="command-wrap">
+            <!-- 左侧：操作台 + 消息记录 -->
+            <div class="cmd-panel">
+                <div class="panel-title">操作台</div>
+                <div class="leader-btn" onclick="showSubMenu(1,event)">封锁事发区域通道</div>
+                <div class="leader-btn" onclick="showSubMenu(2,event)">调度安保人员增援</div>
+                <div class="leader-btn" onclick="showSubMenu(3,event)">联系校医/应急小组</div>
+                <div class="leader-btn" onclick="showSubMenu(5,event)">解除应急状态</div>
+
+                <div class="panel-title" style="margin-top:15px;">实时上报消息</div>
+                <div class="real-msg" id="realMsgBox">
+                    <div class="msg-item msg-red">【10:20:15】教学楼1楼东走廊 烟雾异常告警</div>
+                </div>
+
+                <div class="panel-title">历史上报记录</div>
+                <div class="history-msg" id="historyMsgBox">
+                    <div class="msg-item">【09:12:03】食堂外侧走廊 人员逗留异常</div>
+                    <div class="msg-item">【昨日 16:40:22】操场看台 物品掉落预警</div>
+                    <div class="msg-item">【昨日 14:15:10】宿舍楼2楼楼道 灯光故障上报</div>
+                    <div class="msg-item">【05-28 08:30:00】教学楼正门 门禁异常</div>
+                </div>
+            </div>
+
+            <!-- 中间：自定义应急指令 → 下方已饱满！！！ -->
+            <div class="cmd-panel">
+                <div class="panel-title">自定义应急指令</div>
+                <div class="cmd-desc">选择目标区域、接收人员，选用快捷模板或手动编辑指令下发</div>
+
+                <div class="select-row">
+                    <select id="targetArea">
+                        <option value="teach">教学楼区域</option>
+                        <option value="dorm">宿舍楼区域</option>
+                        <option value="canteen">食堂区域</option>
+                        <option value="class">普通教室区域</option>
+                        <option value="lab">实验区域</option>
+                        <option value="play">操场&户外区域</option>
+                        <option value="gate">校园大门区域</option>
+                    </select>
+                    <select id="targetUser">
+                        <option value="all">全体人员</option>
+                        <option value="teacher">任课老师</option>
+                        <option value="security">安保人员</option>
+                        <option value="medical">医务人员</option>
+                        <option value="logistics">后勤人员</option>
+                        <option value="manager">管理人员</option>
+                    </select>
+                </div>
+
+                <div class="template-group">
+                    <button class="template-btn" onclick="fillCmd(1)">疏散引导</button>
+                    <button class="template-btn" onclick="fillCmd(2)">隐患排查</button>
+                    <button class="template-btn" onclick="fillCmd(3)">区域警戒</button>
+                    <button class="template-btn" onclick="fillCmd(4)">现场救援</button>
+                    <button class="template-btn" onclick="fillCmd(5)">秩序维护</button>
+                </div>
+
+                <textarea class="cmd-textarea" id="cmdInput">请各岗位人员立即按照应急方案开展工作，确保人员安全，现场有序。</textarea>
+
+                <div class="btn-group">
+                    <button class="cmd-btn btn-send" onclick="sendCmd()">下发指令</button>
+                    <button class="cmd-btn btn-clear" onclick="emptyCmd()">清空内容</button>
+                </div>
+
+                <div class="cmd-status">
+                    当前状态：<span class="warn-text">待下发</span>
+                    | 目标区域：<span id="curArea">教学楼区域</span>
+                    | 接收人员：<span id="curUser">全体人员</span>
+                </div>
+
+                <!-- ====================== 【新加：饱满内容】 ====================== -->
+                <div class="cmd-extra-box">
+                    <div class="panel-title" style="margin-top:5px;"></div>
+                    <div class="cmd-timer-bar">
+                        <div class="cmd-timer-fill" id="cmdTimer"></div>
+                    </div>
+
+                    <div class="panel-title">指令下发记录</div>
+                    <div class="cmd-history-box" id="cmdHistoryBox">
+                        <div class="cmd-history-item">暂无指令记录</div>
+                    </div>
+
+                    <div class="panel-title">现场状态标签</div>
+                    <div class="cmd-tag-group">
+                        <div class="cmd-tag orange">火情预警</div>
+                        <div class="cmd-tag blue">疏散中</div>
+                        <div class="cmd-tag green">无伤亡</div>
+                        <div class="cmd-tag blue">安保到位</div>
+                        <div class="cmd-tag green">秩序正常</div>
+                    </div>
+
+                    <div class="panel-title">现场实时简报</div>
+                    <div class="cmd-brief">
+                        事发点：教学楼1楼东走廊<br>
+                        状态：烟雾告警，无明火，人员正在有序疏散<br>
+                        处置：安保已到位，通道已封锁，等待指令执行
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右侧：系统运行日志 -->
+            <div class="cmd-panel">
+                <div class="panel-title">系统运行日志</div>
+                <div class="log-list">
+                    <div class="log-line">10:20:15 接收安保端异常上报</div>
+                    <div class="log-line">10:20:18 系统自动标记事发点位</div>
+                    <div class="log-line">10:21:02 安保人员抵达现场</div>
+                    <div class="log-line">10:22:05 等待领导指令下发</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-row">
+            <div class="stat-card">
+                <h4>现场上报</h4>
+                <div class="stat-item"><span>上报时间</span><span id="reportTime">2026-05-30 10:20:15</span></div>
+                <div class="stat-item"><span>事件类型</span><span class="danger-text">烟雾告警</span></div>
+                <div class="stat-item"><span>上报人</span><span>安保执勤人员</span></div>
+            </div>
+            <div class="stat-card">
+                <h4>处置状态</h4>
+                <div class="stat-item"><span>现场状态</span><span class="warn-text">处置中</span></div>
+                <div class="stat-item"><span>人员疏散</span><span class="safe-text">进行中</span></div>
+                <div class="stat-item"><span>安保人员</span><span>已到位</span></div>
+            </div>
+            <div class="stat-card">
+                <h4>整体态势</h4>
+                <div class="stat-item"><span>风险区域</span><span>教学楼1楼东走廊</span></div>
+                <div class="stat-item"><span>通行通道</span><span class="warn-text">临时封闭</span></div>
+                <div class="stat-item"><span>风险评估</span><span class="danger-text">中等风险</span></div>
+            </div>
+        </div>
     </div>
 
-    <!-- 侧边栏 -->
-    <div class="sidebar">
-        <div class="sidebar-item" data-page="monitor">监控大屏</div>
-        <div class="sidebar-item" data-page="command">应急指令</div>
-        <div class="sidebar-item" data-page="progress">疏散进度</div>
-        <div class="sidebar-item active" data-page="record">历史演练</div>
-    </div>
+    <!-- 处置进度页面 → 已大幅充实 + 图表文字总结 -->
+    <div class="page-panel" id="page-progress">
+        <div class="page-title">应急处置总进度</div>
+        <div class="progress-container">
+            <div class="chart-card pie-card">
+                <h4>人员分布状态</h4>
+                <canvas id="pieChart"></canvas>
+                <div class="chart-desc">已撤离人员占比约35%，大部分人员正在疏散，少量人员滞留现场排查隐患。</div>
+            </div>
 
-    <!-- 主内容区 -->
-    <div class="main-content">
-        <!-- 监控大屏 -->
-        <div class="page-panel" id="page-monitor">
-            <div class="page-title">全域实时火情监控中心</div>
-            <div class="monitor-wrap">
-                <div class="monitor-select-box">
-                    <div class="select-title">监控点位切换</div>
-                    <div class="pos-item fire-alarm active" data-index="0">教学楼区域</div>
-                    <div class="pos-item" data-index="1">实验室区域</div>
-                    <div class="pos-item" data-index="2">食堂后厨区域</div>
-                    <div class="pos-item" data-index="3">普通教室区域</div>
-                    <div class="pos-item" data-index="4">储物间区域</div>
-                    <div class="pos-item" data-index="5">宿舍楼楼道区域</div>
+            <div class="chart-card bar-card">
+                <h4>楼层疏散统计</h4>
+                <canvas id="barChart"></canvas>
+                <div class="chart-desc">各楼层疏散人数均衡，二楼人数略高，整体撤离节奏平稳有序。</div>
+            </div>
+
+            <div class="chart-card line-card">
+                <h4>实时疏散趋势</h4>
+                <canvas id="lineChart"></canvas>
+                <div class="chart-desc">撤离人数持续稳步上升，10分钟内已完成近150人疏散，速度符合预期。</div>
+            </div>
+
+            <!-- 右侧：执行进度模块 -->
+            <div class="progress-side">
+                <div class="panel-title">执行总进度</div>
+                <div class="progress-item"><span>当前指令状态</span><span class="safe-text">处置中</span></div>
+                <div class="progress-item"><span>安保响应状态</span><span class="safe-text">已到位</span></div>
+                <div class="progress-item"><span>区域管控状态</span><span class="warn-text">已封锁</span></div>
+                <div class="progress-item"><span>医疗救护状态</span><span class="safe-text">待命</span></div>
+                <div class="progress-item"><span>现场指挥状态</span><span class="safe-text">正常</span></div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+
+                <div class="panel-title">处置总览</div>
+                <div style="font-size:12px;color:#c0d8ff;line-height:1.6;">
+                    本次火情已启动一级应急响应，教学楼全员疏散中，安保已封锁危险区域，医护人员待命，整体可控无危险。
                 </div>
-                <div class="monitor-main">
-                    <div class="center-title">教学楼火情实时画面</div>
-                    <div class="single-monitor-card fire" id="showMonitor">
-                        <div class="monitor-time" id="nowTime">05-23 22:00:00</div>
-                        <video class="monitor-video" id="mainVideo" autoplay muted loop playsinline controls></video>
-                    </div>
-                    <div class="multi-monitor-box" id="multiMonitor">
-                        <div class="mini-screen warn"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                        <div class="mini-screen"><video class="monitor-video" autoplay muted loop playsinline controls></video></div>
-                    </div>
 
-                    <div class="monitor-buttons">
-                        <button class="btn-monitor blue" id="allScreenBtn">全开所有区域监控</button>
-                        <button class="btn-monitor blue">锁定当前监控画面</button>
-                        <button class="btn-monitor red" id="alarmBtn">一键启动全域警报</button>
-                    </div>
-
-                    <div class="stat-row">
-                        <div class="stat-card">
-                            <h4>火情态势实时研判</h4>
-                            <div class="stat-item"><span>当前火情等级</span><span class="danger-text">三级火情</span></div>
-                            <div class="stat-item"><span>起火核心位置</span><span>教学楼楼层</span></div>
-                            <div class="stat-item"><span>危险覆盖范围</span><span class="danger-text">整栋教学楼</span></div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>现场应急处置状态</h4>
-                            <div class="stat-item"><span>火势蔓延趋势</span><span class="danger-text">快速向上扩散</span></div>
-                            <div class="stat-item"><span>现场灭火推进</span><span class="warn-text">28%</span></div>
-                            <div class="stat-item"><span>预估扑灭耗时</span><span>12分钟</span></div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>外部应急联动响应</h4>
-                            <div class="stat-item"><span>消防救援报备</span><span class="safe-text">已提交求援</span></div>
-                            <div class="stat-item"><span>医疗救护待命</span><span class="safe-text">现场随时支援</span></div>
-                            <div class="stat-item"><span>校门通道管控</span><span class="safe-text">已封闭管制</span></div>
-                        </div>
-                    </div>
-                    <div class="stat-row">
-                        <div class="stat-card">
-                            <h4>校内救援人员部署</h4>
-                            <div class="stat-item"><span>安保人员</span><span>4名</span></div>
-                            <div class="stat-item"><span>校内医护人员</span><span>2名</span></div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>防火抢险物资储备</h4>
-                            <div class="stat-item"><span>可用灭火器材</span><span class="safe-text">42具</span></div>
-                            <div class="stat-item"><span>输水消防水带</span><span class="safe-text">充足齐备</span></div>
-                            <div class="stat-item"><span>防护急救物资</span><span class="safe-text">储备足额</span></div>
-                        </div>
-                    </div>
+                <div class="panel-title">执行日志</div>
+                <div class="log-list">
+                    <div class="log-line">10:20:15 接收安保端异常上报</div>
+                    <div class="log-line">10:20:18 系统自动标记事发点位</div>
+                    <div class="log-line">10:21:02 安保人员抵达现场</div>
+                    <div class="log-line">10:22:05 领导下发疏散指令</div>
+                    <div class="log-line">10:23:10 全员开始有序疏散</div>
+                    <div class="log-line">10:25:30 二楼、三楼疏散完成</div>
                 </div>
             </div>
-        </div>
 
-        <!-- 应急指令页面 -->
-        <div class="page-panel" id="page-command">
-            <div class="page-title">应急指令智能调度中心</div>
-            <div class="command-wrap">
-                <!-- 左侧：指令模板 + 下发对象 -->
-                <div class="cmd-panel">
-                    <div class="panel-title">📋 快捷指令模板</div>
-                    <div class="temp-item" onclick="fillCmd(1)">全员紧急疏散指令</div>
-                    <div class="temp-item" onclick="fillCmd(2)">现场明火扑救指令</div>
-                    <div class="temp-item" onclick="fillCmd(3)">被困人员搜救指令</div>
-                    <div class="temp-item" onclick="fillCmd(4)">现场外围警戒指令</div>
-
-                    <div class="panel-title" style="margin-top:20px;">👥 指令接收岗位</div>
-                    <div class="check-row">
-                        <input type="checkbox" checked id="post1">
-                        <label for="post1">全体安保执勤人员</label>
-                    </div>
-                    <div class="check-row">
-                        <input type="checkbox" checked id="post2">
-                        <label for="post2">各楼层值班教师</label>
-                    </div>
-                    <div class="check-row">
-                        <input type="checkbox" id="post3">
-                        <label for="post3">后勤物资保障组</label>
-                    </div>
-                    <div class="check-row">
-                        <input type="checkbox" id="post4">
-                        <label for="post4">医疗应急救援小组</label>
-                    </div>
-                </div>
-
-                <!-- 中间：指令编辑发布区 -->
-                <div class="cmd-panel">
-                    <div class="alert-notice">
-                        ⚠️ 紧急预警：三级火情触发，教学楼区域即刻开展人员分层撤离避险作业
-                    </div>
-                    <div class="select-group">
-                        <select id="fireLevel">
-                            <option>一级火情</option>
-                            <option>二级火情</option>
-                            <option selected>三级火情</option>
-                        </select>
-                        <select id="targetArea">
-                            <option>教学楼全域区域</option>
-                            <option>实验室危险区域</option>
-                            <option>宿舍生活区域</option>
-                        </select>
-                    </div>
-                    <textarea class="cmd-textarea" id="cmdInput">全体教学楼内人员保持冷静，听从现场指挥分层分批撤离，优先疏散低层人员，避开浓烟与明火区域，教职工负责引导本班学生有序离场，安保人员封堵危险楼层，严防人员折返逗留。</textarea>
-                    <div class="btn-group">
-                        <button class="cmd-btn btn-send" onclick="sendCmd()">下发调度指令</button>
-                        <button class="cmd-btn btn-save" onclick="saveScheme()">留存处置方案</button>
-                        <button class="cmd-btn btn-cancel" onclick="revokeCmd()">撤销已发指令</button>
-                        <button class="cmd-btn btn-clear" onclick="emptyCmd()">清空编辑内容</button>
-                    </div>
-                </div>
-
-                <!-- 右侧：执行进度 + 操作日志 -->
-                <div class="cmd-panel">
-                    <div class="panel-title">📊 指令执行进度</div>
-                    <div class="progress-item">
-                        <span>指令下发状态</span>
-                        <span class="safe-text">已成功推送终端</span>
-                    </div>
-                    <div class="progress-item">
-                        <span>在线接收终端</span>
-                        <span>9 / 12 台</span>
-                    </div>
-                    <div class="progress-item">
-                        <span>现场整体执行进度</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                    <div class="progress-item">
-                        <span>预估处置完成时长</span>
-                        <span>7 分钟</span>
-                    </div>
-
-                    <div class="panel-title" style="margin-top:20px;">📜 实时处置日志</div>
-                    <div class="log-list">
-                        <div class="log-line">2026-05-24 09:12 检测到教学楼火情警报</div>
-                        <div class="log-line">2026-05-24 09:13 自动推送全域疏散预警</div>
-                        <div class="log-line">2026-05-24 09:14 安保队伍赶赴现场管控</div>
-                        <div class="log-line">2026-05-24 09:15 提交外部消防救援申请</div>
-                        <div class="log-line">2026-05-24 09:16 医疗小组抵达现场待命</div>
-                    </div>
-                </div>
+            <div class="chart-card info-card1">
+                <h4>整体疏散数据</h4>
+                <div class="person-item">总人数：426</div>
+                <div class="person-item">已撤离：148</div>
+                <div class="person-item">撤离中：265</div>
+                <div class="person-item">整体进度：34.74%</div>
+                <div class="progress-bar-box"><div class="progress-bar-fill" style="width:34.74%"></div></div>
             </div>
-        </div>
 
-        <!-- 疏散进度页面 -->
-        <div class="page-panel" id="page-progress">
-            <div class="page-title">教学楼区域人员疏散动态统计</div>
-            <div class="fire-info-bar">
-                <span>起火点位：教学楼楼层</span>
-                <span>危险等级：<span class="danger-level">三级火情</span></span>
-                <span>疏散范围：整栋教学楼内部全部人员</span>
-                <span>处置状态：全力开展分层撤离作业</span>
-            </div>
-            <div class="progress-container">
-                <div class="chart-card pie-card">
-                    <h4>人员实时状态占比分布</h4>
-                    <canvas id="pieChart"></canvas>
-                </div>
-                <div class="chart-card bar-card">
-                    <h4>各楼层人员撤离数量统计</h4>
-                    <canvas id="barChart"></canvas>
-                </div>
-                <div class="chart-card line-card">
-                    <h4>整体撤离进度实时变化趋势</h4>
-                    <canvas id="lineChart"></canvas>
-                </div>
-                <div class="chart-card info-card1">
-                    <h4>教学楼全域疏散精准汇总数据</h4>
-                    <div class="person-item">楼栋常驻总人数：426人</div>
-                    <div class="person-item">成功撤离至安全区：148人</div>
-                    <div class="person-item">楼内等待撤离人员：265人</div>
-                    <div class="person-item">浓烟区滞留排查人员：13人</div>
-                    <div class="person-item">当前整体疏散完成率：34.74%</div>
-                    <div class="progress-bar-box">
-                        <div class="progress-bar-fill" style="width:34.74%"></div>
+            <div class="chart-card info-card2">
+                <h4>实时状态数据卡片</h4>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <div class="num">426</div>
+                        <div class="label">总人数</div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 删减后历史演练记录页面 -->
-        <div class="page-panel show" id="page-record">
-            <div class="page-title">历史演练记录</div>
-            <div class="record-wrap">
-                <!-- 左侧：演练记录列表 -->
-                <div class="record-panel">
-                    <div class="panel-title">📋 演练记录列表</div>
-                    <div class="record-list">
-                        <div class="record-item" onclick="selectRecord(1)">
-                            <div class="record-title">
-                                <span>教学楼火灾应急演练</span>
-                                <span class="record-status completed">已完成</span>
-                            </div>
-                            <div class="record-date">2026-05-18 | 参与人数：426人</div>
-                        </div>
-                        <div class="record-item" onclick="selectRecord(2)">
-                            <div class="record-title">
-                                <span>宿舍区火灾疏散演练</span>
-                                <span class="record-status completed">已完成</span>
-                            </div>
-                            <div class="record-date">2026-03-12 | 参与人数：312人</div>
-                        </div>
+                    <div class="data-card">
+                        <div class="num">148</div>
+                        <div class="label">已撤离</div>
                     </div>
-                </div>
-
-                <!-- 右侧：演练详情卡片 -->
-                <div class="record-panel detail-panel">
-                    <div class="detail-header">
-                        <h3 class="detail-title">教学楼火灾应急演练详情</h3>
-                        <button class="detail-btn" onclick="exportRecord()">导出台账报告</button>
+                    <div class="data-card">
+                        <div class="num">34.7%</div>
+                        <div class="label">完成率</div>
                     </div>
-
-                    <div class="detail-info">
-                        <div class="info-block">
-                            <div class="info-row"><span class="label">演练日期</span><span>2026-05-18</span></div>
-                            <div class="info-row"><span class="label">演练区域</span><span>教学楼全域</span></div>
-                            <div class="info-row"><span class="label">组织部门</span><span>校保卫处</span></div>
-                        </div>
-                        <div class="info-block">
-                            <div class="info-row"><span class="label">参与总人数</span><span>426人</span></div>
-                            <div class="info-row"><span class="label">演练等级</span><span>三级火情模拟</span></div>
-                            <div class="info-row"><span class="label">处置完成率</span><span class="safe-text">98.2%</span></div>
-                        </div>
+                    <div class="data-card">
+                        <div class="num">正常</div>
+                        <div class="label">现场秩序</div>
                     </div>
-
-                    <div class="detail-stats">
-                        <div class="stat-block">
-                            <div class="stat-num">426</div>
-                            <div class="stat-label">参与人数</div>
-                        </div>
-                        <div class="stat-block">
-                            <div class="stat-num">4:26</div>
-                            <div class="stat-label">平均撤离时长</div>
-                        </div>
-                        <div class="stat-block">
-                            <div class="stat-num">100%</div>
-                            <div class="stat-label">安全撤离率</div>
-                        </div>
-                        <div class="stat-block">
-                            <div class="stat-num">98.2%</div>
-                            <div class="stat-label">处置达标率</div>
-                        </div>
+                    <div class="data-card">
+                        <div class="num">无伤亡</div>
+                        <div class="label">安全状态</div>
                     </div>
-
-                    <div class="detail-log">
-                        <div class="log-title">演练关键节点记录</div>
-                        <div class="log-item">09:00 演练启动，模拟教学楼三楼火情警报触发</div>
-                        <div class="log-item">09:01 疏散指令下发，各楼层师生有序撤离</div>
-                        <div class="log-item">09:05 首批人员抵达安全集结点，清点人数</div>
-                        <div class="log-item">09:08 所有人员撤离完毕，无滞留人员</div>
-                        <div class="log-item">09:10 消防小组完成现场明火处置演练</div>
-                        <div class="log-item">09:15 演练结束，现场总结评估</div>
+                    <div class="data-card">
+                        <div class="num">可控</div>
+                        <div class="label">险情等级</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const videoSrcArr = [
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/your-video.mp4",
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shiyanshi.mp4",
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/shitang.mp4",
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/jiaoshi.mp4",
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/chuwujian.mp4",
-            "https://yinjigl.oss-cn-beijing.aliyuncs.com/video/sushe.mp4"
-        ];
+    <!-- 历史演练记录 -->
+    <div class="page-panel" id="page-record">
+        <div class="page-title">历史演练记录</div>
+        <div class="record-wrap">
+            <div class="record-panel">
+                <div class="panel-title">演练列表</div>
+                <div class="record-list">
+                    <div class="record-item" onclick="selectRecord(1)">
+                        <div class="record-title"><span>教学楼消防演练</span><span class="record-status completed">已完成</span></div>
+                        <div class="record-date">2026-05-18 | 参与426人</div>
+                    </div>
+                    <div class="record-item" onclick="selectRecord(2)">
+                        <div class="record-title"><span>宿舍区疏散演练</span><span class="record-status completed">已完成</span></div>
+                        <div class="record-date">2026-03-12 | 参与312人</div>
+                    </div>
+                </div>
+            </div>
+            <div class="record-panel detail-panel">
+                <div class="detail-header">
+                    <h3 class="detail-title">演练详情</h3>
+                    <button class="detail-btn" onclick="exportRecord()">导出记录</button>
+                </div>
+                <div class="detail-info">
+                    <div class="info-block">
+                        <div class="info-row"><span class="label">演练日期</span><span>2026-05-18</span></div>
+                        <div class="info-row"><span class="label">演练区域</span><span>教学楼全域</span></div>
+                        <div class="info-row"><span class="label">组织部门</span><span>校保卫处</span></div>
+                    </div>
+                    <div class="info-block">
+                        <div class="info-row"><span class="label">参与人数</span><span>426人</span></div>
+                        <div class="info-row"><span class="label">完成率</span><span class="safe-text">98.2%</span></div>
+                    </div>
+                </div>
+                <div class="detail-stats">
+                    <div class="stat-block"><div class="stat-num">426</div><div class="stat-label">参与人数</div></div>
+                    <div class="stat-block"><div class="stat-num">4:26</div><div class="stat-label">平均用时</div></div>
+                    <div class="stat-block"><div class="stat-num">100%</div><div class="stat-label">疏散率</div></div>
+                    <div class="stat-block"><div class="stat-num">98.2%</div><div class="stat-label">达标率</div></div>
+                </div>
+                <div class="detail-log">
+                    <div class="log-title">演练过程</div>
+                    <div class="log-item">09:00 演练启动，触发火情警报</div>
+                    <div class="log-item">09:01 下发疏散指令，师生有序撤离</div>
+                    <div class="log-item">09:05 人员陆续到达安全集结点</div>
+                    <div class="log-item">09:08 全员撤离完毕，无滞留人员</div>
+                    <div class="log-item">09:10 现场隐患排查完毕</div>
+                    <div class="log-item">09:15 演练结束，现场总结</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // 侧边栏切换
-        const items = document.querySelectorAll('.sidebar-item');
-        const panels = document.querySelectorAll('.page-panel');
-        items.forEach(item=>{
-            item.addEventListener('click',()=>{
-                items.forEach(i=>i.classList.remove('active'));
-                item.classList.add('active');
-                let pid = item.dataset.page;
-                panels.forEach(p=>p.classList.remove('show'));
-                document.getElementById('page-'+pid).classList.add('show');
-            })
+<script>
+    // 基础监控数据
+    const monitorData = {
+        teach: {
+            img: ["jiao1D.jpg","jiao2.jpg","jiao3.jpg","jiao4.jpg","jiao5.jpg","jiao6.jpg","jiao7.jpg","jiao8.jpg"],
+            name: [
+                "教学楼1楼东走廊",
+                "教学楼1楼西走廊",
+                "教学楼2楼走廊",
+                "教学楼3楼走廊",
+                "教学楼主楼梯口",
+                "教学楼侧楼梯口",
+                "教学楼正门入口",
+                "教学楼后侧通道"
+            ]
+        },
+        dorm: {
+            img: ["sushe1.jpg","sushe2.jpg","sushe3.jpg","sushe4.jpg","sushe5.jpg","sushe6.jpg"],
+            name: [
+                "1号宿舍1楼楼道",
+                "1号宿舍2楼楼道",
+                "2号宿舍1楼楼道",
+                "2号宿舍大门",
+                "宿舍园区主干道",
+                "宿舍楼下休闲区"
+            ]
+        },
+        canteen: {
+            img: ["shitang1.jpg","shitang2.jpg","shitang3.jpg","shitang4.jpg","shitang5.jpg","shitang6.jpg"],
+            name: [
+                "食堂正门入口",
+                "食堂打餐区1",
+                "食堂打餐区2",
+                "食堂就餐区",
+                "食堂后厨通道",
+                "食堂外侧走廊"
+            ]
+        },
+        class: {
+            img: ["jiaoshi1.jpg","jiaoshi2.jpg","jiaoshi3.jpg","jiaoshi4.jpg","jiaoshi5.jpg","jiaoshi6.jpg","jiaoshi7.jpg","jiaoshi8.jpg"],
+            name: [
+                "一年级1班教室",
+                "一年级2班教室",
+                "二年级1班教室",
+                "二年级2班教室",
+                "三年级1班教室",
+                "三年级2班教室",
+                "四年级1班教室",
+                "四年级2班教室"
+            ]
+        },
+        lab: {
+            img: ["shiyanshi1.jpg","shiyanshi2.jpg","shiyanshi3.jpg","shiyanshi4.jpg","shiyanshi5.jpg"],
+            name: [
+                "化学实验室",
+                "物理实验室",
+                "生物实验室",
+                "实验楼走廊",
+                "实验楼出入口"
+            ]
+        },
+        play: {
+            img: ["caochang1.jpg","caochang2.jpg","caochang3.jpg","caochang4.jpg","caochang5.jpg","caochang6.jpg"],
+            name: [
+                "塑胶跑道区域",
+                "篮球场",
+                "足球场",
+                "操场看台",
+                "操场西侧小路",
+                "体育器材室门口"
+            ]
+        },
+        gate: {
+            img: ["xiaomen1.jpg","xiaomen2.jpg","xiaomen3.jpg","xiaomen4.jpg","xiaomen5.jpg"],
+            name: [
+                "学校正门",
+                "正门门卫室",
+                "大门左侧通道",
+                "大门右侧通道",
+                "校外路口监控"
+            ]
+        }
+    };
+    const titles = {
+        teach:"教学楼区域",
+        dorm:"宿舍楼区域",
+        canteen:"食堂区域",
+        class:"普通教室区域",
+        lab:"实验区域",
+        play:"操场&户外区域",
+        gate:"校园大门区域"
+    };
+    const userText = {
+        all:"全体人员",
+        teacher:"任课老师",
+        security:"安保人员",
+        medical:"医务人员",
+        logistics:"后勤人员",
+        manager:"管理人员"
+    };
+
+    // 事发点位
+    const alertArea = "teach";
+    const alertIndex = 0;
+
+    // 二级菜单配置
+    const subMenuData = {
+        1: ["封闭主通道","封闭侧通道","全域临时封锁","解除通道封锁"],
+        2: ["就近安保增援","全体安保集结","定点岗位补位","巡逻组转向事发地"],
+        3: ["校医小组出动","应急救护组到场","医疗物资调配","伤员临时安置"],
+        5: ["局部解除警戒","分区恢复通行","全员恢复秩序","整体解除应急"]
+    };
+
+    // DOM
+    const grid = document.getElementById('monitorGrid');
+    const areaTitle = document.getElementById('areaTitle');
+    const posItems = document.querySelectorAll('.pos-item');
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    const panels = document.querySelectorAll('.page-panel');
+    const monitorModal = document.getElementById('monitorModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalClose = document.getElementById('modalClose');
+    const alertPopup = document.getElementById('alertPopup');
+    const jumpMonitorBtn = document.getElementById('jumpMonitorBtn');
+    const closePopupBtn = document.getElementById('closePopupBtn');
+    const subPop = document.getElementById('subPop');
+    const targetAreaSel = document.getElementById('targetArea');
+    const targetUserSel = document.getElementById('targetUser');
+    const curAreaText = document.getElementById('curArea');
+    const curUserText = document.getElementById('curUser');
+    const cmdHistoryBox = document.getElementById('cmdHistoryBox');
+    const cmdTimer = document.getElementById('cmdTimer');
+
+    // 关闭弹窗
+    modalClose.addEventListener('click', ()=> monitorModal.style.display = 'none');
+    monitorModal.addEventListener('click', e=>{
+        if(e.target === monitorModal) monitorModal.style.display = 'none';
+    });
+    closePopupBtn.addEventListener('click', ()=> alertPopup.style.display = 'none');
+
+    // 点击页面空白关闭二级菜单
+    document.addEventListener('click', ()=> subPop.style.display = 'none');
+
+    // 显示二级细分菜单
+    function showSubMenu(type, e){
+        e.stopPropagation();
+        let list = subMenuData[type];
+        let html = "";
+        list.forEach(item=>{
+            html += `<div class="sub-pop-item" onclick="selectSubItem('${item}')">${item}</div>`;
         });
+        subPop.innerHTML = html;
+        subPop.style.left = (e.pageX + 10) + "px";
+        subPop.style.top = (e.pageY + 10) + "px";
+        subPop.style.display = "block";
+    }
+    // 选择二级选项
+    function selectSubItem(txt){
+        subPop.style.display = "none";
+        alert(`✅ 已执行操作：${txt}`);
+    }
 
-        // 点位切换播放视频
-        const posItems=document.querySelectorAll('.pos-item');
-        const mainVideo=document.getElementById('mainVideo');
-        posItems.forEach((item,idx)=>{
-            item.addEventListener('click',()=>{
-                posItems.forEach(i=>i.classList.remove('active'));
-                item.classList.add('active');
-                mainVideo.src = videoSrcArr[idx];
-            });
+    // 跳转事发监控
+    jumpMonitorBtn.addEventListener('click', ()=>{
+        alertPopup.style.display = 'none';
+        posItems.forEach(item=>{
+            item.classList.remove('active');
+            if(item.dataset.area === alertArea) item.classList.add('active');
         });
+        loadMonitor(alertArea);
+    });
 
-        // 六分屏
-        const allScreenBtn = document.getElementById('allScreenBtn');
-        const multiMonitor = document.getElementById('multiMonitor');
-        const showMonitor = document.getElementById('showMonitor');
-        allScreenBtn.addEventListener('click',()=>{
-            multiMonitor.classList.toggle('show');
-            if(multiMonitor.classList.contains('show')){
-                showMonitor.style.display = 'none';
-                let frames = multiMonitor.querySelectorAll('video');
-                frames.forEach((frm,idx)=>{
-                    frm.src = videoSrcArr[idx];
-                })
-            }else{
-                showMonitor.style.display = 'flex';
+    // 顶部导航切换页面
+    sidebarItems.forEach(item=>{
+        item.addEventListener('click', ()=>{
+            sidebarItems.forEach(i=>i.classList.remove('active'));
+            item.classList.add('active');
+            const pid = item.dataset.page;
+            panels.forEach(p=>p.classList.remove('show'));
+            document.getElementById('page-'+pid).classList.add('show');
+        });
+    });
+
+    // 区域、接收人员下拉联动状态文字
+    targetAreaSel.addEventListener('change', ()=>{
+        curAreaText.innerText = titles[targetAreaSel.value];
+    });
+    targetUserSel.addEventListener('change', ()=>{
+        curUserText.innerText = userText[targetUserSel.value];
+    });
+
+    // 加载监控 + 高亮告警框
+    function loadMonitor(area){
+        areaTitle.innerText = titles[area] + "实时监控";
+        grid.innerHTML = "";
+        const imgList = monitorData[area].img;
+        const nameList = monitorData[area].name;
+
+        imgList.forEach((src, i)=>{
+            const item = document.createElement('div');
+            item.className = 'monitor-item';
+            if(area === alertArea && i === alertIndex){
+                item.classList.add('alert-border');
             }
-        })
-
-        // 时间刷新
-        function updateTime() {
-            const now = new Date();
-            const m = String(now.getMonth()+1).padStart(2,'0');
-            const d = String(now.getDate()).padStart(2,'0');
-            const h = String(now.getHours()).padStart(2,'0');
-            const mi = String(now.getMinutes()).padStart(2,'0');
-            const s = String(now.getSeconds()).padStart(2,'0');
-            document.getElementById('nowTime').innerText = `${m}-${d} ${h}:${mi}:${s}`;
-        }
-        setInterval(updateTime, 1000);
-
-        // 弹窗事件
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const alarmModal = document.getElementById('alarmModal');
-        closeModalBtn.addEventListener('click', function(){
-            alarmModal.style.display = 'none';
-            alert("已确认接收三级火情告警信息！");
-        });
-        document.getElementById('alarmBtn').addEventListener('click',()=>{
-            alert("已同步启动三级火情全域应急处置预案！");
-        });
-
-        // 指令模板填充
-        function fillCmd(type){
-            const input = document.getElementById('cmdInput');
-            let text = '';
-            if(type===1){
-                text="立即组织教学楼全体师生有序撤离，远离起火楼层，严禁拥挤折返，各岗位人员即刻到岗疏导人流，保障撤离通道畅通。";
-            }else if(type===2){
-                text="消防安保小组携带灭火器材火速赶赴起火点位，优先压制明火源头，阻断火势向上蔓延，作业人员务必做好自身防护措施。";
-            }else if(type===3){
-                text="分层逐间排查教室、走廊、楼梯间等区域，仔细确认有无滞留被困人员，发现人员第一时间开展搜救与救助工作。";
-            }else{
-                text="立刻封锁起火建筑周边全部出入口，禁止无关人员靠近危险区域，维护现场秩序，预留应急救援车辆通行通道。";
-            }
-            input.value = text;
-        }
-
-        // 指令功能
-        function sendCmd(){alert("✅ 应急指令已成功下发至选中岗位终端");}
-        function saveScheme(){alert("✅ 本次处置方案已存档备份");}
-        function revokeCmd(){alert("✅ 已撤销下发指令，现场执行同步终止");}
-        function emptyCmd(){document.getElementById('cmdInput').value='';}
-
-        // 历史演练台账功能
-        function selectRecord(id){
-            alert("已查看演练记录 ID: " + id);
-        }
-        function exportRecord(){
-            alert("演练台账报告已导出！");
-        }
-
-        // 图表初始化
-        let totalPeople = 426,safePeople = 148,waitPeople = 265,stayPeople = 13;
-        let timeArr = [0,2,4,6,8,10],safeTrend = [0,32,59,91,124,148];
-        let areaLabel = ["一楼","二楼","三楼","四楼"],areaData = [36,42,35,38];
-        let pieChart,barChart,lineChart;
-
-        window.addEventListener('load',()=>{
-            mainVideo.src = videoSrcArr[0];
-            initChart();
-        });
-        function initChart(){
-            pieChart = new Chart(document.getElementById('pieChart'),{
-                type:'doughnut',
-                data:{labels:['已撤离','待撤离','滞留排查'],datasets:[{data:[safePeople,waitPeople,stayPeople],backgroundColor:['#4cd964','#ffb400','#ff5555']}]},
-                options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}}}
+            item.innerHTML = `
+                <img src="${src}" alt="监控画面">
+                <div class="monitor-label">${nameList[i]}</div>
+            `;
+            item.addEventListener('click', ()=>{
+                modalImg.src = src;
+                monitorModal.style.display = 'flex';
             });
-            barChart = new Chart(document.getElementById('barChart'),{
-                type:'bar',
-                data:{labels:areaLabel,datasets:[{label:'撤离人数',data:areaData,backgroundColor:'#41B3FF'}]},
-                options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
-            });
-            lineChart = new Chart(document.getElementById('lineChart'),{
-                type:'line',
-                data:{labels:timeArr.map(t=>t+"分"),datasets:[{label:'累计撤离人数',data:safeTrend,borderColor:'#41B3FF',fill:true,backgroundColor:'rgba(65,179,255,0.2)'}]},
-                options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
-            });
-        }
+            grid.appendChild(item);
+        });
+    }
 
-        setInterval(()=>{
-            if(safePeople < totalPeople - stayPeople){
-                safePeople++;waitPeople--;
-                safeTrend[safeTrend.length-1] = safePeople;
-                pieChart.data.datasets[0].data = [safePeople,waitPeople,stayPeople];
-                lineChart.data.datasets[0].data = safeTrend;
-                pieChart.update();lineChart.update();
-                let rate = (safePeople / totalPeople * 100).toFixed(2);
-                document.querySelector('.info-card1 .person-item:last-child span').innerText = rate+"%";
-            }
-        },2000);
-    </script>
+    // 左侧点位切换
+    posItems.forEach(el=>{
+        el.addEventListener('click', ()=>{
+            posItems.forEach(e=>e.classList.remove('active'));
+            el.classList.add('active');
+            loadMonitor(el.dataset.area);
+        });
+    });
+
+    // 指令模板填充
+    function fillCmd(type){
+        const input = document.getElementById('cmdInput');
+        const texts = {
+            1: "立即组织全体人员有序疏散，远离危险区域，各岗位人员到岗疏导。",
+            2: "全面排查现场隐患，及时上报异常，严防险情扩大。",
+            3: "对事发区域实施警戒，禁止无关人员进入。",
+            4: "救援小组赶赴现场，优先保障人员安全，做好现场救护。",
+            5: "加强现场巡逻，维护秩序，防止人员拥挤踩踏。"
+        };
+        input.value = texts[type];
+    }
+
+    // 下发指令，带出接收对象 + 记录历史
+    function sendCmd(){
+        let area = titles[targetAreaSel.value];
+        let user = userText[targetUserSel.value];
+        let content = document.getElementById('cmdInput').value;
+        let time = new Date().toLocaleTimeString();
+
+        alert(`✅ 指令已下发\n目标区域：${area}\n接收人员：${user}`);
+
+        // 状态更新
+        document.querySelector('.cmd-status .warn-text').className = "safe-text";
+        document.querySelector('.cmd-status .safe-text').innerText = "已下发";
+
+        // 写入历史记录
+        if(cmdHistoryBox.querySelector('.cmd-history-item').innerText === '暂无指令记录'){
+            cmdHistoryBox.innerHTML = '';
+        }
+        let item = document.createElement('div');
+        item.className = 'cmd-history-item';
+        item.innerText = `[${time}] ${area} → ${user}：${content.substring(0,18)}...`;
+        cmdHistoryBox.prepend(item);
+
+        // 倒计时动画
+        cmdTimer.style.width = "100%";
+        setTimeout(()=>{
+            cmdTimer.style.width = "0%";
+        },3000);
+    }
+
+    function emptyCmd(){
+        document.getElementById('cmdInput').value = '';
+    }
+
+    function selectRecord(id){ alert("已查看演练记录 ID："+id); }
+    function exportRecord(){ alert("演练记录导出成功"); }
+
+    // 初始化
+    window.onload = ()=>{
+        alertPopup.style.display = 'block';
+        loadMonitor('teach');
+        initCharts();
+    };
+
+    // 图表数据
+    let totalPeople = 426, safePeople = 148, waitPeople = 265, stayPeople = 13;
+    let timeArr = [0,2,4,6,8,10], safeTrend = [0,32,59,91,124,148];
+    let areaLabel = ["一楼","二楼","三楼","四楼"], areaData = [36,42,35,38];
+    let pieChart, barChart, lineChart;
+
+    function initCharts(){
+        pieChart = new Chart(document.getElementById('pieChart'),{
+            type:'doughnut',
+            data:{labels:['已撤离','待撤离','滞留排查'],datasets:[{data:[safePeople,waitPeople,stayPeople],backgroundColor:['#4cd964','#ffb400','#ff5555']}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}}}
+        });
+        barChart = new Chart(document.getElementById('barChart'),{
+            type:'bar',
+            data:{labels:areaLabel,datasets:[{label:'撤离人数',data:areaData,backgroundColor:'#41B3FF'}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
+        });
+        lineChart = new Chart(document.getElementById('lineChart'),{
+            type:'line',
+            data:{labels:timeArr.map(t=>t+"分"),datasets:[{label:'累计撤离人数',data:safeTrend,borderColor:'#41B3FF',fill:true,backgroundColor:'rgba(65,179,255,0.2)'}]},
+            options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#a0c8ff'}},y:{ticks:{color:'#a0c8ff'}}}}
+        });
+    }
+
+    // 模拟疏散数据变化
+    setInterval(()=>{
+        if(safePeople < totalPeople - stayPeople){
+            safePeople++; waitPeople--;
+            safeTrend[safeTrend.length-1] = safePeople;
+            pieChart.data.datasets[0].data = [safePeople,waitPeople,stayPeople];
+            lineChart.data.datasets[0].data = safeTrend;
+            pieChart.update(); lineChart.update();
+            const rate = (safePeople / totalPeople * 100).toFixed(2);
+            document.querySelector('.info-card1 .person-item:last-child span').innerText = rate + "%";
+        }
+    },2000);
+</script>
 </body>
 </html>

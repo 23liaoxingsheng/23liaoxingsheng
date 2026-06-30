@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>智慧安保指挥中心 | 小学多场景应急系统</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <title>安保端 · 智慧安保指挥中心</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js">
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== 全部样式保持不变 ===== */
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
         * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         body { background: #0a0f1a; color: #e2e8f0; overflow: hidden; }
@@ -18,9 +23,11 @@
         .monitor-card:hover { transform: translateY(-6px) scale(1.02); border-color: #3b82f6; box-shadow: 0 20px 35px -12px rgba(59, 130, 246, 0.4); }
         .zone-item.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(0, 212, 255, 0.1)); border-left: 3px solid #3b82f6; }
         .scenario-btn.active-scenario { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(0, 212, 255, 0.15)); border-color: #3b82f6; color: #60a5fa; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .scenario-btn.fire-active { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); border-color: #ef4444; color: #f87171; }
+        .scenario-btn.earthquake-active { background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(202, 138, 4, 0.1)); border-color: #eab308; color: #fbbf24; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; transition: all 0.3s ease; }
         .status-critical { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1s infinite; }
-        .status-warning { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+        .status-warning { background: #eab308; box-shadow: 0 0 8px #eab308; animation: pulse 1.2s infinite; }
         .status-normal { background: #10b981; box-shadow: 0 0 6px #10b981; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         ::-webkit-scrollbar { width: 4px; }
@@ -33,21 +40,470 @@
         .heatmap-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0f1a; z-index: 1000; display: none; flex-direction: column; animation: fadeInModal 0.3s ease; }
         .heatmap-modal.active { display: flex; }
         @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
-        .modal-header-bar { background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(148, 163, 184, 0.2); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .modal-close-btn { width: 36px; height: 36px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 50%; color: #ef4444; font-size: 18px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .modal-header-bar { background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(148, 163, 184, 0.2); padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .modal-close-btn { width: 32px; height: 32px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 50%; color: #ef4444; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .modal-close-btn:hover { background: #ef4444; color: white; transform: rotate(90deg); }
         .heatmap-launch-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); border: none; transition: all 0.3s; }
         .heatmap-launch-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
-        .slider-track { -webkit-appearance: none; appearance: none; height: 4px; background: #334155; border-radius: 2px; outline: none; }
-        .slider-track::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #f59e0b; border-radius: 50%; cursor: pointer; border: 2px solid #1e293b; }
+        .slider-track { -webkit-appearance: none; appearance: none; height: 3px; background: #334155; border-radius: 2px; outline: none; }
+        .slider-track::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #f59e0b; border-radius: 50%; cursor: pointer; border: 2px solid #1e293b; }
         .legend-gradient { background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444); }
-        .time-marker.active { color: #f59e0b; font-weight: 600; }
-        .grid-bg { background-image: linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px); background-size: 20px 20px; }
         .floor-tab { transition: all 0.2s; cursor: pointer; }
         .floor-tab.active { background: #f59e0b; color: #0f172a; font-weight: 600; }
         .floor-tab:hover:not(.active) { background: rgba(245, 158, 11, 0.3); }
         .monitor-card video { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; background: #0a0f1a; }
         .monitor-card video:hover { opacity: 0.95; }
+
+        .scene-fire .glass-card { border-color: rgba(239, 68, 68, 0.25); }
+        .scene-fire .monitor-card { border-color: rgba(239, 68, 68, 0.15); }
+        .scene-earthquake .glass-card { border-color: rgba(234, 179, 8, 0.2); }
+        .scene-earthquake .monitor-card { border-color: rgba(234, 179, 8, 0.12); }
+
+        .heatmap-chart-wrapper {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            background: #0f172a;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .heatmap-chart-wrapper .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+        .heatmap-sidebar {
+            width: 170px;
+            flex-shrink: 0;
+            background: rgba(30,41,59,0.9);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .heatmap-sidebar .section { padding: 6px 10px; border-bottom: 1px solid rgba(71,85,105,0.25); }
+        .heatmap-sidebar .section:last-child { border-bottom: none; flex: 1; }
+        .heatmap-sidebar .section-title { font-size: 9px; font-weight: 600; color: #94a3b8; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .heatmap-sidebar .zone-btn-sm {
+            display: block; width: 100%; text-align: left; padding: 3px 6px; border-radius: 4px;
+            font-size: 10px; color: #94a3b8; transition: all 0.2s; cursor: pointer;
+            border: 1px solid transparent; margin-bottom: 1px;
+        }
+        .heatmap-sidebar .zone-btn-sm:hover { background: rgba(255,255,255,0.04); }
+        .heatmap-sidebar .zone-btn-sm.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #fbbf24; }
+        .heatmap-sidebar .floor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+        .heatmap-sidebar .floor-grid .floor-btn {
+            padding: 2px 0; border-radius: 3px; text-align: center; font-size: 10px;
+            background: rgba(30,41,59,0.5); color: #94a3b8; cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .heatmap-sidebar .floor-grid .floor-btn:hover { background: rgba(245,158,11,0.2); }
+        .heatmap-sidebar .floor-grid .floor-btn.active { background: #f59e0b; color: #0f172a; font-weight: 600; border-color: #f59e0b; }
+        .heatmap-sidebar .stat-item-sm {
+            display: flex; justify-content: space-between; padding: 1px 0; font-size: 10px; color: #94a3b8;
+        }
+        .heatmap-sidebar .stat-item-sm .num { color: #f0f9ff; font-weight: 600; }
+        .heatmap-sidebar .stat-item-sm .num.red { color: #f87171; }
+        .heatmap-sidebar .stat-item-sm .num.orange { color: #fbbf24; }
+        .heatmap-sidebar .stat-bar { width: 100%; height: 3px; background: #1e293b; border-radius: 2px; overflow: hidden; margin-top: 1px; }
+        .heatmap-sidebar .stat-bar .fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+        .heatmap-sidebar .stat-bar .fill.red { background: #ef4444; }
+        .heatmap-sidebar .stat-bar .fill.orange { background: #f59e0b; }
+
+        .report-area {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .report-area::-webkit-scrollbar { width: 3px; }
+        .report-area::-webkit-scrollbar-track { background: transparent; }
+        .report-area::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+        .report-item {
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(30,41,59,0.4);
+            border-left: 3px solid #3b82f6;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        .report-item .r-time { color: #64748b; font-size: 9px; }
+        .report-item .r-type { font-weight: 600; }
+        .report-item .r-type.urgent { color: #ef4444; }
+        .report-item .r-type.warning { color: #f59e0b; }
+        .report-item .r-type.info { color: #3b82f6; }
+        .report-item .r-content { color: #cbd5e1; margin: 2px 0; }
+        .report-item .r-status { font-size: 9px; padding: 1px 8px; border-radius: 10px; background: rgba(34,197,94,0.1); color: #4ade80; }
+        .report-item .r-status.pending { background: rgba(245,158,11,0.1); color: #fbbf24; }
+
+        .btn-logout {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #f87171;
+            padding: 5px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: rgba(239,68,68,0.2);
+            border-color: rgba(239,68,68,0.4);
+            transform: scale(1.02);
+        }
+        .btn-logout i { margin-right: 6px; }
+
+        .btn-report {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-report:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+        .btn-report:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        select.report-select {
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(71,85,105,0.3);
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+        select.report-select:focus { border-color: #3b82f6; }
+        select.report-select option { background: #1e293b; }
+
+        textarea.report-textarea {
+            background: rgba(15,23,42,0.5);
+            border: 1px solid rgba(71,85,105,0.2);
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 10px 12px;
+            font-size: 15px;
+            resize: none;
+            width: 100%;
+            outline: none;
+            transition: border 0.2s;
+            line-height: 1.6;
+        }
+        textarea.report-textarea:focus { border-color: #3b82f6; }
+        textarea.report-textarea::placeholder { color: #475569; }
+
+        .report-hint {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .report-location-input {
+            background: rgba(15,23,42,0.6);
+            border: 1px solid rgba(71,85,105,0.2);
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .report-location-input:focus {
+            border-color: #3b82f6;
+        }
+        #reportCharCount {
+            font-size: 13px;
+        }
+
+        .map3d-launch-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            transition: all 0.3s;
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .map3d-launch-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+        .map3d-launch-btn i { font-size: 14px; }
+
+        #three-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: grab;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #0f1a2e, #05080f);
+            min-height: 200px;
+        }
+        #three-container:active { cursor: grabbing; }
+
+        .three-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+            color: #94a3b8;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 5;
+        }
+        .three-overlay i { margin-right: 6px; color: #f59e0b; }
+
+        .building-popup {
+            position: absolute;
+            background: rgba(8, 14, 26, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(56, 132, 255, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 200px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            z-index: 10;
+        }
+        .building-popup.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .building-popup .b-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f0f9ff;
+        }
+        .building-popup .b-info {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+        .building-popup .b-info span { color: #60a5fa; }
+        .building-popup .b-status {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .building-popup .b-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .building-popup .b-status .dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .building-popup .b-status .dot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1.2s infinite; }
+        .building-popup .b-status .dot.yellow { background: #eab308; box-shadow: 0 0 8px #eab308; }
+
+        /* 3D模态框内容布局 */
+        #map3dContent {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: #05080f;
+        }
+        #map3dContent .modal-header-bar {
+            flex-shrink: 0;
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .map3d-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+            position: relative;
+            background: #05080f;
+        }
+
+        /* ===== 事故弹窗样式 ===== */
+        .incident-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInIncident 0.4s ease;
+        }
+        .incident-modal.active {
+            display: flex;
+        }
+        @keyframes fadeInIncident {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .incident-modal-box {
+            max-width: 520px;
+            width: 90%;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 20px;
+            padding: 32px 36px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(239, 68, 68, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .incident-modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ef4444, #f97316, #ef4444);
+            background-size: 200% 100%;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { background-position: -200% 0; }
+            50% { background-position: 200% 0; }
+        }
+        .incident-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.12);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 16px;
+            animation: pulseRing 2s ease-in-out infinite;
+        }
+        @keyframes pulseRing {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+        }
+        .incident-title {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            color: #f87171;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .incident-subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .incident-detail {
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border-left: 3px solid #ef4444;
+        }
+        .incident-detail .label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .incident-detail .value {
+            font-size: 15px;
+            color: #f0f9ff;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .incident-detail .value .highlight {
+            color: #f87171;
+            font-weight: 700;
+        }
+        .incident-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .incident-actions .btn-primary {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+        }
+        .incident-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+        }
+        .incident-actions .btn-secondary {
+            padding: 12px 24px;
+            border-radius: 10px;
+            background: rgba(71, 85, 105, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.2);
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .incident-actions .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.3);
+            color: #e2e8f0;
+        }
+        .incident-time {
+            text-align: center;
+            font-size: 12px;
+            color: #475569;
+            margin-top: 16px;
+        }
+        .incident-badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -55,36 +511,135 @@
     <header class="glass-panel h-14 flex items-center justify-between px-6 z-20 flex-shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-shield-alt text-white text-sm"></i></div>
-            <div><h1 class="text-base font-bold text-white tracking-tight">小学多场景应急系统 · 智慧安保指挥中心</h1><p class="text-[10px] text-slate-400">Primary School Multi-Scenario Emergency | Security Command Center</p></div>
+            <div><h1 class="text-base font-bold text-white tracking-tight">安保端 · 智慧安保指挥中心</h1><p class="text-[10px] text-slate-400">Security Command Center | 小学多场景应急系统</p></div>
         </div>
         <div class="flex items-center gap-4">
             <button id="openHeatmapBtn" class="heatmap-launch-btn px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-fire"></i> 热力图</button>
-            <div class="flex items-center gap-2 text-xs"><span class="status-dot status-normal"></span><span class="text-slate-300">系统正常</span></div>
+            <button id="open3DMapBtn" class="map3d-launch-btn px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-cube"></i> 3D校园地图</button>
+            <div class="flex items-center gap-2 text-xs" id="statusBadge"><span class="status-dot status-normal" id="statusDot"></span><span class="text-slate-300" id="statusText">系统正常</span></div>
             <div class="h-5 w-px bg-slate-700"></div>
             <div class="text-right"><div class="text-sm font-mono text-cyan-400" id="currentTime">--:--:--</div><div class="text-[10px] text-slate-500" id="currentDate">----年--月--日</div></div>
+            <button class="btn-logout" onclick="location.href='login.html'"><i class="fas fa-sign-out-alt"></i>返回登录</button>
         </div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden p-4 gap-4">
+    <div class="flex-1 flex overflow-hidden p-4 gap-4" id="appContainer">
         <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0">
             <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-cyan-400"></i> 监控区域</h2><div class="space-y-1.5" id="zoneMenu"></div></div>
             <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-orange-400"></i> 应急场景模拟</h2><div class="space-y-1.5" id="scenarioMenu"></div></div>
-            <div class="p-4 flex-1"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-chart-line text-cyan-400"></i> 实时统计</h2><div class="space-y-3"><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">当前区域估算人数</div><div class="text-2xl font-bold text-white" id="zoneTotal">0</div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">⚠️ 最高风险区域</div><div class="text-sm font-semibold text-red-400" id="hotArea">-</div><div class="w-full bg-slate-700 rounded-full h-1.5 mt-2"><div class="bg-red-500 h-1.5 rounded-full" id="hotBar" style="width:0%"></div></div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">平均人群密度</div><div class="text-lg font-bold text-cyan-400" id="avgDensity">0 人/m²</div></div></div></div>
+            <div class="p-4 flex-1"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-chart-line text-cyan-400"></i> 实时统计</h2><div class="space-y-3"><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">👥 当前区域人数</div><div class="text-2xl font-bold text-white" id="zoneTotal">0</div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">⚠️ 最高风险区域</div><div class="text-sm font-semibold text-red-400" id="hotArea">-</div><div class="w-full bg-slate-700 rounded-full h-1.5 mt-2"><div class="bg-red-500 h-1.5 rounded-full" id="hotBar" style="width:0%"></div></div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">📊 平均人群密度</div><div class="text-lg font-bold text-cyan-400" id="avgDensity">0 人/m²</div></div></div></div>
         </aside>
 
         <main class="flex-1 flex flex-col gap-4 min-w-0">
-            <div class="glass-card rounded-xl px-4 py-3 flex items-center justify-between flex-shrink-0"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center"><i class="fas fa-video text-cyan-400 text-sm"></i></div><div><div class="text-sm font-semibold text-white" id="zoneName">教学楼区</div><div class="text-[10px] text-slate-400" id="zoneDesc">24路摄像头 · 实时监控</div></div></div><div class="flex items-center gap-4 text-xs"><div><span class="text-slate-400">在线率</span> <span class="text-green-400 font-mono" id="onlineRate">100%</span></div><div><span class="text-slate-400">今日预警</span> <span class="text-orange-400 font-mono" id="todayAlerts">3</span></div></div></div>
+            <div class="glass-card rounded-xl px-4 py-3 flex items-center justify-between flex-shrink-0" id="zoneHeader"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center"><i class="fas fa-video text-cyan-400 text-sm"></i></div><div><div class="text-sm font-semibold text-white" id="zoneName">教学楼区</div><div class="text-[10px] text-slate-400" id="zoneDesc">24路摄像头 · 实时监控</div></div></div><div class="flex items-center gap-4 text-xs"><div><span class="text-slate-400">在线率</span> <span class="text-green-400 font-mono" id="onlineRate">100%</span></div><div><span class="text-slate-400">今日预警</span> <span class="text-orange-400 font-mono" id="todayAlerts">3</span></div></div></div>
             <div class="grid grid-cols-3 gap-3 flex-1 min-h-0" id="monitorGrid"></div>
         </main>
 
-        <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0"><div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-bell text-red-400"></i> 实时预警<span class="ml-auto text-[10px] text-red-400 animate-pulse">● LIVE</span></h2></div><div class="flex-1 overflow-y-auto p-3 space-y-2" id="alertList"></div><div class="p-3 border-t border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-cyan-400"></i> 执勤人员</h2><div class="space-y-2" id="teamList"></div></div></aside>
+        <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0">
+            <div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-bell text-red-400"></i> 实时预警<span class="ml-auto text-[10px] text-red-400 animate-pulse">● LIVE</span></h2></div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-2 max-h-[200px]" id="alertList"></div>
+
+            <!-- ===== 消息上报区域 ===== -->
+            <div class="p-3 border-b border-slate-700/50" style="border-top: 1px solid rgba(71,85,105,0.25);">
+                <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2 mb-2">
+                    <i class="fas fa-paper-plane text-blue-400"></i> 消息上报
+                    <span class="ml-auto text-xs text-slate-500">→ 校领导端</span>
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <select id="reportType" class="report-select flex-1">
+                            <option value="异常事件">⚠️ 异常事件</option>
+                            <option value="设备故障">🔧 设备故障</option>
+                            <option value="人员受伤">🏥 人员受伤</option>
+                            <option value="火灾隐患">🔥 火灾隐患</option>
+                            <option value="治安事件">🚔 治安事件</option>
+                            <option value="其他">📋 其他</option>
+                        </select>
+                        <select id="reportUrgency" class="report-select w-28">
+                            <option value="普通">普通</option>
+                            <option value="紧急">紧急</option>
+                            <option value="特别紧急">特别紧急</option>
+                        </select>
+                    </div>
+                    <input type="text" id="reportLocation" class="report-location-input" placeholder="📍 具体位置（如：教学楼3楼东侧走廊）" />
+                    <p class="report-hint">💡 示例：发现火情、设备损坏或可疑人员，请详细描述时间、地点、情况。</p>
+                    <textarea id="reportContent" class="report-textarea" rows="4" maxlength="500" placeholder="请详细描述事件详情、涉及人员、当前状态等信息..."></textarea>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400" id="reportCharCount">0 / 500</span>
+                        <button id="reportSubmitBtn" class="btn-report"><i class="fas fa-upload mr-1"></i>上报</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 flex-1 overflow-hidden" style="border-top: 1px solid rgba(71,85,105,0.15);">
+                <div class="flex items-center justify-between mb-1.5">
+                    <h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-history text-cyan-400"></i> 上报记录</h2>
+                    <span class="text-[9px] text-slate-500" id="reportCount">0 条</span>
+                </div>
+                <div class="report-area max-h-[160px] overflow-y-auto" id="reportList">
+                    <div class="text-[10px] text-slate-500 text-center py-4">暂无上报记录</div>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-cyan-400"></i> 执勤人员</h2><div class="space-y-2" id="teamList"></div></div>
+        </aside>
     </div>
 
     <button id="emergencyBtn" class="emergency-btn"><i class="fas fa-bell"></i></button>
     <div id="toast" class="toast"><div class="flex items-center gap-2"><i class="fas fa-info-circle text-cyan-400"></i><span class="text-sm font-semibold" id="toastTitle">系统通知</span></div><div class="text-xs text-slate-300 mt-1" id="toastMsg">消息内容</div></div>
-    <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[1000] hidden items-center justify-center" onclick="if(event.target===this) closeCameraModal()"><div class="w-[85vw] max-w-5xl glass-panel rounded-2xl overflow-hidden"><div class="p-4 border-b border-cyan-500/30 flex justify-between items-center"><h2 class="text-lg font-bold text-cyan-400"><i class="fas fa-camera mr-2"></i><span id="modalCameraName">监控画面</span></h2><button onclick="closeCameraModal()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40">✕</button></div><div class="p-6"><div class="aspect-video bg-black rounded-xl overflow-hidden"><img id="modalCameraImg" src="" class="w-full h-full object-cover"></div><div class="mt-4 text-sm text-slate-300" id="modalCameraDesc"></div></div></div></div>
 
-    <div id="heatmapModal" class="heatmap-modal"><div id="heatmapContent" style="flex:1; display: flex; flex-direction: column; overflow: hidden;"></div></div>
+    <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[1000] hidden items-center justify-center" onclick="if(event.target===this) closeCameraModal()"><div class="w-[85vw] max-w-5xl glass-panel rounded-2xl overflow-hidden"><div class="p-4 border-b border-cyan-500/30 flex justify-between items-center"><h2 class="text-lg font-bold text-cyan-400"><i class="fas fa-camera mr-2"></i><span id="modalCameraName">监控画面</span></h2><button onclick="closeCameraModal()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40">✕</button></div><div class="p-6"><div class="aspect-video bg-black rounded-xl overflow-hidden"><img id="modalCameraImg" src="" class="w-full h-full object-cover" style="display:none;"></div><div class="mt-4 text-sm text-slate-300" id="modalCameraDesc"></div></div></div></div>
+
+    <div id="heatmapModal" class="heatmap-modal"><div id="heatmapContent" style="width:100%; height:100%; display:flex; flex-direction:column;"></div></div>
+
+    <!-- ===== 3D校园地图弹窗 ===== -->
+    <div id="map3dModal" class="heatmap-modal">
+        <div id="map3dContent">
+            <div class="modal-header-bar">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center"><i class="fas fa-cube text-white text-sm"></i></div>
+                    <div><h1 class="text-base font-bold text-white">3D 智慧校园 · 数字孪生</h1><p class="text-[9px] text-slate-400">实时数字孪生 · 拖拽旋转 · 滚轮缩放 · 点击建筑查看详情</p></div>
+                </div>
+                <button id="close3DMapModalBtn" class="modal-close-btn">✕</button>
+            </div>
+            <div class="map3d-body">
+                <div id="three-container">
+                    <div class="building-popup" id="buildingPopup3d">
+                        <div class="b-name" id="popupName3d">教学楼</div>
+                        <div class="b-info" id="popupInfo3d"><span>📐</span> 建筑面积 12000m² · 5层</div>
+                        <div class="b-status"><span class="dot green"></span> 状态：正常运行</div>
+                    </div>
+                </div>
+                <div class="three-overlay"><i class="fas fa-mouse-pointer"></i> 拖拽旋转 · 滚轮缩放 · 点击建筑查看详情</div>
+                <div style="position:absolute; top:12px; right:16px; z-index:20; background:rgba(5,8,15,0.6); backdrop-filter:blur(12px); border-radius:10px; padding:8px 14px; border:1px solid rgba(255,255,255,0.04); pointer-events:none;">
+                    <div style="font-size:10px; color:#64748b; line-height:1.8;">
+                        <div>建筑 <span style="color:#f0f9ff;font-weight:600;float:right;margin-left:16px;" id="mapTotalBuildings">10</span></div>
+                        <div>总楼层 <span style="color:#f0f9ff;font-weight:600;float:right;margin-left:16px;" id="mapTotalFloors">--</span></div>
+                        <div>实时人数 <span style="color:#f0f9ff;font-weight:600;float:right;margin-left:16px;" id="mapLivePeople">--</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 事故弹窗 ===== -->
+    <div id="incidentModal" class="incident-modal">
+        <div class="incident-modal-box">
+            <div class="incident-badge">🚨 实时警报</div>
+            <div class="incident-icon">🔥</div>
+            <div class="incident-title">发现火情事故</div>
+            <div class="incident-subtitle">教学楼区 · 东侧走廊</div>
+            <div class="incident-detail">
+                <div class="label">📋 事故详情</div>
+                <div class="value">教学楼区东侧走廊 <span class="highlight">烟雾探测器触发</span>，疑似发生火情，<br>请立即前往处置！</div>
+            </div>
+            <div class="incident-actions">
+                <button id="incidentGotoBtn" class="btn-primary"><i class="fas fa-video"></i> 跳转到事故地监控</button>
+                <button id="incidentDismissBtn" class="btn-secondary">稍后处理</button>
+            </div>
+            <div class="incident-time" id="incidentTime">⏱ 事发时间：--:--:--</div>
+        </div>
+    </div>
 
     <script>
         // ==================== 主界面数据 ====================
@@ -95,296 +650,1274 @@
             4: { name: "体育运动区", desc: "16路摄像头", icon: "⚽", cameras: 16, online: 16, alerts: 1, camPrefix: "体育场", buildingName: "健体运动场", floors: 1 },
             5: { name: "图书馆区", desc: "12路摄像头", icon: "📚", cameras: 12, online: 11, alerts: 2, camPrefix: "图书馆", buildingName: "博雅图书馆", floors: 3 }
         };
-        
+
+        // 视频文件名前缀映射：区域ID → 前缀
+        const videoPrefixMap = {
+            1: 'jiaoshi',
+            2: 'sushe',
+            3: 'shitang',
+            4: 'caochang',
+            5: 'tushuguan'
+        };
+
         let currentZoneId = 1;
         let currentScenario = 'normal';
-        
-        function showToast(title, msg) { const t=document.getElementById('toast'); document.getElementById('toastTitle').innerHTML=title; document.getElementById('toastMsg').innerHTML=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-        function updateTime() { const n=new Date(); document.getElementById('currentTime').innerHTML=n.toLocaleTimeString(); document.getElementById('currentDate').innerHTML=n.toLocaleDateString(); }
-        setInterval(updateTime,1000); updateTime();
-        
-        function switchZone(zoneId) { currentZoneId=zoneId; document.querySelectorAll('.zone-item').forEach(el=>{if(parseInt(el.dataset.zone)===zoneId)el.classList.add('active'); else el.classList.remove('active');}); renderMonitorGrid(); updateZoneStats(); }
-        function updateZoneStats() { const z=zones[currentZoneId]; document.getElementById('zoneName').innerHTML=`${z.icon} ${z.name}`; document.getElementById('zoneDesc').innerHTML=z.desc; document.getElementById('onlineRate').innerHTML=`${Math.round(z.online/z.cameras*100)}%`; document.getElementById('todayAlerts').innerHTML=z.alerts; document.getElementById('zoneTotal').innerHTML=Math.floor(Math.random()*200+80); document.getElementById('avgDensity').innerHTML=(Math.random()*0.7+0.3).toFixed(2); document.getElementById('hotArea').innerHTML=`${z.name} 中心区`; document.getElementById('hotBar').style.width=`${Math.floor(Math.random()*70+25)}%`; }
-        
-        // ==================== 监控网格渲染：教学楼摄像头1使用视频（chuwujian） ====================
-        function renderMonitorGrid() { 
-            const z = zones[currentZoneId]; 
-            let h = ''; 
-            for(let i=1;i<=6;i++){
-                const cId = `${z.camPrefix}-${i}`; 
-                const cName = `${z.name} · 摄像头${i}`; 
-                const a = (z.alerts>0&&(i===2||i===5)); 
-                
-                // ★★★ 教学楼区域（zoneId=1）的第1个摄像头使用视频 ★★★
-                const isVideo = (currentZoneId === 1 && i === 1);
-                let mediaContent = '';
-                if (isVideo) {
-                    mediaContent = `
-                        <video autoplay muted loop playsinline>
-                            <source src="chuwujian.mp4" type="video/mp4">
-                            您的浏览器不支持视频播放
-                        </video>
-                    `;
-                } else {
-                    mediaContent = `<img src="https://picsum.photos/seed/${cId}/400/225" class="w-full h-full object-cover opacity-85">`;
-                }
-                
-                h += `<div class="glass-card rounded-xl overflow-hidden monitor-card" data-cam-id="${cId}" data-cam-name="${cName}">
+        let scenarioInterval = null;
+        const totalPeople = 426;
+        let reportHistory = [];
+
+        // ==================== 3D 场景全局变量 ====================
+        let scene3d = null,
+            camera3d = null,
+            renderer3d = null,
+            controls3d = null;
+        let buildingMeshes3d = [];
+        let buildingData3d = [];
+        let animFrameId = null;
+        let is3DInitialized = false;
+        let is3DOpening = false;
+
+        const raycaster3d = new THREE.Raycaster();
+        const mouse3d = new THREE.Vector2();
+
+        function showToast(title, msg, type) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastTitle').innerHTML = title;
+            document.getElementById('toastMsg').innerHTML = msg;
+            t.style.borderLeftColor = type === 'fire' ? '#ef4444' : type === 'earthquake' ? '#eab308' : '#3b82f6';
+            t.classList.add('show');
+            clearTimeout(t._hideTimer);
+            t._hideTimer = setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        function updateTime() { const n = new Date();
+            document.getElementById('currentTime').innerHTML = n.toLocaleTimeString();
+            document.getElementById('currentDate').innerHTML = n.toLocaleDateString(); }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        function switchZone(zoneId) { currentZoneId = zoneId;
+            document.querySelectorAll('.zone-item').forEach(el => { if (parseInt(el.dataset.zone) === zoneId) el.classList.add(
+                    'active');
+                else el.classList.remove('active'); });
+            renderMonitorGrid();
+            updateZoneStats(); }
+
+        function updateZoneStats() { const z = zones[currentZoneId];
+            document.getElementById('zoneName').innerHTML = `${z.icon} ${z.name}`;
+            document.getElementById('zoneDesc').innerHTML = z.desc;
+            document.getElementById('onlineRate').innerHTML = `${Math.round(z.online/z.cameras*100)}%`;
+            document.getElementById('todayAlerts').innerHTML = z.alerts;
+            document.getElementById('zoneTotal').innerHTML = Math.floor(Math.random() * 200 + 80);
+            document.getElementById('avgDensity').innerHTML = (Math.random() * 0.7 + 0.3).toFixed(2);
+            document.getElementById('hotArea').innerHTML = `${z.name} 中心区`;
+            document.getElementById('hotBar').style.width = `${Math.floor(Math.random()*70+25)}%`; }
+
+        // ★★★ 获取视频文件名（根据区域ID和摄像头序号） ★★★
+        function getVideoFileName(zoneId, camIndex) {
+            const prefix = videoPrefixMap[zoneId] || 'jiaoshi';
+            return prefix + camIndex + '.mp4';
+        }
+
+        // ★★★ 生成摄像头媒体内容（全部使用视频） ★★★
+        function generateCameraMedia(zoneId, camIndex) {
+            const videoFile = getVideoFileName(zoneId, camIndex);
+            return `
+                <video autoplay muted loop playsinline>
+                    <source src="${videoFile}" type="video/mp4">
+                    您的浏览器不支持视频播放
+                </video>
+            `;
+        }
+
+        function renderMonitorGrid() {
+            const z = zones[currentZoneId];
+            const zoneId = currentZoneId;
+            let h = '';
+            for (let i = 1; i <= 6; i++) {
+                const cId = `${z.camPrefix}-${i}`;
+                const cName = `${z.name} · 摄像头${i}`;
+                const a = (z.alerts > 0 && (i === 2 || i === 5));
+                const mediaContent = generateCameraMedia(zoneId, i);
+                let scenarioTag = '';
+                if (currentScenario === 'fire') scenarioTag =
+                    '<span class="absolute top-2 right-2 text-[9px] bg-red-600/90 text-white px-2 py-0.5 rounded-full shadow-lg animate-pulse">🔥 消防演习</span>';
+                else if (currentScenario === 'earthquake') scenarioTag =
+                    '<span class="absolute top-2 right-2 text-[9px] bg-yellow-600/90 text-white px-2 py-0.5 rounded-full shadow-lg animate-pulse">🌍 地震避险</span>';
+                let borderClass = '';
+                if (currentScenario === 'fire') borderClass = ' border-red-500/30 shadow-red-500/10';
+                else if (currentScenario === 'earthquake') borderClass = ' border-yellow-500/30 shadow-yellow-500/10';
+                h += `<div class="glass-card rounded-xl overflow-hidden monitor-card${borderClass}" data-cam-id="${cId}" data-cam-name="${cName}" data-zone-id="${zoneId}" data-cam-index="${i}">
                     <div class="px-3 py-2 border-b border-slate-700/50 flex justify-between items-center">
                         <span class="text-[11px] font-medium">📹 ${cName}</span>
                         ${a?'<span class="text-[9px] text-red-400 animate-pulse">⚠️ 预警</span>':'<span class="text-[9px] text-green-400">● 正常</span>'}
                     </div>
                     <div class="aspect-video bg-slate-900 relative">
                         ${mediaContent}
+                        ${scenarioTag}
                         <div class="absolute bottom-1 left-1 text-[8px] bg-black/60 px-1 rounded">${new Date().toLocaleTimeString()}</div>
                     </div>
-                </div>`; 
+                </div>`;
             }
-            document.getElementById('monitorGrid').innerHTML = h; 
-            document.querySelectorAll('.monitor-card').forEach(c=>c.addEventListener('click',()=>{openCameraModal(c.dataset.camName,c.dataset.camId);})); 
-            updateZoneStats(); 
+            document.getElementById('monitorGrid').innerHTML = h;
+            // 绑定点击事件：点击监控卡片打开弹窗
+            document.querySelectorAll('.monitor-card').forEach(c => {
+                c.addEventListener('click', function() {
+                    const name = this.dataset.camName;
+                    const zoneId = parseInt(this.dataset.zoneId);
+                    const camIndex = parseInt(this.dataset.camIndex);
+                    openCameraModal(name, zoneId, camIndex);
+                });
+            });
+            updateZoneStats();
         }
-        
-        // ==================== 弹窗：教学楼摄像头1显示视频（chuwujian） ====================
-        function openCameraModal(name,id){const m=document.getElementById('cameraModal'); document.getElementById('modalCameraName').innerHTML=`📹 ${name}`; 
-            // 判断是否为教学楼摄像头1（使用视频）
-            if (id === '教学楼-1') {
-                document.getElementById('modalCameraImg').style.display = 'none';
-                // 如果已有video元素则复用，否则创建
-                let existingVideo = m.querySelector('video');
-                if (!existingVideo) {
-                    const video = document.createElement('video');
-                    video.autoplay = true;
-                    video.muted = true;
-                    video.loop = true;
-                    video.playsInline = true;
-                    video.className = 'w-full h-full object-cover';
-                    video.innerHTML = `<source src="chuwujian.mp4" type="video/mp4">您的浏览器不支持视频播放`;
-                    const container = m.querySelector('.aspect-video');
-                    container.appendChild(video);
-                    existingVideo = video;
+
+        // ★★★ 打开摄像头弹窗（使用视频） ★★★
+        function openCameraModal(name, zoneId, camIndex) {
+            const m = document.getElementById('cameraModal');
+            document.getElementById('modalCameraName').innerHTML = `📹 ${name}`;
+
+            // 获取或创建视频元素
+            let video = m.querySelector('video');
+            if (!video) {
+                video = document.createElement('video');
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.className = 'w-full h-full object-cover';
+                const container = m.querySelector('.aspect-video');
+                container.appendChild(video);
+            }
+            // 设置视频源
+            const videoFile = getVideoFileName(zoneId, camIndex);
+            video.innerHTML = `<source src="${videoFile}" type="video/mp4">您的浏览器不支持视频播放`;
+            video.load();
+            video.style.display = 'block';
+
+            // 隐藏img
+            const img = m.querySelector('#modalCameraImg');
+            if (img) img.style.display = 'none';
+
+            document.getElementById('modalCameraDesc').innerHTML =
+                `📍 位置：${name} | 状态：${currentScenario!=='normal'?'应急模式':'正常监控'} | 时间：${new Date().toLocaleString()}`;
+
+            m.classList.remove('hidden');
+            m.style.display = 'flex';
+        }
+
+        function closeCameraModal() { const m = document.getElementById('cameraModal');
+            m.classList.add('hidden');
+            m.style.display = 'none'; }
+
+        function setScenario(s) {
+            if (scenarioInterval) { clearInterval(scenarioInterval);
+                scenarioInterval = null; }
+            currentScenario = s;
+            const container = document.getElementById('appContainer');
+            const zone = zones[currentZoneId];
+            const zoneName = zone.name;
+            document.querySelectorAll('.scenario-btn').forEach(b => {
+                b.classList.remove('active-scenario', 'fire-active', 'earthquake-active');
+                if (b.dataset.scenario === s) {
+                    if (s === 'fire') b.classList.add('fire-active');
+                    else if (s === 'earthquake') b.classList.add('earthquake-active');
+                    else b.classList.add('active-scenario');
                 }
-                existingVideo.style.display = 'block';
-                const img = m.querySelector('#modalCameraImg');
-                if (img) img.style.display = 'none';
-                document.getElementById('modalCameraDesc').innerHTML = `📍 位置：${name} | 状态：${currentScenario!=='normal'?'应急模式':'正常监控'} | 时间：${new Date().toLocaleString()}`;
+            });
+            container.classList.remove('scene-fire', 'scene-earthquake');
+            if (s === 'fire') container.classList.add('scene-fire');
+            else if (s === 'earthquake') container.classList.add('scene-earthquake');
+            const dot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            dot.className = 'status-dot';
+            if (s === 'normal') {
+                dot.classList.add('status-normal');
+                statusText.textContent = '系统正常';
+                statusText.className = 'text-slate-300';
+            } else if (s === 'fire') {
+                dot.classList.add('status-critical');
+                statusText.textContent = '🔴 消防应急响应中';
+                statusText.className = 'text-red-400 font-semibold';
+            } else if (s === 'earthquake') {
+                dot.classList.add('status-warning');
+                statusText.textContent = '🟡 地震应急响应中';
+                statusText.className = 'text-yellow-400 font-semibold';
+            }
+            const zoneDesc = document.getElementById('zoneDesc');
+            const zoneHeader = document.getElementById('zoneHeader');
+            if (s === 'fire') {
+                zoneDesc.innerHTML = '🔥 消防演习 · 紧急疏散中';
+                zoneHeader.style.borderColor = 'rgba(239,68,68,0.3)';
+            } else if (s === 'earthquake') {
+                zoneDesc.innerHTML = '🌍 地震避险 · 人员就地躲避中';
+                zoneHeader.style.borderColor = 'rgba(234,179,8,0.3)';
             } else {
-                // 普通摄像头使用图片
-                const img = document.getElementById('modalCameraImg');
-                img.style.display = 'block';
-                img.src = `https://picsum.photos/seed/${id}/1200/675`;
-                const video = m.querySelector('video');
-                if (video) video.style.display = 'none';
-                document.getElementById('modalCameraDesc').innerHTML = `📍 位置：${name} | 状态：${currentScenario!=='normal'?'应急模式':'正常监控'} | 时间：${new Date().toLocaleString()}`;
+                zoneDesc.innerHTML = zone.desc + ' · 日常监控';
+                zoneHeader.style.borderColor = 'rgba(0,212,255,0.15)';
             }
-            m.classList.remove('hidden'); m.style.display='flex'; 
+            const alertCount = document.getElementById('todayAlerts');
+            const onlineRate = document.getElementById('onlineRate');
+            if (s === 'fire') {
+                alertCount.textContent = '6';
+                alertCount.className = 'text-red-400 font-mono';
+                onlineRate.textContent = '97%';
+            } else if (s === 'earthquake') {
+                alertCount.textContent = '4';
+                alertCount.className = 'text-yellow-400 font-mono';
+                onlineRate.textContent = '96%';
+            } else {
+                alertCount.textContent = '2';
+                alertCount.className = 'text-orange-400 font-mono';
+                onlineRate.textContent = '100%';
+            }
+            const totalEl = document.getElementById('zoneTotal');
+            const densityEl = document.getElementById('avgDensity');
+            const hotAreaEl = document.getElementById('hotArea');
+            const hotBarEl = document.getElementById('hotBar');
+            if (s === 'fire') {
+                totalEl.textContent = '256';
+                totalEl.className = 'text-2xl font-bold text-red-400';
+                densityEl.textContent = '0.35 人/m²';
+                densityEl.className = 'text-lg font-bold text-red-400';
+                hotAreaEl.textContent = '🔥 ' + zoneName + ' 东侧走廊';
+                hotAreaEl.className = 'text-sm font-semibold text-red-400';
+                hotBarEl.style.width = '85%';
+                hotBarEl.className = 'bg-red-500 h-1.5 rounded-full';
+                let fireCount = 256;
+                scenarioInterval = setInterval(() => {
+                    if (fireCount > 80) {
+                        fireCount -= 2 + Math.floor(Math.random() * 3);
+                        totalEl.textContent = fireCount;
+                        densityEl.textContent = (0.15 + (fireCount / totalPeople) * 0.5).toFixed(2) + ' 人/m²';
+                    }
+                }, 1500);
+            } else if (s === 'earthquake') {
+                totalEl.textContent = '312';
+                totalEl.className = 'text-2xl font-bold text-yellow-400';
+                densityEl.textContent = '0.72 人/m²';
+                densityEl.className = 'text-lg font-bold text-yellow-400';
+                hotAreaEl.textContent = '🌍 ' + zoneName + ' 中央大厅';
+                hotAreaEl.className = 'text-sm font-semibold text-yellow-400';
+                hotBarEl.style.width = '65%';
+                hotBarEl.className = 'bg-yellow-500 h-1.5 rounded-full';
+                let eqCount = 312;
+                scenarioInterval = setInterval(() => {
+                    const change = Math.floor(Math.random() * 5) - 2;
+                    eqCount = Math.max(280, Math.min(340, eqCount + change));
+                    totalEl.textContent = eqCount;
+                    densityEl.textContent = (0.55 + (eqCount / totalPeople) * 0.35).toFixed(2) + ' 人/m²';
+                }, 2000);
+            } else {
+                totalEl.textContent = '148';
+                totalEl.className = 'text-2xl font-bold text-white';
+                densityEl.textContent = '0.42 人/m²';
+                densityEl.className = 'text-lg font-bold text-cyan-400';
+                hotAreaEl.textContent = zoneName + ' 中心区';
+                hotAreaEl.className = 'text-sm font-semibold text-red-400';
+                hotBarEl.style.width = '40%';
+                hotBarEl.className = 'bg-red-500 h-1.5 rounded-full';
+            }
+            updateAlertList(s, zoneName);
+            renderMonitorGrid();
+            const names = { normal: '日常模式', fire: '🔥 消防疏散演习', earthquake: '🌍 地震避险模式' };
+            const detailMap = {
+                normal: '系统运行正常，所有监控点位在线',
+                fire: '🚨 火情警报已触发，请立即组织全员疏散！',
+                earthquake: '🌍 地震预警已触发，请立即指导人员就地避险！'
+            };
+            showToast(`✅ 已切换至「${names[s]}」`, detailMap[s], s);
         }
-        function closeCameraModal(){const m=document.getElementById('cameraModal'); m.classList.add('hidden'); m.style.display='none';}
-        
-        function setScenario(s){currentScenario=s; document.querySelectorAll('.scenario-btn').forEach(b=>{if(b.dataset.scenario===s)b.classList.add('active-scenario'); else b.classList.remove('active-scenario');}); showToast('应急场景',`${s==='normal'?'日常模式':s==='fire'?'消防疏散演习':s==='earthquake'?'地震避险模式':'校园封闭应急'} 已激活`);}
-        function renderAlerts(){const a=[{type:'⚠️ 警告',msg:'教学楼东侧楼梯人群聚集',time:'2分钟前'},{type:'📢 提示',msg:'图书馆入口人流密度上升',time:'5分钟前'},{type:'⚠️ 警告',msg:'食堂后厨烟雾传感器触发',time:'12分钟前'}]; document.getElementById('alertList').innerHTML=a.map(x=>`<div class="bg-slate-800/40 rounded-lg p-2 border-l-4 border-orange-500"><div class="text-[10px] font-bold text-orange-400">${x.type}</div><div class="text-[11px] mt-1">${x.msg}</div><div class="text-[9px] text-slate-500 mt-1">${x.time}</div></div>`).join('');}
-        function renderTeam(){const t=[{name:'张队长',role:'总指挥'},{name:'李副队',role:'巡逻组长'},{name:'王队员',role:'监控员'}]; document.getElementById('teamList').innerHTML=t.map(m=>`<div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-xs font-bold">${m.name[0]}</div><div class="flex-1"><div class="text-xs font-medium">${m.name}</div><div class="text-[9px] text-slate-400">${m.role}</div></div><div class="w-2 h-2 rounded-full bg-green-400"></div></div>`).join('');}
-        function buildSidebar(){const zc=document.getElementById('zoneMenu'); zc.innerHTML=''; Object.entries(zones).forEach(([id,val])=>{const b=document.createElement('button'); b.className=`zone-item w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 ${parseInt(id)===currentZoneId?'active':''}`; b.dataset.zone=id; b.innerHTML=`<span>${val.icon}</span><span>${val.name}</span><span class="ml-auto text-[9px] text-slate-400">${val.cameras}路</span>`; b.onclick=()=>switchZone(parseInt(id)); zc.appendChild(b);}); const sc=document.getElementById('scenarioMenu'); sc.innerHTML=''; const scs=[{id:'normal',name:'日常模式',icon:'check-circle'},{id:'fire',name:'消防疏散演习',icon:'fire'},{id:'earthquake',name:'地震避险模式',icon:'mountain'},{id:'lockdown',name:'校园封闭应急',icon:'lock'}]; scs.forEach(s=>{const b=document.createElement('button'); b.className=`scenario-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 border ${s.id==='normal'?'border-cyan-500/30 active-scenario':'border-transparent'}`; b.dataset.scenario=s.id; b.innerHTML=`<i class="fas fa-${s.icon} text-xs"></i> ${s.name}`; b.onclick=()=>setScenario(s.id); sc.appendChild(b);});}
-        function triggerEmergency(){showToast('⚠️ 紧急预案启动','所有安保人员立即就位！请遵循疏散指引！'); if(currentScenario==='normal')setScenario('fire');}
-        
-        // ==================== 各区域独立建筑布局数据 ====================
-        const buildingLayouts = {
-            1: {
-                name: "知行教学楼",
-                floors: {
-                    1: [
-                        {id:"A101",name:"一年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},
-                        {id:"A102",name:"一年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},
-                        {id:"A103",name:"一年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},
-                        {id:"A104",name:"教师办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:15},
-                        {id:"B101",name:"美术教室",type:"专用教室",x:50,y:170,w:100,h:90,cap:40},
-                        {id:"B102",name:"音乐教室",type:"专用教室",x:50,y:280,w:100,h:90,cap:40},
-                        {id:"C101",name:"科学实验室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},
-                        {id:"C102",name:"计算机教室",type:"机房",x:470,y:280,w:100,h:90,cap:50},
-                        {id:"HALL",name:"中央大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:120},
-                        {id:"CORR1",name:"东走廊",type:"走廊",x:440,y:50,w:30,h:320,cap:80},
-                        {id:"CORR2",name:"西走廊",type:"走廊",x:30,y:50,w:30,h:320,cap:80},
-                        {id:"STAIR1",name:"东楼梯",type:"楼梯间",x:460,y:140,w:25,h:35,cap:30},
-                        {id:"STAIR2",name:"西楼梯",type:"楼梯间",x:25,y:140,w:25,h:35,cap:30},
-                        {id:"WC1",name:"卫生间(东)",type:"卫生间",x:490,y:340,w:40,h:50,cap:20},
-                        {id:"WC2",name:"卫生间(西)",type:"卫生间",x:40,y:340,w:40,h:50,cap:20}
-                    ],
-                    2: [
-                        {id:"A201",name:"二年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},
-                        {id:"A202",name:"二年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},
-                        {id:"A203",name:"二年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},
-                        {id:"A204",name:"年级办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:12},
-                        {id:"B201",name:"书法教室",type:"专用教室",x:50,y:170,w:100,h:90,cap:40},
-                        {id:"B202",name:"劳技教室",type:"专用教室",x:50,y:280,w:100,h:90,cap:40},
-                        {id:"C201",name:"自然教室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},
-                        {id:"C202",name:"录播教室",type:"专用教室",x:470,y:280,w:100,h:90,cap:45},
-                        {id:"HALL2",name:"二层大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:100},
-                        {id:"CORR1_2",name:"东走廊",type:"走廊",x:440,y:50,w:30,h:320,cap:80},
-                        {id:"CORR2_2",name:"西走廊",type:"走廊",x:30,y:50,w:30,h:320,cap:80},
-                        {id:"STAIR1_2",name:"东楼梯",type:"楼梯间",x:460,y:140,w:25,h:35,cap:30},
-                        {id:"STAIR2_2",name:"西楼梯",type:"楼梯间",x:25,y:140,w:25,h:35,cap:30}
-                    ],
-                    3: [
-                        {id:"A301",name:"三年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},
-                        {id:"A302",name:"三年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},
-                        {id:"A303",name:"三年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},
-                        {id:"A304",name:"教研组",type:"办公室",x:420,y:50,w:80,h:80,cap:12},
-                        {id:"B301",name:"英语角",type:"活动室",x:50,y:170,w:100,h:90,cap:40},
-                        {id:"B302",name:"少先队室",type:"活动室",x:50,y:280,w:100,h:90,cap:40},
-                        {id:"C301",name:"探究实验室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},
-                        {id:"C302",name:"未来教室",type:"专用教室",x:470,y:280,w:100,h:90,cap:45},
-                        {id:"HALL3",name:"三层大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:100}
-                    ],
-                    4: [
-                        {id:"A401",name:"六年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},
-                        {id:"A402",name:"六年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},
-                        {id:"A403",name:"六年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},
-                        {id:"A404",name:"毕业班办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:12},
-                        {id:"B401",name:"心理辅导室",type:"专用教室",x:50,y:170,w:100,h:90,cap:30},
-                        {id:"B402",name:"多功能厅",type:"活动室",x:50,y:280,w:100,h:90,cap:80},
-                        {id:"C401",name:"STEAM教室",type:"实验室",x:470,y:170,w:100,h:90,cap:40},
-                        {id:"C402",name:"考试指挥中心",type:"办公室",x:470,y:280,w:100,h:90,cap:20}
-                    ]
-                }
-            },
-            2: {
-                name: "明德公寓",
-                floors: {
-                    1: [
-                        {id:"101",name:"男生宿舍101",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},
-                        {id:"102",name:"男生宿舍102",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},
-                        {id:"103",name:"男生宿舍103",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},
-                        {id:"104",name:"宿管值班室",type:"办公室",x:350,y:60,w:70,h:70,cap:4},
-                        {id:"105",name:"男生宿舍105",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},
-                        {id:"106",name:"洗衣房",type:"服务",x:80,y:160,w:70,h:70,cap:10},
-                        {id:"107",name:"公共浴室",type:"浴室",x:170,y:160,w:70,h:70,cap:20},
-                        {id:"108",name:"活动室",type:"活动室",x:260,y:160,w:160,h:70,cap:50},
-                        {id:"CORR_D1",name:"一层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}
-                    ],
-                    2: [
-                        {id:"201",name:"女生宿舍201",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},
-                        {id:"202",name:"女生宿舍202",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},
-                        {id:"203",name:"女生宿舍203",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},
-                        {id:"204",name:"女生宿舍204",type:"宿舍",x:350,y:60,w:70,h:70,cap:8},
-                        {id:"205",name:"女生宿舍205",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},
-                        {id:"206",name:"自习室",type:"自习室",x:80,y:160,w:160,h:70,cap:40},
-                        {id:"207",name:"心理驿站",type:"活动室",x:260,y:160,w:100,h:70,cap:20},
-                        {id:"CORR_D2",name:"二层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}
-                    ],
-                    3: [
-                        {id:"301",name:"混合宿舍301",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},
-                        {id:"302",name:"混合宿舍302",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},
-                        {id:"303",name:"混合宿舍303",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},
-                        {id:"304",name:"教师宿舍",type:"宿舍",x:350,y:60,w:160,h:70,cap:16},
-                        {id:"305",name:"活动室",type:"活动室",x:80,y:160,w:160,h:70,cap:40},
-                        {id:"306",name:"阅览室",type:"阅览室",x:260,y:160,w:100,h:70,cap:30},
-                        {id:"CORR_D3",name:"三层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}
-                    ],
-                    4: [
-                        {id:"401",name:"高年级宿舍401",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},
-                        {id:"402",name:"高年级宿舍402",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},
-                        {id:"403",name:"高年级宿舍403",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},
-                        {id:"404",name:"高年级宿舍404",type:"宿舍",x:350,y:60,w:70,h:70,cap:8},
-                        {id:"405",name:"高年级宿舍405",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},
-                        {id:"406",name:"天台活动区",type:"活动室",x:80,y:160,w:250,h:70,cap:60},
-                        {id:"CORR_D4",name:"四层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}
-                    ]
-                }
-            },
-            3: {
-                name: "思源餐厅",
-                floors: {
-                    1: [
-                        {id:"D101",name:"打餐区A",type:"餐厅",x:80,y:60,w:130,h:90,cap:80},
-                        {id:"D102",name:"打餐区B",type:"餐厅",x:240,y:60,w:130,h:90,cap:80},
-                        {id:"D103",name:"就餐大厅",type:"大厅",x:80,y:180,w:290,h:110,cap:200},
-                        {id:"D104",name:"后厨操作间",type:"厨房",x:420,y:60,w:130,h:230,cap:30},
-                        {id:"D105",name:"仓库",type:"仓库",x:80,y:320,w:100,h:60,cap:10},
-                        {id:"D106",name:"洗碗间",type:"服务",x:200,y:320,w:80,h:60,cap:8},
-                        {id:"D107",name:"员工休息室",type:"办公室",x:310,y:320,w:60,h:60,cap:6},
-                        {id:"D108",name:"走廊",type:"走廊",x:50,y:30,w:530,h:25,cap:60}
-                    ],
-                    2: [
-                        {id:"D201",name:"包间1",type:"餐厅",x:80,y:60,w:100,h:80,cap:20},
-                        {id:"D202",name:"包间2",type:"餐厅",x:200,y:60,w:100,h:80,cap:20},
-                        {id:"D203",name:"包间3",type:"餐厅",x:320,y:60,w:100,h:80,cap:20},
-                        {id:"D204",name:"小餐厅",type:"餐厅",x:440,y:60,w:110,h:80,cap:40},
-                        {id:"D205",name:"储物间",type:"仓库",x:80,y:170,w:80,h:70,cap:8},
-                        {id:"D206",name:"办公室",type:"办公室",x:180,y:170,w:80,h:70,cap:6},
-                        {id:"D207",name:"会议室",type:"活动室",x:280,y:170,w:80,h:70,cap:15},
-                        {id:"D208",name:"备餐区",type:"厨房",x:380,y:170,w:170,h:70,cap:20},
-                        {id:"D209",name:"二层走廊",type:"走廊",x:50,y:30,w:530,h:25,cap:40}
-                    ]
-                }
-            },
-            4: {
-                name: "健体运动场",
-                floors: {
-                    1: [
-                        {id:"S101",name:"塑胶跑道",type:"运动场",x:60,y:60,w:300,h:160,cap:150},
-                        {id:"S102",name:"足球场",type:"运动场",x:380,y:60,w:170,h:160,cap:100},
-                        {id:"S103",name:"篮球场",type:"运动场",x:60,y:240,w:180,h:120,cap:80},
-                        {id:"S104",name:"看台区",type:"看台",x:260,y:240,w:140,h:120,cap:200},
-                        {id:"S105",name:"器材室",type:"仓库",x:420,y:240,w:80,h:55,cap:10},
-                        {id:"S106",name:"更衣室",type:"服务",x:420,y:305,w:80,h:55,cap:15},
-                        {id:"S107",name:"卫生间",type:"卫生间",x:50,y:390,w:60,h:40,cap:10},
-                        {id:"S108",name:"医务室",type:"办公室",x:130,y:390,w:60,h:40,cap:5},
-                        {id:"S109",name:"通道",type:"走廊",x:30,y:30,w:500,h:25,cap:60}
-                    ]
-                }
-            },
-            5: {
-                name: "博雅图书馆",
-                floors: {
-                    1: [
-                        {id:"R101",name:"低年级阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:60},
-                        {id:"R102",name:"绘本馆",type:"阅览室",x:250,y:50,w:150,h:100,cap:50},
-                        {id:"R103",name:"报刊阅览室",type:"阅览室",x:420,y:50,w:130,h:100,cap:40},
-                        {id:"STACK1",name:"藏书库",type:"书库",x:80,y:180,w:100,h:100,cap:20},
-                        {id:"CIRC",name:"借阅台",type:"服务台",x:200,y:180,w:60,h:60,cap:10},
-                        {id:"COMP1",name:"电子阅览室",type:"机房",x:280,y:180,w:130,h:100,cap:40},
-                        {id:"OFFICE1",name:"馆长室",type:"办公室",x:430,y:180,w:120,h:80,cap:8},
-                        {id:"CORR_L1",name:"一层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}
-                    ],
-                    2: [
-                        {id:"R201",name:"高年级阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:60},
-                        {id:"R202",name:"教师阅览室",type:"阅览室",x:250,y:50,w:150,h:100,cap:40},
-                        {id:"R203",name:"参考阅览室",type:"阅览室",x:420,y:50,w:130,h:100,cap:35},
-                        {id:"STACK2",name:"密集书库",type:"书库",x:80,y:180,w:100,h:100,cap:20},
-                        {id:"STUDY",name:"小组研讨室",type:"研讨室",x:200,y:180,w:80,h:80,cap:12},
-                        {id:"COMP2",name:"多媒体室",type:"机房",x:300,y:180,w:110,h:100,cap:30},
-                        {id:"CORR_L2",name:"二层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}
-                    ],
-                    3: [
-                        {id:"R301",name:"特藏阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:40},
-                        {id:"R302",name:"研修室A",type:"研讨室",x:250,y:50,w:70,h:100,cap:15},
-                        {id:"R303",name:"研修室B",type:"研讨室",x:340,y:50,w:70,h:100,cap:15},
-                        {id:"R304",name:"学术报告厅",type:"报告厅",x:430,y:50,w:120,h:150,cap:80},
-                        {id:"STACK3",name:"古籍书库",type:"书库",x:80,y:180,w:100,h:100,cap:15},
-                        {id:"OFFICE2",name:"采编室",type:"办公室",x:200,y:180,w:100,h:80,cap:10},
-                        {id:"CORR_L3",name:"三层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}
-                    ]
+
+        function updateAlertList(scenario, zoneName) {
+            const alertList = document.getElementById('alertList');
+            let alerts = [];
+            const time = new Date().toLocaleTimeString();
+            if (scenario === 'fire') {
+                alerts = [
+                    { type: '🚨 紧急', msg: `🔥 ${zoneName}东侧走廊 烟雾探测器触发！`, time: time, level: 'critical' },
+                    { type: '🚨 紧急', msg: `📢 疏散指令已下达：全体人员立即撤离！`, time: time, level: 'critical' },
+                    { type: '⚠️ 警告', msg: `🚒 消防应急小组已出动，预计2分钟到达`, time: time, level: 'warning' },
+                    { type: '📢 提示', msg: `🚪 东侧安全通道已开启，请有序疏散`, time: time, level: 'info' },
+                    { type: '📢 提示', msg: `👥 当前已疏散 ${Math.floor(Math.random()*100+50)} 人`, time: time, level: 'info' }
+                ];
+            } else if (scenario === 'earthquake') {
+                alerts = [
+                    { type: '🌍 预警', msg: `🌍 ${zoneName}区域 地震预警系统触发！`, time: time, level: 'warning' },
+                    { type: '🌍 预警', msg: `📢 避险指令：请全体人员就近躲避！`, time: time, level: 'warning' },
+                    { type: '⚠️ 警告', msg: `🏗️ 建筑结构监测：${zoneName}主体结构稳定`, time: time, level: 'info' },
+                    { type: '📢 提示', msg: `🪑 应急避险区域已开放：${zoneName}中央大厅`, time: time, level: 'info' },
+                    { type: '📢 提示', msg: `👥 当前避险人数 ${Math.floor(Math.random()*200+100)} 人`, time: time, level: 'info' }
+                ];
+            } else {
+                alerts = [
+                    { type: 'ℹ️ 信息', msg: '系统运行正常，所有监控点位在线', time: new Date(Date.now() - 120000)
+                        .toLocaleTimeString(), level: 'info' },
+                    { type: 'ℹ️ 信息', msg: '今日无异常事件，校园秩序良好', time: new Date(Date.now() - 300000)
+                        .toLocaleTimeString(), level: 'info' },
+                    { type: 'ℹ️ 信息', msg: `当前 ${zoneName} 人流量平稳`, time: new Date(Date.now() - 600000)
+                        .toLocaleTimeString(), level: 'info' }
+                ];
+            }
+            const levelColors = {
+                critical: 'border-red-500 text-red-400',
+                warning: 'border-yellow-500 text-yellow-400',
+                info: 'border-blue-500 text-blue-400'
+            };
+            alertList.innerHTML = alerts.map(x => `
+                <div class="bg-slate-800/40 rounded-lg p-2 border-l-4 ${levelColors[x.level] || 'border-slate-500'}">
+                    <div class="text-[10px] font-bold ${levelColors[x.level] || 'text-slate-400'}">${x.type}</div>
+                    <div class="text-[11px] mt-1 text-slate-200">${x.msg}</div>
+                    <div class="text-[9px] text-slate-500 mt-1">${x.time}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderTeam() { const t = [{ name: '张队长', role: '总指挥' }, { name: '李副队', role: '巡逻组长' }, { name: '王队员',
+                role: '监控员' }
+            ];
+            document.getElementById('teamList').innerHTML = t.map(m =>
+                `<div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-xs font-bold">${m.name[0]}</div><div class="flex-1"><div class="text-xs font-medium">${m.name}</div><div class="text-[9px] text-slate-400">${m.role}</div></div><div class="w-2 h-2 rounded-full bg-green-400"></div></div>`
+                ).join(''); }
+
+        function buildSidebar() {
+            const zc = document.getElementById('zoneMenu');
+            zc.innerHTML = '';
+            Object.entries(zones).forEach(([id, val]) => {
+                const b = document.createElement('button');
+                b.className =
+                    `zone-item w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 ${parseInt(id)===currentZoneId?'active':''}`;
+                b.dataset.zone = id;
+                b.innerHTML = `<span>${val.icon}</span><span>${val.name}</span>`;
+                b.onclick = () => switchZone(parseInt(id));
+                zc.appendChild(b);
+            });
+            const sc = document.getElementById('scenarioMenu');
+            sc.innerHTML = '';
+            const scs = [{ id: 'normal', name: '日常模式', icon: 'check-circle' }, { id: 'fire', name: '消防疏散演习',
+                icon: 'fire' }, { id: 'earthquake', name: '地震避险模式', icon: 'mountain' }];
+            scs.forEach(s => {
+                const b = document.createElement('button');
+                b.className =
+                    `scenario-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 border ${s.id==='normal'?'border-cyan-500/30 active-scenario':'border-transparent'}`;
+                b.dataset.scenario = s.id;
+                b.innerHTML = `<i class="fas fa-${s.icon} text-xs"></i> ${s.name}`;
+                b.onclick = () => setScenario(s.id);
+                sc.appendChild(b);
+            });
+        }
+
+        function triggerEmergency() { showToast('🚨 紧急预案启动', '所有安保人员立即就位！请遵循疏散指引！', 'fire'); if (currentScenario ===
+                'normal') setScenario('fire'); }
+
+        // ===== 上报功能 =====
+        function submitReport() {
+            const type = document.getElementById('reportType').value;
+            const urgency = document.getElementById('reportUrgency').value;
+            const location = document.getElementById('reportLocation').value.trim();
+            const content = document.getElementById('reportContent').value.trim();
+            if (!content) { showToast('⚠️ 提示', '请填写上报内容', 'warning'); return; }
+            if (content.length < 3) { showToast('⚠️ 提示', '内容至少3个字', 'warning'); return; }
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            const dateStr = now.toLocaleDateString();
+            const urgencyLabel = urgency === '特别紧急' ? '🔴 特别紧急' : urgency === '紧急' ? '🟡 紧急' : '🟢 普通';
+            const fullContent = location ? `【位置】${location}\n【详情】${content}` : content;
+            const report = {
+                id: Date.now(),
+                type: type,
+                urgency: urgency,
+                content: fullContent,
+                time: timeStr,
+                date: dateStr,
+                status: 'pending'
+            };
+            reportHistory.unshift(report);
+            renderReportList();
+            document.getElementById('reportContent').value = '';
+            document.getElementById('reportLocation').value = '';
+            document.getElementById('reportCharCount').textContent = '0 / 500';
+            document.getElementById('reportCount').textContent = reportHistory.length + ' 条';
+            showToast('✅ 上报成功', `【${type}】已发送至校领导端（${urgencyLabel}）`, 'info');
+            setTimeout(() => {
+                report.status = 'sent';
+                renderReportList();
+            }, 1500);
+        }
+
+        function renderReportList() {
+            const container = document.getElementById('reportList');
+            if (reportHistory.length === 0) {
+                container.innerHTML = '<div class="text-[10px] text-slate-500 text-center py-4">暂无上报记录</div>';
+                return;
+            }
+            const urgencyMap = { '特别紧急': 'urgent', '紧急': 'warning', '普通': 'info' };
+            const statusMap = { 'pending': '⏳ 发送中', 'sent': '✅ 已送达' };
+            container.innerHTML = reportHistory.map(r => `
+                <div class="report-item">
+                    <div class="flex justify-between items-start">
+                        <span class="r-type ${urgencyMap[r.urgency] || 'info'}">${r.type}</span>
+                        <span class="r-status ${r.status === 'pending' ? 'pending' : ''}">${statusMap[r.status] || '已发送'}</span>
+                    </div>
+                    <div class="r-content">${r.content}</div>
+                    <div class="flex justify-between text-[9px] text-slate-500">
+                        <span>${r.date} ${r.time}</span>
+                        <span class="${urgencyMap[r.urgency] === 'urgent' ? 'text-red-400' : urgencyMap[r.urgency] === 'warning' ? 'text-yellow-400' : 'text-slate-400'}">${r.urgency}</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('reportCount').textContent = reportHistory.length + ' 条';
+        }
+
+        // ============================================================
+        // ★★★ 3D校园地图（完整保留） ★★★
+        // ============================================================
+        const buildings3d = [
+            { name: '知行教学楼', icon: '🏛️', x: -12, z: -6, w: 11, d: 8, h: 9, color: 0x3b82f6, floors: 5,
+            area: '14,000m²', type: '教学' },
+            { name: '明德公寓A', icon: '🏠', x: 10, z: -10, w: 8.5, d: 6.5, h: 7, color: 0x22c55e, floors: 4,
+            area: '9,000m²', type: '宿舍' },
+            { name: '明德公寓B', icon: '🏠', x: 10, z: 3, w: 8.5, d: 6.5, h: 7, color: 0x22c55e, floors: 4,
+            area: '9,000m²', type: '宿舍' },
+            { name: '思源餐厅', icon: '🍽️', x: -3, z: 12, w: 9.5, d: 6.5, h: 5.5, color: 0xf59e0b, floors: 2,
+            area: '7,000m²', type: '食堂' },
+            { name: '博雅图书馆', icon: '📚', x: -15, z: 7, w: 6.5, d: 6.5, h: 6.5, color: 0x8b5cf6, floors: 3,
+            area: '5,500m²', type: '图书馆' },
+            { name: '健体体育馆', icon: '🏟️', x: 3, z: -16, w: 8.5, d: 9.5, h: 6, color: 0xef4444, floors: 2,
+            area: '8,500m²', type: '体育' },
+            { name: '艺术中心', icon: '🎨', x: -7, z: -16, w: 5.5, d: 5.5, h: 4.5, color: 0xec4899, floors: 3,
+            area: '4,500m²', type: '艺术' },
+            { name: '实验中心', icon: '🧪', x: -17, z: -3, w: 5.5, d: 5.5, h: 5.5, color: 0x06b6d4, floors: 3,
+            area: '5,000m²', type: '实验' },
+            { name: '行政楼', icon: '🏢', x: 17, z: -3, w: 6, d: 5.5, h: 5.5, color: 0x6366f1, floors: 3,
+            area: '4,800m²', type: '行政' },
+            { name: '会议中心', icon: '🏛️', x: -3, z: -8, w: 5, d: 4, h: 4, color: 0x14b8a6, floors: 2,
+            area: '3,500m²', type: '会议' },
+        ];
+
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+                const r = typeof radii === 'number' ? radii : (radii || 0);
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                return this;
+            };
+        }
+
+        function createHighResWindowTexture(color, floors, rows) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            const baseColor = new THREE.Color(color);
+            const bg = baseColor.clone().multiplyScalar(0.15);
+            ctx.fillStyle = bg.getStyle();
+            ctx.fillRect(0, 0, 1024, 1024);
+            for (let i = 0; i < 30; i++) {
+                const y = (i / 30) * 1024;
+                ctx.strokeStyle = `rgba(255,255,255,0.015)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(1024, y);
+                ctx.stroke();
+            }
+            const colsActual = Math.max(4, Math.floor(rows * 0.7));
+            const spacingX = 1024 / (colsActual + 1);
+            const spacingY = 1024 / (rows + 1);
+            const wSize = Math.min(spacingX, spacingY) * 0.4;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < colsActual; c++) {
+                    const x = spacingX * (c + 1);
+                    const y = spacingY * (r + 1);
+                    const alpha = 0.3 + Math.random() * 0.5;
+                    const grad = ctx.createRadialGradient(x, y, 0, x, y, wSize * 1.2);
+                    grad.addColorStop(0, `rgba(180, 230, 255, ${alpha * 0.7})`);
+                    grad.addColorStop(0.5, `rgba(120, 200, 255, ${alpha * 0.3})`);
+                    grad.addColorStop(1, `rgba(80, 160, 255, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.shadowColor = `rgba(100, 200, 255, ${alpha * 0.15})`;
+                    ctx.shadowBlur = 20;
+                    ctx.fillRect(x - wSize, y - wSize * 1.3, wSize * 2, wSize * 2.6);
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = `rgba(200, 230, 255, 0.06)`;
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(x - wSize / 2, y - wSize * 1.2 / 2, wSize, wSize * 1.2);
+                    ctx.strokeStyle = `rgba(200, 240, 255, ${alpha * 0.03})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeRect(x - wSize / 4, y - wSize * 0.8 / 2, wSize / 2, wSize * 0.8);
                 }
             }
+            for (let r = 1; r < rows; r++) {
+                const y = (r / rows) * 1024;
+                ctx.strokeStyle = `rgba(200, 230, 255, 0.03)`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(20, y);
+                ctx.lineTo(1004, y);
+                ctx.stroke();
+            }
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createAdvancedBuilding3d(data) {
+            const group = new THREE.Group();
+            const { x, z, w, d, h, color, name, floors, area, icon, type } = data;
+            const tex = createHighResWindowTexture(color, floors, Math.max(floors, 2));
+            const mat = new THREE.MeshPhysicalMaterial({
+                map: tex,
+                roughness: 0.25,
+                metalness: 0.6,
+                emissive: new THREE.Color(color),
+                emissiveIntensity: 0.03,
+                color: color,
+                clearcoat: 0.05,
+                clearcoatRoughness: 0.3,
+                envMapIntensity: 0.4,
+            });
+            const geo = new THREE.BoxGeometry(w, h, d);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.y = h / 2;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.userData = { buildingIndex: buildingData3d.length };
+            group.add(mesh);
+            buildingMeshes3d.push(mesh);
+            const edgeGeo = new THREE.EdgesGeometry(geo);
+            const edgeMat = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.3 });
+            const edge = new THREE.LineSegments(edgeGeo, edgeMat);
+            edge.position.y = h / 2;
+            group.add(edge);
+            const edgeGeo2 = new THREE.EdgesGeometry(new THREE.BoxGeometry(w + 0.3, h + 0.3, d + 0.3));
+            const edgeMat2 = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.08 });
+            const edge2 = new THREE.LineSegments(edgeGeo2, edgeMat2);
+            edge2.position.y = h / 2;
+            group.add(edge2);
+            const topLineGeo = new THREE.BoxGeometry(w + 0.5, 0.08, d + 0.5);
+            const topLineMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.15 });
+            const topLine = new THREE.Mesh(topLineGeo, topLineMat);
+            topLine.position.y = h + 0.06;
+            group.add(topLine);
+            const equipMat = new THREE.MeshStandardMaterial({ color: 0x4a5a7a, roughness: 0.4, metalness: 0.8,
+                emissive: 0x1a2a4a, emissiveIntensity: 0.05 });
+            for (let i = 0; i < 3; i++) {
+                const eq = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.3 + Math.random() * 0.5, 0.2 + Math.random() * 0.3, 0.3 + Math.random() * 0.5),
+                    equipMat
+                );
+                eq.position.set(
+                    (Math.random() - 0.5) * w * 0.5,
+                    h + 0.2 + Math.random() * 0.2,
+                    (Math.random() - 0.5) * d * 0.5
+                );
+                eq.castShadow = true;
+                group.add(eq);
+            }
+            const labelCanvas = document.createElement('canvas');
+            labelCanvas.width = 640;
+            labelCanvas.height = 180;
+            const ctx2 = labelCanvas.getContext('2d');
+            ctx2.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx2.shadowBlur = 40;
+            const grad = ctx2.createLinearGradient(0, 0, 640, 0);
+            grad.addColorStop(0, 'rgba(5,8,15,0)');
+            grad.addColorStop(0.1, 'rgba(5,8,15,0.7)');
+            grad.addColorStop(0.5, 'rgba(5,8,15,0.9)');
+            grad.addColorStop(0.9, 'rgba(5,8,15,0.7)');
+            grad.addColorStop(1, 'rgba(5,8,15,0)');
+            ctx2.fillStyle = grad;
+            ctx2.roundRect(0, 0, 640, 180, 0);
+            ctx2.fill();
+            ctx2.shadowBlur = 0;
+            const c = new THREE.Color(color);
+            ctx2.strokeStyle = `rgba(${c.r*255|0},${c.g*255|0},${c.b*255|0},0.15)`;
+            ctx2.lineWidth = 1.5;
+            ctx2.roundRect(12, 12, 616, 156, 14);
+            ctx2.stroke();
+            ctx2.font = '44px sans-serif';
+            ctx2.textAlign = 'center';
+            ctx2.textBaseline = 'middle';
+            ctx2.fillStyle = '#f0f9ff';
+            ctx2.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx2.shadowBlur = 10;
+            ctx2.fillText(icon, 80, 92);
+            ctx2.shadowBlur = 0;
+            ctx2.font = 'bold 44px Inter, sans-serif';
+            ctx2.textAlign = 'left';
+            ctx2.textBaseline = 'middle';
+            ctx2.fillStyle = '#f0f9ff';
+            ctx2.fillText(name, 130, 70);
+            ctx2.font = '24px Inter, sans-serif';
+            ctx2.fillStyle = '#94a3b8';
+            ctx2.fillText(floors + 'F · ' + area + ' · ' + type, 130, 116);
+            const labelTex = new THREE.CanvasTexture(labelCanvas);
+            const labelMat = new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthTest: false,
+                sizeAttenuation: true });
+            const label = new THREE.Sprite(labelMat);
+            label.scale.set(7.5, 2.2, 1);
+            label.position.set(0, h + 3.2, 0);
+            group.add(label);
+            const glowGeo = new THREE.PlaneGeometry(w + 3, d + 3);
+            const glowMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.04, side: THREE
+                    .DoubleSide });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.rotation.x = -Math.PI / 2;
+            glow.position.y = 0.01;
+            group.add(glow);
+            group.position.set(x, 0, z);
+            scene3d.add(group);
+            buildingData3d.push({ ...data, mesh, group, label });
+            return group;
+        }
+
+        function createTree3d(x, z, scale) {
+            const group = new THREE.Group();
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x2d1a0a, roughness: 0.9, metalness: 0 });
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15 * scale, 0.3 * scale, 0.8 * scale, 6), trunkMat);
+            trunk.position.y = 0.4 * scale;
+            trunk.castShadow = true;
+            group.add(trunk);
+            const colors = [0x1a5a3a, 0x2a6a4a, 0x0a4a2a];
+            for (let i = 0; i < 3; i++) {
+                const crownMat = new THREE.MeshStandardMaterial({ color: colors[i % colors.length], roughness: 0.8,
+                    metalness: 0, emissive: 0x0a2a1a, emissiveIntensity: 0.03 });
+                const r = (0.8 - i * 0.15) * scale;
+                const crown = new THREE.Mesh(new THREE.SphereGeometry(r + Math.random() * 0.2, 6, 6), crownMat);
+                crown.position.set(
+                    (Math.random() - 0.5) * 0.3 * scale,
+                    0.9 * scale + i * 0.35 * scale + Math.random() * 0.1,
+                    (Math.random() - 0.5) * 0.3 * scale
+                );
+                crown.castShadow = true;
+                group.add(crown);
+            }
+            group.position.set(x, 0, z);
+            scene3d.add(group);
+        }
+
+        function createLamp3d(x, z) {
+            const group = new THREE.Group();
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x4a5a7a, metalness: 0.7, roughness: 0.2 });
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 1.4, 6), poleMat);
+            pole.position.y = 0.7;
+            pole.castShadow = true;
+            group.add(pole);
+            const armMat = new THREE.MeshStandardMaterial({ color: 0x4a5a7a, metalness: 0.7, roughness: 0.2 });
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.04, 0.04), armMat);
+            arm.position.set(0.3, 1.4, 0);
+            group.add(arm);
+            const lightMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.6 });
+            const light = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8), lightMat);
+            light.position.set(0.6, 1.35, 0);
+            group.add(light);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.06, side: THREE
+                    .DoubleSide });
+            const glow = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 8), glowMat);
+            glow.position.set(0.6, 1.35, 0);
+            group.add(glow);
+            group.position.set(x, 0, z);
+            scene3d.add(group);
+        }
+
+        function createLightPillar3d(x, z, color, height) {
+            const group = new THREE.Group();
+            const geo = new THREE.CylinderGeometry(0.03, 0.03, height, 6);
+            const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.15, blending: THREE
+                    .AdditiveBlending });
+            const pillar = new THREE.Mesh(geo, mat);
+            pillar.position.y = height / 2;
+            group.add(pillar);
+            const dotMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.3 });
+            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), dotMat);
+            dot.position.y = height;
+            group.add(dot);
+            group.position.set(x, 0, z);
+            scene3d.add(group);
+            return { pillar, dot };
+        }
+
+        function initThreeScene() {
+            const container = document.getElementById('three-container');
+            if (!container) {
+                console.error('3D容器未找到');
+                return false;
+            }
+            const rect = container.getBoundingClientRect();
+            const width = container.clientWidth || rect.width || 600;
+            const height = container.clientHeight || rect.height || 400;
+            if (width < 10 || height < 10) {
+                console.warn('容器尺寸太小，等待重试...', width, height);
+                return false;
+            }
+            if (renderer3d) {
+                try {
+                    if (renderer3d.domElement && renderer3d.domElement.parentNode) {
+                        renderer3d.domElement.parentNode.removeChild(renderer3d.domElement);
+                    }
+                    renderer3d.dispose();
+                } catch (e) { console.warn('清理渲染器时出错:', e); }
+                renderer3d = null;
+                scene3d = null;
+                camera3d = null;
+                controls3d = null;
+                buildingMeshes3d = [];
+                buildingData3d = [];
+                if (animFrameId) { cancelAnimationFrame(animFrameId);
+                    animFrameId = null; }
+            }
+            scene3d = new THREE.Scene();
+            scene3d.background = new THREE.Color(0x05080f);
+            scene3d.fog = new THREE.FogExp2(0x05080f, 0.0035);
+            const aspect = width / height;
+            camera3d = new THREE.PerspectiveCamera(35, aspect, 0.1, 200);
+            camera3d.position.set(30, 22, 35);
+            camera3d.lookAt(0, 2, 0);
+            renderer3d = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer3d.setSize(width, height);
+            renderer3d.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer3d.shadowMap.enabled = true;
+            renderer3d.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer3d.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer3d.toneMappingExposure = 1.2;
+            renderer3d.outputEncoding = THREE.sRGBEncoding;
+            renderer3d.physicallyCorrectLights = true;
+            container.appendChild(renderer3d.domElement);
+            controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
+            controls3d.enableDamping = true;
+            controls3d.dampingFactor = 0.05;
+            controls3d.rotateSpeed = 0.5;
+            controls3d.zoomSpeed = 1.2;
+            controls3d.maxPolarAngle = Math.PI / 2.1;
+            controls3d.minDistance = 12;
+            controls3d.maxDistance = 70;
+            controls3d.target.set(0, 2.5, 0);
+            controls3d.update();
+            const ambient = new THREE.AmbientLight(0x223366, 0.5);
+            scene3d.add(ambient);
+            const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0);
+            mainLight.position.set(25, 40, 20);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            mainLight.shadow.camera.near = 0.5;
+            mainLight.shadow.camera.far = 100;
+            mainLight.shadow.camera.left = -40;
+            mainLight.shadow.camera.right = 40;
+            mainLight.shadow.camera.top = 40;
+            mainLight.shadow.camera.bottom = -40;
+            mainLight.shadow.bias = -0.0005;
+            scene3d.add(mainLight);
+            const fillLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+            fillLight.position.set(-30, 25, -20);
+            scene3d.add(fillLight);
+            const rimLight = new THREE.DirectionalLight(0xff8844, 0.25);
+            rimLight.position.set(-10, 15, -40);
+            scene3d.add(rimLight);
+            const bottomLight = new THREE.DirectionalLight(0x2244aa, 0.15);
+            bottomLight.position.set(0, -10, 0);
+            scene3d.add(bottomLight);
+            const pointLight = new THREE.PointLight(0x3b82f6, 0.6, 40);
+            pointLight.position.set(0, 15, 0);
+            scene3d.add(pointLight);
+            const hemi = new THREE.HemisphereLight(0x4466aa, 0x112233, 0.6);
+            scene3d.add(hemi);
+            const groundGeo = new THREE.PlaneGeometry(100, 100);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x05080f, roughness: 0.4, metalness: 0.8,
+                transparent: true, opacity: 0.95 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -0.2;
+            ground.receiveShadow = true;
+            scene3d.add(ground);
+            const gridHelper = new THREE.GridHelper(90, 60, 0x1a3b7a, 0x0f1a44);
+            gridHelper.position.y = 0.01;
+            scene3d.add(gridHelper);
+            const gridHelper2 = new THREE.GridHelper(90, 120, 0x0a1a3a, 0x050f22);
+            gridHelper2.position.y = 0.005;
+            scene3d.add(gridHelper2);
+            for (let i = 0; i < 3; i++) {
+                const radius = 12 + i * 5;
+                const ringGeo = new THREE.RingGeometry(radius - 0.3, radius + 0.3, 80);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x1a3b7a, side: THREE.DoubleSide,
+                    transparent: true, opacity: 0.12 - i * 0.025 });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = -Math.PI / 2;
+                ring.position.y = 0.03;
+                scene3d.add(ring);
+            }
+            buildings3d.forEach(b => createAdvancedBuilding3d(b));
+            const treePositions = [
+                [-22, -8],
+                [-22, 0],
+                [-22, 8],
+                [22, -8],
+                [22, 0],
+                [22, 8],
+                [-6, -20],
+                [6, -20],
+                [-6, 20],
+                [6, 20],
+                [-20, -16],
+                [20, -16],
+                [-20, 16],
+                [20, 16],
+                [-14, -19],
+                [14, -19],
+                [-14, 19],
+                [14, 19],
+                [-24, -4],
+                [-24, 4],
+                [24, -4],
+                [24, 4],
+                [0, -22],
+                [0, 22]
+            ];
+            treePositions.forEach(p => createTree3d(p[0], p[1], 1.0 + Math.random() * 0.4));
+            const lampPositions = [
+                [-16, -11],
+                [-16, 11],
+                [16, -11],
+                [16, 11],
+                [-10, -18],
+                [10, -18],
+                [-10, 18],
+                [10, 18],
+                [0, -20],
+                [0, 20],
+                [-20, -6],
+                [-20, 6],
+                [20, -6],
+                [20, 6]
+            ];
+            lampPositions.forEach(p => createLamp3d(p[0], p[1]));
+            const pillarPositions = [
+                [-10, -10, 0x3b82f6, 6],
+                [-10, 10, 0x3b82f6, 6],
+                [10, -10, 0x22c55e, 5],
+                [10, 10, 0x22c55e, 5],
+                [0, -14, 0x8b5cf6, 5],
+                [0, 14, 0xf59e0b, 4],
+                [-14, 0, 0x06b6d4, 5],
+                [14, 0, 0xef4444, 4]
+            ];
+            pillarPositions.forEach(p => createLightPillar3d(p[0], p[1], p[2], p[3]));
+            const starsGeo = new THREE.BufferGeometry();
+            const starsCount = 2000;
+            const starsPos = new Float32Array(starsCount * 3);
+            const starsSizes = new Float32Array(starsCount);
+            for (let i = 0; i < starsCount; i++) {
+                starsPos[i * 3] = (Math.random() - 0.5) * 300;
+                starsPos[i * 3 + 1] = 5 + Math.random() * 40;
+                starsPos[i * 3 + 2] = (Math.random() - 0.5) * 300 - 30;
+                starsSizes[i] = 0.1 + Math.random() * 0.2;
+            }
+            starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+            starsGeo.setAttribute('size', new THREE.BufferAttribute(starsSizes, 1));
+            const starsMat = new THREE.PointsMaterial({ color: 0x8888ff, size: 0.15, transparent: true, opacity: 0.4,
+                blending: THREE.AdditiveBlending, sizeAttenuation: true });
+            const stars = new THREE.Points(starsGeo, starsMat);
+            scene3d.add(stars);
+            const flowGeo = new THREE.BufferGeometry();
+            const flowCount = 300;
+            const flowPos = new Float32Array(flowCount * 3);
+            const flowData = [];
+            for (let i = 0; i < flowCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 5 + Math.random() * 25;
+                flowPos[i * 3] = Math.cos(angle) * radius;
+                flowPos[i * 3 + 1] = 0.5 + Math.random() * 10;
+                flowPos[i * 3 + 2] = Math.sin(angle) * radius;
+                flowData.push({ angle, radius, speed: 0.001 + Math.random() * 0.004, height: flowPos[i * 3 + 1],
+                    hSpeed: 0.002 + Math.random() * 0.005, phase: Math.random() * Math.PI * 2 });
+            }
+            flowGeo.setAttribute('position', new THREE.BufferAttribute(flowPos, 3));
+            const flowMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.25, transparent: true, opacity: 0.3,
+                blending: THREE.AdditiveBlending, sizeAttenuation: true });
+            const flowPoints = new THREE.Points(flowGeo, flowMat);
+            scene3d.add(flowPoints);
+            const ffGeo = new THREE.BufferGeometry();
+            const ffCount = 120;
+            const ffPos = new Float32Array(ffCount * 3);
+            const ffVel = [];
+            for (let i = 0; i < ffCount; i++) {
+                ffPos[i * 3] = (Math.random() - 0.5) * 55;
+                ffPos[i * 3 + 1] = 0.5 + Math.random() * 10;
+                ffPos[i * 3 + 2] = (Math.random() - 0.5) * 55;
+                ffVel.push({ x: (Math.random() - 0.5) * 0.008, y: (Math.random() - 0.5) * 0.005, z: (Math.random() - 0.5) *
+                        0.008, phase: Math.random() * Math.PI * 2 });
+            }
+            ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPos, 3));
+            const ffMat = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.18, transparent: true, opacity: 0.5,
+                blending: THREE.AdditiveBlending, sizeAttenuation: true });
+            const ffPoints = new THREE.Points(ffGeo, ffMat);
+            scene3d.add(ffPoints);
+            renderer3d.domElement.addEventListener('click', onBuildingClick3d);
+            renderer3d.domElement.addEventListener('mousemove', onBuildingHover3d);
+            let totalFloors = 0;
+            buildings3d.forEach(b => totalFloors += b.floors);
+            document.getElementById('mapTotalBuildings').textContent = buildings3d.length;
+            document.getElementById('mapTotalFloors').textContent = totalFloors + '层';
+            document.getElementById('mapLivePeople').textContent = 486;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            animate3d(flowData, flowPoints, ffVel, ffPoints, stars);
+            is3DInitialized = true;
+            return true;
+        }
+
+        function onBuildingClick3d(event) {
+            const container = document.getElementById('three-container');
+            if (!container) return;
+            const rect = container.getBoundingClientRect();
+            mouse3d.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse3d.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster3d.setFromCamera(mouse3d, camera3d);
+            const intersects = raycaster3d.intersectObjects(buildingMeshes3d);
+            if (intersects.length > 0) {
+                const idx = intersects[0].object.userData.buildingIndex;
+                const data = buildingData3d[idx];
+                if (data) {
+                    showPopup3d(event.clientX, event.clientY, data);
+                }
+            } else {
+                hidePopup3d();
+            }
+        }
+
+        function onBuildingHover3d(event) {
+            const container = document.getElementById('three-container');
+            if (!container) return;
+            const rect = container.getBoundingClientRect();
+            mouse3d.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse3d.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster3d.setFromCamera(mouse3d, camera3d);
+            const intersects = raycaster3d.intersectObjects(buildingMeshes3d);
+            buildingMeshes3d.forEach(m => {
+                if (m.material.emissiveIntensity !== undefined) {
+                    m.material.emissiveIntensity = 0.03;
+                }
+            });
+            if (intersects.length > 0) {
+                const hit = intersects[0].object;
+                hit.material.emissiveIntensity = 0.2;
+                renderer3d.domElement.style.cursor = 'pointer';
+            } else {
+                renderer3d.domElement.style.cursor = 'grab';
+            }
+        }
+
+        function showPopup3d(x, y, data) {
+            const popup = document.getElementById('buildingPopup3d');
+            if (!popup) return;
+            document.getElementById('popupName3d').textContent = data.icon + ' ' + data.name;
+            document.getElementById('popupInfo3d').innerHTML = `<span>📐</span> 建筑面积 ${data.area} · ${data.floors}层`;
+            const statusMap = { 'normal': { text: '正常运行', color: 'green' }, 'warning': { text: '⚠️ 需关注',
+                color: 'yellow' }, 'danger': { text: '🚨 紧急', color: 'red' } };
+            const s = statusMap[data.status] || statusMap.normal;
+            const statusEl = popup.querySelector('.b-status');
+            statusEl.innerHTML = `<span class="dot ${s.color}"></span> 状态：${s.text}`;
+            const container = document.getElementById('three-container');
+            const rect = container.getBoundingClientRect();
+            const left = Math.min(x - rect.left + 16, container.clientWidth - 240);
+            const top = Math.min(y - rect.top - 20, container.clientHeight - 160);
+            popup.style.left = left + 'px';
+            popup.style.top = top + 'px';
+            popup.classList.add('show');
+        }
+
+        function hidePopup3d() {
+            const popup = document.getElementById('buildingPopup3d');
+            if (popup) popup.classList.remove('show');
+        }
+
+        function animate3d(flowData, flowPoints, ffVel, ffPoints, stars) {
+            let time = 0;
+            function loop() {
+                animFrameId = requestAnimationFrame(loop);
+                time += 0.008;
+                if (controls3d) controls3d.update();
+                if (stars) stars.rotation.y += 0.0001;
+                if (flowPoints) {
+                    const fPos = flowPoints.geometry.attributes.position.array;
+                    for (let i = 0; i < flowData.length; i++) {
+                        const d = flowData[i];
+                        d.angle += d.speed;
+                        const hOffset = Math.sin(time * d.hSpeed + d.phase) * 1.5;
+                        fPos[i * 3] = Math.cos(d.angle) * d.radius;
+                        fPos[i * 3 + 1] = d.height + hOffset;
+                        fPos[i * 3 + 2] = Math.sin(d.angle) * d.radius;
+                    }
+                    flowPoints.geometry.attributes.position.needsUpdate = true;
+                }
+                if (ffPoints) {
+                    const ffPosArr = ffPoints.geometry.attributes.position.array;
+                    for (let i = 0; i < ffVel.length; i++) {
+                        ffPosArr[i * 3] += ffVel[i].x + Math.sin(time * 0.5 + i) * 0.003;
+                        ffPosArr[i * 3 + 1] += ffVel[i].y + Math.sin(time * 0.7 + i * 0.5) * 0.003;
+                        ffPosArr[i * 3 + 2] += ffVel[i].z + Math.cos(time * 0.6 + i * 0.7) * 0.003;
+                        if (ffPosArr[i * 3] > 28) ffPosArr[i * 3] = -28;
+                        if (ffPosArr[i * 3] < -28) ffPosArr[i * 3] = 28;
+                        if (ffPosArr[i * 3 + 1] > 12) ffPosArr[i * 3 + 1] = 0.5;
+                        if (ffPosArr[i * 3 + 1] < 0.5) ffPosArr[i * 3 + 1] = 12;
+                        if (ffPosArr[i * 3 + 2] > 28) ffPosArr[i * 3 + 2] = -28;
+                        if (ffPosArr[i * 3 + 2] < -28) ffPosArr[i * 3 + 2] = 28;
+                    }
+                    ffPoints.geometry.attributes.position.needsUpdate = true;
+                }
+                if (renderer3d && scene3d && camera3d) {
+                    renderer3d.render(scene3d, camera3d);
+                }
+            }
+            loop();
+        }
+
+        function open3DMap() {
+            if (is3DOpening) return;
+            is3DOpening = true;
+            const modal = document.getElementById('map3dModal');
+            modal.classList.add('active');
+            is3DInitialized = false;
+            let attempts = 0;
+            const maxAttempts = 20;
+            function tryInit() {
+                attempts++;
+                const container = document.getElementById('three-container');
+                if (!container) {
+                    if (attempts < maxAttempts) { setTimeout(tryInit, 100); return; }
+                    is3DOpening = false;
+                    return;
+                }
+                const rect = container.getBoundingClientRect();
+                const w = container.clientWidth || rect.width;
+                const h = container.clientHeight || rect.height;
+                if (w > 50 && h > 50) {
+                    const success = initThreeScene();
+                    is3DOpening = false;
+                    if (!success) {
+                        setTimeout(() => {
+                            if (!is3DInitialized) {
+                                initThreeScene();
+                            }
+                        }, 200);
+                    }
+                } else if (attempts < maxAttempts) {
+                    setTimeout(tryInit, 100);
+                } else {
+                    console.warn('3D容器尺寸获取超时，使用默认尺寸');
+                    initThreeScene();
+                    is3DOpening = false;
+                }
+            }
+            setTimeout(tryInit, 50);
+        }
+
+        function close3DMap() {
+            const modal = document.getElementById('map3dModal');
+            modal.classList.remove('active');
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+                animFrameId = null;
+            }
+            if (renderer3d) {
+                try {
+                    const container = document.getElementById('three-container');
+                    if (container && renderer3d.domElement && renderer3d.domElement.parentNode === container) {
+                        container.removeChild(renderer3d.domElement);
+                    }
+                    renderer3d.dispose();
+                } catch (e) { console.warn('清理3D资源时出错:', e); }
+                renderer3d = null;
+                scene3d = null;
+                camera3d = null;
+                controls3d = null;
+                buildingMeshes3d = [];
+                buildingData3d = [];
+                is3DInitialized = false;
+            }
+            is3DOpening = false;
+        }
+
+        // ============================================================
+        // ★★★ 热力图（完整保留） ★★★
+        // ============================================================
+        const buildingLayouts = {
+            1: { name: "知行教学楼", floors: {
+                1: [{ id: "A101", name: "一年级(1)班", type: "教室", x: 50, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A102", name: "一年级(2)班", type: "教室", x: 170, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A103", name: "一年级(3)班", type: "教室", x: 290, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A104", name: "教师办公室", type: "办公室", x: 410, y: 40, w: 80, h: 80, cap: 15 },
+                    { id: "B101", name: "美术教室", type: "专用教室", x: 40, y: 160, w: 100, h: 90, cap: 40 },
+                    { id: "B102", name: "音乐教室", type: "专用教室", x: 40, y: 270, w: 100, h: 90, cap: 40 },
+                    { id: "C101", name: "科学实验室", type: "实验室", x: 460, y: 160, w: 100, h: 90, cap: 35 },
+                    { id: "C102", name: "计算机教室", type: "机房", x: 460, y: 270, w: 100, h: 90, cap: 50 },
+                    { id: "HALL", name: "中央大厅", type: "大厅", x: 220, y: 160, w: 220, h: 100, cap: 120 },
+                    { id: "CORR1", name: "东走廊", type: "走廊", x: 430, y: 40, w: 30, h: 320, cap: 80 },
+                    { id: "CORR2", name: "西走廊", type: "走廊", x: 20, y: 40, w: 30, h: 320, cap: 80 },
+                    { id: "STAIR1", name: "东楼梯", type: "楼梯间", x: 450, y: 130, w: 25, h: 35, cap: 30 },
+                    { id: "STAIR2", name: "西楼梯", type: "楼梯间", x: 15, y: 130, w: 25, h: 35, cap: 30 },
+                    { id: "WC1", name: "卫生间(东)", type: "卫生间", x: 480, y: 330, w: 40, h: 50, cap: 20 },
+                    { id: "WC2", name: "卫生间(西)", type: "卫生间", x: 30, y: 330, w: 40, h: 50, cap: 20 }
+                ],
+                2: [{ id: "A201", name: "二年级(1)班", type: "教室", x: 50, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A202", name: "二年级(2)班", type: "教室", x: 170, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A203", name: "二年级(3)班", type: "教室", x: 290, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A204", name: "年级办公室", type: "办公室", x: 410, y: 40, w: 80, h: 80, cap: 12 },
+                    { id: "B201", name: "书法教室", type: "专用教室", x: 40, y: 160, w: 100, h: 90, cap: 40 },
+                    { id: "B202", name: "劳技教室", type: "专用教室", x: 40, y: 270, w: 100, h: 90, cap: 40 },
+                    { id: "C201", name: "自然教室", type: "实验室", x: 460, y: 160, w: 100, h: 90, cap: 35 },
+                    { id: "C202", name: "录播教室", type: "专用教室", x: 460, y: 270, w: 100, h: 90, cap: 45 },
+                    { id: "HALL2", name: "二层大厅", type: "大厅", x: 220, y: 160, w: 220, h: 100, cap: 100 },
+                    { id: "CORR1_2", name: "东走廊", type: "走廊", x: 430, y: 40, w: 30, h: 320, cap: 80 },
+                    { id: "CORR2_2", name: "西走廊", type: "走廊", x: 20, y: 40, w: 30, h: 320, cap: 80 },
+                    { id: "STAIR1_2", name: "东楼梯", type: "楼梯间", x: 450, y: 130, w: 25, h: 35, cap: 30 },
+                    { id: "STAIR2_2", name: "西楼梯", type: "楼梯间", x: 15, y: 130, w: 25, h: 35, cap: 30 }
+                ],
+                3: [{ id: "A301", name: "三年级(1)班", type: "教室", x: 50, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A302", name: "三年级(2)班", type: "教室", x: 170, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A303", name: "三年级(3)班", type: "教室", x: 290, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A304", name: "教研组", type: "办公室", x: 410, y: 40, w: 80, h: 80, cap: 12 },
+                    { id: "B301", name: "英语角", type: "活动室", x: 40, y: 160, w: 100, h: 90, cap: 40 },
+                    { id: "B302", name: "少先队室", type: "活动室", x: 40, y: 270, w: 100, h: 90, cap: 40 },
+                    { id: "C301", name: "探究实验室", type: "实验室", x: 460, y: 160, w: 100, h: 90, cap: 35 },
+                    { id: "C302", name: "未来教室", type: "专用教室", x: 460, y: 270, w: 100, h: 90, cap: 45 },
+                    { id: "HALL3", name: "三层大厅", type: "大厅", x: 220, y: 160, w: 220, h: 100, cap: 100 }
+                ],
+                4: [{ id: "A401", name: "六年级(1)班", type: "教室", x: 50, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A402", name: "六年级(2)班", type: "教室", x: 170, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A403", name: "六年级(3)班", type: "教室", x: 290, y: 40, w: 100, h: 80, cap: 45 },
+                    { id: "A404", name: "毕业班办公室", type: "办公室", x: 410, y: 40, w: 80, h: 80, cap: 12 },
+                    { id: "B401", name: "心理辅导室", type: "专用教室", x: 40, y: 160, w: 100, h: 90, cap: 30 },
+                    { id: "B402", name: "多功能厅", type: "活动室", x: 40, y: 270, w: 100, h: 90, cap: 80 },
+                    { id: "C401", name: "STEAM教室", type: "实验室", x: 460, y: 160, w: 100, h: 90, cap: 40 },
+                    { id: "C402", name: "考试指挥中心", type: "办公室", x: 460, y: 270, w: 100, h: 90, cap: 20 }
+                ]
+            } },
+            2: { name: "明德公寓", floors: {
+                1: [{ id: "101", name: "男生宿舍101", type: "宿舍", x: 80, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "102", name: "男生宿舍102", type: "宿舍", x: 170, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "103", name: "男生宿舍103", type: "宿舍", x: 260, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "104", name: "宿管值班室", type: "办公室", x: 350, y: 60, w: 70, h: 70, cap: 4 },
+                    { id: "105", name: "男生宿舍105", type: "宿舍", x: 440, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "106", name: "洗衣房", type: "服务", x: 80, y: 160, w: 70, h: 70, cap: 10 },
+                    { id: "107", name: "公共浴室", type: "浴室", x: 170, y: 160, w: 70, h: 70, cap: 20 },
+                    { id: "108", name: "活动室", type: "活动室", x: 260, y: 160, w: 160, h: 70, cap: 50 },
+                    { id: "CORR_D1", name: "一层走廊", type: "走廊", x: 50, y: 30, w: 480, h: 25, cap: 100 }
+                ],
+                2: [{ id: "201", name: "女生宿舍201", type: "宿舍", x: 80, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "202", name: "女生宿舍202", type: "宿舍", x: 170, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "203", name: "女生宿舍203", type: "宿舍", x: 260, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "204", name: "女生宿舍204", type: "宿舍", x: 350, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "205", name: "女生宿舍205", type: "宿舍", x: 440, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "206", name: "自习室", type: "自习室", x: 80, y: 160, w: 160, h: 70, cap: 40 },
+                    { id: "207", name: "心理驿站", type: "活动室", x: 260, y: 160, w: 100, h: 70, cap: 20 },
+                    { id: "CORR_D2", name: "二层走廊", type: "走廊", x: 50, y: 30, w: 480, h: 25, cap: 100 }
+                ],
+                3: [{ id: "301", name: "混合宿舍301", type: "宿舍", x: 80, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "302", name: "混合宿舍302", type: "宿舍", x: 170, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "303", name: "混合宿舍303", type: "宿舍", x: 260, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "304", name: "教师宿舍", type: "宿舍", x: 350, y: 60, w: 160, h: 70, cap: 16 },
+                    { id: "305", name: "活动室", type: "活动室", x: 80, y: 160, w: 160, h: 70, cap: 40 },
+                    { id: "306", name: "阅览室", type: "阅览室", x: 260, y: 160, w: 100, h: 70, cap: 30 },
+                    { id: "CORR_D3", name: "三层走廊", type: "走廊", x: 50, y: 30, w: 480, h: 25, cap: 100 }
+                ],
+                4: [{ id: "401", name: "高年级宿舍401", type: "宿舍", x: 80, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "402", name: "高年级宿舍402", type: "宿舍", x: 170, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "403", name: "高年级宿舍403", type: "宿舍", x: 260, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "404", name: "高年级宿舍404", type: "宿舍", x: 350, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "405", name: "高年级宿舍405", type: "宿舍", x: 440, y: 60, w: 70, h: 70, cap: 8 },
+                    { id: "406", name: "天台活动区", type: "活动室", x: 80, y: 160, w: 250, h: 70, cap: 60 },
+                    { id: "CORR_D4", name: "四层走廊", type: "走廊", x: 50, y: 30, w: 480, h: 25, cap: 100 }
+                ]
+            } },
+            3: { name: "思源餐厅", floors: {
+                1: [{ id: "D101", name: "打餐区A", type: "餐厅", x: 80, y: 60, w: 130, h: 90, cap: 80 },
+                    { id: "D102", name: "打餐区B", type: "餐厅", x: 240, y: 60, w: 130, h: 90, cap: 80 },
+                    { id: "D103", name: "就餐大厅", type: "大厅", x: 80, y: 180, w: 290, h: 110, cap: 200 },
+                    { id: "D104", name: "后厨操作间", type: "厨房", x: 420, y: 60, w: 130, h: 230, cap: 30 },
+                    { id: "D105", name: "仓库", type: "仓库", x: 80, y: 320, w: 100, h: 60, cap: 10 },
+                    { id: "D106", name: "洗碗间", type: "服务", x: 200, y: 320, w: 80, h: 60, cap: 8 },
+                    { id: "D107", name: "员工休息室", type: "办公室", x: 310, y: 320, w: 60, h: 60, cap: 6 },
+                    { id: "D108", name: "走廊", type: "走廊", x: 50, y: 30, w: 530, h: 25, cap: 60 }
+                ],
+                2: [{ id: "D201", name: "包间1", type: "餐厅", x: 80, y: 60, w: 100, h: 80, cap: 20 },
+                    { id: "D202", name: "包间2", type: "餐厅", x: 200, y: 60, w: 100, h: 80, cap: 20 },
+                    { id: "D203", name: "包间3", type: "餐厅", x: 320, y: 60, w: 100, h: 80, cap: 20 },
+                    { id: "D204", name: "小餐厅", type: "餐厅", x: 440, y: 60, w: 110, h: 80, cap: 40 },
+                    { id: "D205", name: "储物间", type: "仓库", x: 80, y: 170, w: 80, h: 70, cap: 8 },
+                    { id: "D206", name: "办公室", type: "办公室", x: 180, y: 170, w: 80, h: 70, cap: 6 },
+                    { id: "D207", name: "会议室", type: "活动室", x: 280, y: 170, w: 80, h: 70, cap: 15 },
+                    { id: "D208", name: "备餐区", type: "厨房", x: 380, y: 170, w: 170, h: 70, cap: 20 },
+                    { id: "D209", name: "二层走廊", type: "走廊", x: 50, y: 30, w: 530, h: 25, cap: 40 }
+                ]
+            } },
+            4: { name: "健体运动场", floors: {
+                1: [{ id: "S101", name: "塑胶跑道", type: "运动场", x: 60, y: 60, w: 300, h: 160, cap: 150 },
+                    { id: "S102", name: "足球场", type: "运动场", x: 380, y: 60, w: 170, h: 160, cap: 100 },
+                    { id: "S103", name: "篮球场", type: "运动场", x: 60, y: 240, w: 180, h: 120, cap: 80 },
+                    { id: "S104", name: "看台区", type: "看台", x: 260, y: 240, w: 140, h: 120, cap: 200 },
+                    { id: "S105", name: "器材室", type: "仓库", x: 420, y: 240, w: 80, h: 55, cap: 10 },
+                    { id: "S106", name: "更衣室", type: "服务", x: 420, y: 305, w: 80, h: 55, cap: 15 },
+                    { id: "S107", name: "卫生间", type: "卫生间", x: 50, y: 390, w: 60, h: 40, cap: 10 },
+                    { id: "S108", name: "医务室", type: "办公室", x: 130, y: 390, w: 60, h: 40, cap: 5 },
+                    { id: "S109", name: "通道", type: "走廊", x: 30, y: 30, w: 500, h: 25, cap: 60 }
+                ]
+            } },
+            5: { name: "博雅图书馆", floors: {
+                1: [{ id: "R101", name: "低年级阅览室", type: "阅览室", x: 80, y: 50, w: 150, h: 100, cap: 60 },
+                    { id: "R102", name: "绘本馆", type: "阅览室", x: 250, y: 50, w: 150, h: 100, cap: 50 },
+                    { id: "R103", name: "报刊阅览室", type: "阅览室", x: 420, y: 50, w: 130, h: 100, cap: 40 },
+                    { id: "STACK1", name: "藏书库", type: "书库", x: 80, y: 180, w: 100, h: 100, cap: 20 },
+                    { id: "CIRC", name: "借阅台", type: "服务台", x: 200, y: 180, w: 60, h: 60, cap: 10 },
+                    { id: "COMP1", name: "电子阅览室", type: "机房", x: 280, y: 180, w: 130, h: 100, cap: 40 },
+                    { id: "OFFICE1", name: "馆长室", type: "办公室", x: 430, y: 180, w: 120, h: 80, cap: 8 },
+                    { id: "CORR_L1", name: "一层大厅", type: "大厅", x: 70, y: 30, w: 500, h: 20, cap: 80 }
+                ],
+                2: [{ id: "R201", name: "高年级阅览室", type: "阅览室", x: 80, y: 50, w: 150, h: 100, cap: 60 },
+                    { id: "R202", name: "教师阅览室", type: "阅览室", x: 250, y: 50, w: 150, h: 100, cap: 40 },
+                    { id: "R203", name: "参考阅览室", type: "阅览室", x: 420, y: 50, w: 130, h: 100, cap: 35 },
+                    { id: "STACK2", name: "密集书库", type: "书库", x: 80, y: 180, w: 100, h: 100, cap: 20 },
+                    { id: "STUDY", name: "小组研讨室", type: "研讨室", x: 200, y: 180, w: 80, h: 80, cap: 12 },
+                    { id: "COMP2", name: "多媒体室", type: "机房", x: 300, y: 180, w: 110, h: 100, cap: 30 },
+                    { id: "CORR_L2", name: "二层大厅", type: "大厅", x: 70, y: 30, w: 500, h: 20, cap: 80 }
+                ],
+                3: [{ id: "R301", name: "特藏阅览室", type: "阅览室", x: 80, y: 50, w: 150, h: 100, cap: 40 },
+                    { id: "R302", name: "研修室A", type: "研讨室", x: 250, y: 50, w: 70, h: 100, cap: 15 },
+                    { id: "R303", name: "研修室B", type: "研讨室", x: 340, y: 50, w: 70, h: 100, cap: 15 },
+                    { id: "R304", name: "学术报告厅", type: "报告厅", x: 430, y: 50, w: 120, h: 150, cap: 80 },
+                    { id: "STACK3", name: "古籍书库", type: "书库", x: 80, y: 180, w: 100, h: 100, cap: 15 },
+                    { id: "OFFICE2", name: "采编室", type: "办公室", x: 200, y: 180, w: 100, h: 80, cap: 10 },
+                    { id: "CORR_L3", name: "三层大厅", type: "大厅", x: 70, y: 30, w: 500, h: 20, cap: 80 }
+                ]
+            } }
         };
-        
-        let heatmapChart = null, heatmapTrendChart = null;
-        let heatmapCurrentZone = 1, heatmapCurrentFloor = 1, heatmapCurrentTime = 14;
-        let heatmapIsPlaying = false, heatmapPlayInterval, heatmapCurrentView = 'heatmap';
-        
-        function getCurrentRooms() { const layout = buildingLayouts[heatmapCurrentZone]; if(!layout || !layout.floors[heatmapCurrentFloor]) return []; return layout.floors[heatmapCurrentFloor]; }
-        
+
+        let heatmapChart = null,
+            heatmapTrendChart = null;
+        let heatmapCurrentZone = 1,
+            heatmapCurrentFloor = 1,
+            heatmapCurrentTime = 14;
+        let heatmapIsPlaying = false,
+            heatmapPlayInterval,
+            heatmapCurrentView = 'heatmap';
+
+        function getCurrentRooms() { const layout = buildingLayouts[heatmapCurrentZone]; if (!layout || !layout.floors[
+                heatmapCurrentFloor]) return []; return layout.floors[heatmapCurrentFloor]; }
+
         function generateHeatmapData() {
             const rooms = getCurrentRooms();
-            if(!rooms.length) return [];
+            if (!rooms.length) return [];
             const data = [];
-            let baseFactor = currentScenario === 'fire' ? 1.3 : currentScenario === 'earthquake' ? 0.6 : currentScenario === 'lockdown' ? 1.15 : 1.0;
-            
-            const BUILDING_MIN_X = 20;
-            const BUILDING_MAX_X = 630;
-            const BUILDING_MIN_Y = 20;
-            const BUILDING_MAX_Y = 430;
-            
+            let baseFactor = currentScenario === 'fire' ? 1.5 : currentScenario === 'earthquake' ? 0.7 : 1.0;
+            const BUILDING_MIN_X = 0,
+                BUILDING_MAX_X = 650,
+                BUILDING_MIN_Y = 0,
+                BUILDING_MAX_Y = 450;
             rooms.forEach(room => {
                 let occ = 0.25;
                 const hour = heatmapCurrentTime;
@@ -395,226 +1928,249 @@
                 else if (hour >= 7 && hour < 8) occ = 0.30;
                 else if (hour >= 19 && hour < 22) occ = 0.20;
                 else occ = 0.08;
-                
                 const typeMultiplier = {
-                    '教室': 1.0, '专用教室': 1.0, '实验室': 0.95, '机房': 0.90,
-                    '办公室': 0.70, '活动室': 0.60, '大厅': 0.55, '走廊': 0.30,
-                    '楼梯间': 0.25, '卫生间': 0.20, '宿舍': 0.60, '阅览室': 0.65,
-                    '书库': 0.40, '报告厅': 0.50, '研讨室': 0.55, '服务台': 0.50,
-                    '餐厅': 0.75, '厨房': 0.50, '仓库': 0.30, '运动场': 0.60,
-                    '看台': 0.55, '浴室': 0.35, '自习室': 0.65
+                    '教室': 1.0,
+                    '专用教室': 1.0,
+                    '实验室': 0.95,
+                    '机房': 0.90,
+                    '办公室': 0.70,
+                    '活动室': 0.60,
+                    '大厅': 0.55,
+                    '走廊': 0.30,
+                    '楼梯间': 0.25,
+                    '卫生间': 0.20,
+                    '宿舍': 0.60,
+                    '阅览室': 0.65,
+                    '书库': 0.40,
+                    '报告厅': 0.50,
+                    '研讨室': 0.55,
+                    '服务台': 0.50,
+                    '餐厅': 0.75,
+                    '厨房': 0.50,
+                    '仓库': 0.30,
+                    '运动场': 0.60,
+                    '看台': 0.55,
+                    '浴室': 0.35,
+                    '自习室': 0.65
                 };
                 const mult = typeMultiplier[room.type] || 0.50;
                 occ = occ * mult;
                 occ = Math.min(0.95, Math.max(0.05, occ * baseFactor));
-                
                 let count = Math.floor(room.cap * occ);
-                if (room.type === '教室' || room.type === '专用教室' || room.type === '实验室') {
-                    count = Math.max(10, count);
-                } else if (room.type === '办公室') {
-                    count = Math.max(3, count);
-                } else if (room.type === '大厅' || room.type === '餐厅') {
-                    count = Math.max(8, count);
-                } else if (room.type === '运动场') {
-                    count = Math.max(15, count);
-                } else {
-                    count = Math.max(2, count);
-                }
+                if (room.type === '教室' || room.type === '专用教室' || room.type === '实验室') count = Math.max(10,
+                count);
+                else if (room.type === '办公室') count = Math.max(3, count);
+                else if (room.type === '大厅' || room.type === '餐厅') count = Math.max(8, count);
+                else if (room.type === '运动场') count = Math.max(15, count);
+                else count = Math.max(2, count);
                 count = Math.min(room.cap, count);
-                
-                const padX = Math.max(4, (room.w || 70) * 0.06);
-                const padY = Math.max(4, (room.h || 70) * 0.06);
-                let minX = room.x + padX;
-                let maxX = room.x + (room.w || 70) - padX;
-                let minY = room.y + padY;
-                let maxY = room.y + (room.h || 70) - padY;
-                
-                minX = Math.max(BUILDING_MIN_X, minX);
-                maxX = Math.min(BUILDING_MAX_X, maxX);
-                minY = Math.max(BUILDING_MIN_Y, minY);
-                maxY = Math.min(BUILDING_MAX_Y, maxY);
-                
+                const padX = Math.max(1, (room.w || 70) * 0.02);
+                const padY = Math.max(1, (room.h || 70) * 0.02);
+                let minX = Math.max(BUILDING_MIN_X, room.x + padX);
+                let maxX = Math.min(BUILDING_MAX_X, room.x + (room.w || 70) - padX);
+                let minY = Math.max(BUILDING_MIN_Y, room.y + padY);
+                let maxY = Math.min(BUILDING_MAX_Y, room.y + (room.h || 70) - padY);
                 if (maxX <= minX || maxY <= minY) {
                     const cx = Math.min(Math.max(room.x + (room.w || 70) / 2, BUILDING_MIN_X), BUILDING_MAX_X);
                     const cy = Math.min(Math.max(room.y + (room.h || 70) / 2, BUILDING_MIN_Y), BUILDING_MAX_Y);
                     for (let i = 0; i < Math.min(count, 30); i++) {
-                        let x = cx + (Math.random() - 0.5) * 8;
-                        let y = cy + (Math.random() - 0.5) * 8;
-                        x = Math.min(Math.max(x, BUILDING_MIN_X), BUILDING_MAX_X);
-                        y = Math.min(Math.max(y, BUILDING_MIN_Y), BUILDING_MAX_Y);
+                        let x = Math.min(Math.max(cx + (Math.random() - 0.5) * 6, BUILDING_MIN_X), BUILDING_MAX_X);
+                        let y = Math.min(Math.max(cy + (Math.random() - 0.5) * 6, BUILDING_MIN_Y), BUILDING_MAX_Y);
                         data.push([x, y, 35 + occ * 55]);
                     }
                     return;
                 }
-                
                 for (let i = 0; i < count; i++) {
                     let x, y;
                     if (Math.random() > 0.25) {
                         x = minX + Math.random() * (maxX - minX);
                         y = minY + Math.random() * (maxY - minY);
                     } else {
-                        const cx = (minX + maxX) / 2;
-                        const cy = (minY + maxY) / 2;
-                        const rx = (maxX - minX) / 3;
-                        const ry = (maxY - minY) / 3;
-                        x = cx + (Math.random() - 0.5) * rx * 1.8;
-                        y = cy + (Math.random() - 0.5) * ry * 1.8;
-                        x = Math.max(minX, Math.min(maxX, x));
-                        y = Math.max(minY, Math.min(maxY, y));
+                        const cx = (minX + maxX) / 2,
+                            cy = (minY + maxY) / 2;
+                        const rx = (maxX - minX) / 3,
+                            ry = (maxY - minY) / 3;
+                        x = Math.max(minX, Math.min(maxX, cx + (Math.random() - 0.5) * rx * 1.8));
+                        y = Math.max(minY, Math.min(maxY, cy + (Math.random() - 0.5) * ry * 1.8));
                     }
                     x = Math.min(Math.max(x, BUILDING_MIN_X), BUILDING_MAX_X);
                     y = Math.min(Math.max(y, BUILDING_MIN_Y), BUILDING_MAX_Y);
-                    const intensity = 30 + occ * 60 + (Math.random() - 0.5) * 15;
-                    data.push([x, y, Math.max(15, Math.min(100, intensity))]);
+                    data.push([x, y, Math.max(15, Math.min(100, 30 + occ * 60 + (Math.random() - 0.5) * 15))]);
                 }
             });
             return data;
         }
-        
-        function initHeatmapChart() { 
-            const dom = document.getElementById('heatmapChart'); 
-            if(!dom) return; 
-            if (heatmapChart) { heatmapChart.dispose(); heatmapChart = null; }
-            heatmapChart = echarts.init(dom); 
+
+        function initHeatmapChart() {
+            const dom = document.getElementById('heatmapChart');
+            if (!dom) return;
+            if (heatmapChart) { heatmapChart.dispose();
+                heatmapChart = null; }
+            heatmapChart = echarts.init(dom);
             if (document.getElementById('heatmapTrendChart')) {
-                if (heatmapTrendChart) { heatmapTrendChart.dispose(); heatmapTrendChart = null; }
-                heatmapTrendChart = echarts.init(document.getElementById('heatmapTrendChart')); 
+                if (heatmapTrendChart) { heatmapTrendChart.dispose();
+                    heatmapTrendChart = null; }
+                heatmapTrendChart = echarts.init(document.getElementById('heatmapTrendChart'));
             }
-            updateHeatmapChart(); 
-            if (heatmapTrendChart) updateHeatmapTrendChart(); 
-            window.addEventListener('resize',()=>{ heatmapChart?.resize(); heatmapTrendChart?.resize(); }); 
+            updateHeatmapChart();
+            if (heatmapTrendChart) updateHeatmapTrendChart();
+            window.addEventListener('resize', () => { heatmapChart?.resize();
+                heatmapTrendChart?.resize(); });
         }
-        
+
         function updateHeatmapChart() {
             if (!heatmapChart) return;
             const rooms = getCurrentRooms();
             const data = generateHeatmapData();
             const zone = zones[heatmapCurrentZone];
             const building = buildingLayouts[heatmapCurrentZone];
-            
-            const graphicElements = rooms.map(r => ({ 
-                type:'rect', 
-                shape:{ x:r.x, y:r.y, width:r.w||70, height:r.h||70 }, 
-                style:{ 
-                    fill: r.type === '走廊' ? 'rgba(100,116,139,0.08)' : 
-                           r.type === '大厅' ? 'rgba(59,130,246,0.05)' : 
-                           r.type === '楼梯间' ? 'rgba(148,163,184,0.06)' : 
-                           r.type === '运动场' ? 'rgba(34,197,94,0.04)' : 'transparent', 
-                    stroke: r.type === '走廊' ? 'rgba(148,163,184,0.2)' : 
-                            r.type === '大厅' ? 'rgba(59,130,246,0.25)' : 
-                            r.type === '运动场' ? 'rgba(34,197,94,0.3)' :
-                            'rgba(148,163,184,0.3)', 
-                    lineWidth: r.type === '大厅' || r.type === '运动场' ? 1.5 : 1,
-                    lineDash: r.type === '走廊' ? [3,3] : undefined
-                } 
-            }));
-            
-            rooms.forEach(r => { 
-                let name = r.name.length > 8 ? r.name.slice(0,6)+'..' : r.name; 
-                if (r.type === '走廊' || r.type === '大厅' || r.type === '运动场') name = r.name;
-                graphicElements.push({ 
-                    type:'text', 
-                    style:{ 
-                        text: name, 
-                        x: r.x + (r.w||70)/2, 
-                        y: r.y + (r.h||70)/2, 
-                        textAlign:'center', 
-                        textVerticalAlign:'middle', 
-                        fill: r.type === '走廊' ? 'rgba(255,255,255,0.2)' : 
-                              r.type === '大厅' ? 'rgba(255,255,255,0.4)' : 
-                              r.type === '运动场' ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,255,0.45)', 
-                        fontSize: r.type === '走廊' ? 7 : (r.type === '大厅' || r.type === '运动场' ? 10 : 9),
-                        fontWeight: r.type === '大厅' || r.type === '运动场' ? 'bold' : 'normal'
-                    }, 
-                    silent:true 
-                }); 
-            });
-            
-            graphicElements.push({ 
-                type:'rect', 
-                shape:{ x:18, y:18, width:614, height:414 }, 
-                style:{ fill:'rgba(245,158,11,0.02)', stroke:'#f59e0b', lineWidth:2, lineDash:[6,4] } 
-            });
-            graphicElements.push({ 
-                type:'text', 
-                left:30, 
-                top:5, 
-                style:{ text:`${zone.icon} ${building?.name||zone.name} · ${heatmapCurrentFloor}F 平面图`, fill:'#f59e0b', fontSize:12, fontWeight:'bold' } 
-            });
-            
-            const option = { 
-                backgroundColor:'#0f172a', 
-                tooltip:{ 
-                    trigger:'item', 
-                    backgroundColor:'rgba(15,23,42,0.96)', 
-                    borderColor:'#f59e0b', 
-                    formatter:(p)=>p.data && p.data.length >= 3 ? 
-                        `<b>🔥 热力点</b><br/>密度指数: ${Math.round(p.data[2])}<br/>位置: (${Math.round(p.data[0])}, ${Math.round(p.data[1])})` : 
-                        '点击查看区域详情' 
-                }, 
-                xAxis:{ show:false, min:0, max:650 }, 
-                yAxis:{ show:false, min:0, max:450 }, 
-                graphic:graphicElements, 
-                visualMap:{ 
-                    min:15, 
-                    max:100, 
-                    calculable:true, 
-                    orient:'horizontal', 
-                    left:'center', 
-                    bottom:5, 
-                    inRange:{ color:['#3b82f6','#10b981','#facc15','#f97316','#ef4444'] }, 
-                    textStyle:{ color:'#94a3b8', fontSize:10 } 
-                }, 
-                series:[{ 
-                    type: heatmapCurrentView === 'heatmap' ? 'heatmap' : 'scatter', 
-                    data: data, 
-                    blurSize: heatmapCurrentView === 'heatmap' ? 18 : 0, 
-                    pointSize: heatmapCurrentView === 'scatter' ? 8 : 0, 
-                    itemStyle: heatmapCurrentView === 'scatter' ? { 
+            const baseOption = {
+                backgroundColor: '#0f172a',
+                grid: { left: 0, right: 0, top: 0, bottom: 0, containLabel: false },
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(15,23,42,0.96)',
+                    borderColor: '#f59e0b',
+                    formatter: (p) => p.data && p.data.length >= 3 ?
+                        `<b>🔥 热力点</b><br/>密度指数: ${Math.round(p.data[2])}<br/>位置: (${Math.round(p.data[0])}, ${Math.round(p.data[1])})` :
+                        '点击查看区域详情'
+                },
+                xAxis: { show: false, min: 0, max: 650, gridIndex: 0 },
+                yAxis: { show: false, min: 0, max: 450, gridIndex: 0 },
+                visualMap: {
+                    min: 15,
+                    max: 100,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: 2,
+                    inRange: { color: ['#3b82f6', '#10b981', '#facc15', '#f97316', '#ef4444'] },
+                    textStyle: { color: '#94a3b8', fontSize: 8 }
+                },
+                series: [{
+                    type: heatmapCurrentView === 'heatmap' ? 'heatmap' : 'scatter',
+                    data: data,
+                    blurSize: heatmapCurrentView === 'heatmap' ? 16 : 0,
+                    pointSize: heatmapCurrentView === 'scatter' ? 6 : 0,
+                    itemStyle: heatmapCurrentView === 'scatter' ? {
                         color: (p) => {
                             const val = p.data && p.data.length >= 3 ? p.data[2] : 50;
                             return val > 75 ? '#ef4444' : val > 45 ? '#f59e0b' : '#10b981';
                         },
-                        opacity: 0.85
-                    } : undefined 
-                }] 
+                        opacity: 0.8
+                    } : undefined
+                }]
             };
-            heatmapChart.setOption(option);
-            
-            const total = data.length; 
-            const avgDens = total > 0 ? (total / (620 * 420) * 10000).toFixed(1) : '0.0'; 
-            let maxOcc = 0, hotRoom = '';
-            rooms.forEach(r => { 
-                const cnt = data.filter(d => d[0] >= r.x && d[0] <= r.x + (r.w||70) && d[1] >= r.y && d[1] <= r.y + (r.h||70)).length; 
-                const occ = r.cap > 0 ? cnt / r.cap : 0; 
-                if(occ > maxOcc && r.type !== '走廊' && r.type !== '楼梯间'){ 
-                    maxOcc = occ; 
-                    hotRoom = r.name; 
-                } 
+            heatmapChart.setOption(baseOption, false);
+            const p00 = heatmapChart.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [0, 0]);
+            const p650_450 = heatmapChart.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [650, 450]);
+            const p0_450 = heatmapChart.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [0, 450]);
+            const p650_0 = heatmapChart.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [650, 0]);
+            const minX = Math.min(p00[0], p650_450[0], p0_450[0], p650_0[0]);
+            const maxX = Math.max(p00[0], p650_450[0], p0_450[0], p650_0[0]);
+            const minY = Math.min(p00[1], p650_450[1], p0_450[1], p650_0[1]);
+            const maxY = Math.max(p00[1], p650_450[1], p0_450[1], p650_0[1]);
+            const gridX = minX;
+            const gridY = minY;
+            const gridW = maxX - minX;
+            const gridH = maxY - minY;
+            const scaleX = gridW / 650;
+            const scaleY = gridH / 450;
+            const graphicElements = rooms.map(r => ({
+                type: 'rect',
+                shape: {
+                    x: r.x * scaleX + gridX,
+                    y: r.y * scaleY + gridY,
+                    width: (r.w || 70) * scaleX,
+                    height: (r.h || 70) * scaleY
+                },
+                style: {
+                    fill: r.type === '走廊' ? 'rgba(100,116,139,0.04)' :
+                        r.type === '大厅' ? 'rgba(59,130,246,0.02)' :
+                        r.type === '楼梯间' ? 'rgba(148,163,184,0.03)' :
+                        r.type === '运动场' ? 'rgba(34,197,94,0.02)' :
+                        'transparent',
+                    stroke: r.type === '走廊' ? 'rgba(200,220,255,0.35)' :
+                        r.type === '大厅' ? 'rgba(100,180,255,0.6)' :
+                        r.type === '运动场' ? 'rgba(100,220,150,0.6)' :
+                        'rgba(220,235,255,0.55)',
+                    lineWidth: r.type === '大厅' || r.type === '运动场' ? 2.0 : 1.5,
+                    lineDash: undefined
+                }
+            }));
+            rooms.forEach(r => {
+                let name = r.name.length > 8 ? r.name.slice(0, 6) + '..' : r.name;
+                if (r.type === '走廊' || r.type === '大厅' || r.type === '运动场') name = r.name;
+                const textColor = r.type === '走廊' ? 'rgba(255,255,255,0.25)' :
+                    r.type === '大厅' ? 'rgba(255,255,255,0.45)' :
+                    r.type === '运动场' ? 'rgba(100,220,150,0.5)' :
+                    'rgba(255,255,255,0.5)';
+                graphicElements.push({
+                    type: 'text',
+                    style: {
+                        text: name,
+                        x: r.x * scaleX + gridX + ((r.w || 70) * scaleX) / 2,
+                        y: r.y * scaleY + gridY + ((r.h || 70) * scaleY) / 2,
+                        textAlign: 'center',
+                        textVerticalAlign: 'middle',
+                        fill: textColor,
+                        fontSize: r.type === '走廊' ? 7 : (r.type === '大厅' || r.type === '运动场' ? 10 : 9),
+                        fontWeight: r.type === '大厅' || r.type === '运动场' ? 'bold' : 'normal'
+                    },
+                    silent: true
+                });
+            });
+            graphicElements.push({
+                type: 'rect',
+                shape: { x: gridX, y: gridY, width: gridW, height: gridH },
+                style: { fill: 'rgba(245,158,11,0.008)', stroke: '#f59e0b', lineWidth: 2.5, lineDash: [6, 4] }
+            });
+            graphicElements.push({
+                type: 'text',
+                left: gridX + 8,
+                top: gridY + 4,
+                style: { text: `${zone.icon} ${building?.name||zone.name} · ${heatmapCurrentFloor}F`, fill: '#f59e0b',
+                    fontSize: 12, fontWeight: 'bold' }
+            });
+            heatmapChart.setOption({ graphic: graphicElements });
+            const total = data.length;
+            const avgDens = total > 0 ? (total / (650 * 450) * 10000).toFixed(1) : '0.0';
+            let maxOcc = 0,
+                hotRoom = '';
+            rooms.forEach(r => {
+                const cnt = data.filter(d => d[0] >= r.x && d[0] <= r.x + (r.w || 70) && d[1] >= r.y && d[1] <= r
+                    .y + (r.h || 70)).length;
+                const occ = r.cap > 0 ? cnt / r.cap : 0;
+                if (occ > maxOcc && r.type !== '走廊' && r.type !== '楼梯间') { maxOcc = occ;
+                    hotRoom = r.name; }
             });
             document.getElementById('heatmapFloorTotal').textContent = total;
             document.getElementById('heatmapHotestArea').textContent = hotRoom || '暂无数据';
             document.getElementById('heatmapAvgDensity').textContent = `${avgDens} 人/m²`;
-            document.getElementById('heatmapCurrentZoneTitle').innerHTML = `${zone.icon} ${zone.name} · ${building?.name||''} ${heatmapCurrentFloor}F`;
+            document.getElementById('heatmapCurrentZoneTitle').innerHTML =
+                `${zone.icon} ${zone.name} · ${building?.name||''} ${heatmapCurrentFloor}F`;
         }
-        
-        function updateHeatmapTrendChart() { 
+
+        function updateHeatmapTrendChart() {
             if (!heatmapTrendChart) return;
-            const hours=['8:00','10:00','12:00','14:00','16:00','18:00','20:00']; 
-            const vals=hours.map(()=>40+Math.random()*80); 
-            heatmapTrendChart.setOption({ 
-                backgroundColor:'transparent', 
-                grid:{left:0,right:0,top:5,bottom:5}, 
-                xAxis:{data:hours,show:false}, 
-                yAxis:{show:false}, 
-                series:[{
-                    data:vals,type:'line',smooth:true,symbol:'none',
-                    lineStyle:{color:'#f59e0b',width:2},
-                    areaStyle:{opacity:0.25,color:'#f59e0b'}
-                }] 
-            }); 
+            const hours = ['8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+            const vals = hours.map(() => 40 + Math.random() * 80);
+            heatmapTrendChart.setOption({
+                backgroundColor: 'transparent',
+                grid: { left: 0, right: 0, top: 3, bottom: 3, containLabel: false },
+                xAxis: { data: hours, show: false },
+                yAxis: { show: false },
+                series: [{
+                    data: vals,
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'none',
+                    lineStyle: { color: '#f59e0b', width: 1.5 },
+                    areaStyle: { opacity: 0.2, color: '#f59e0b' }
+                }]
+            });
         }
-        
+
         function openHeatmapModal() {
             const modal = document.getElementById('heatmapModal');
             const content = document.getElementById('heatmapContent');
@@ -622,70 +2178,69 @@
             const building = buildingLayouts[heatmapCurrentZone];
             const maxFloor = zone?.floors || (building?.floors ? Object.keys(building.floors).length : 4);
             content.innerHTML = `
-                <div style="height:100%; display:flex; flex-direction:column;">
+                <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
                     <div class="modal-header-bar">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center"><i class="fas fa-building text-white"></i></div>
-                            <div><h1 class="text-lg font-bold text-white">多楼层热力图监控系统</h1><p class="text-xs text-slate-400">真实建筑布局 · 实时人流热力分析</p></div>
+                            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center"><i class="fas fa-building text-white text-sm"></i></div>
+                            <div><h1 class="text-base font-bold text-white">多楼层热力图监控系统</h1><p class="text-[9px] text-slate-400">真实建筑布局 · 实时人流热力分析</p></div>
                         </div>
                         <button id="closeHeatmapModalBtn" class="modal-close-btn">✕</button>
                     </div>
-                    <div style="flex:1; display:flex; overflow:hidden;">
-                        <div class="w-56 glass-panel flex flex-col border-r border-slate-700/50" style="background:rgba(30,41,59,0.9);">
-                            <div class="p-3 border-b border-slate-700/50">
-                                <h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-layer-group text-orange-400 mr-1"></i>区域选择</h2>
-                                <div class="space-y-1.5" id="heatmapZoneButtons">
-                                    ${Object.entries(zones).map(([id,val])=>`<button class="zone-heatmap-btn w-full text-left px-3 py-2 rounded-lg text-xs transition-all ${parseInt(id)===heatmapCurrentZone?'bg-orange-500/20 border-orange-500 text-orange-400 border':'border-transparent text-slate-400 hover:bg-slate-700/50'}" data-zone-id="${id}"><div>${val.icon} ${val.name}</div><div class="text-[9px] text-slate-500">${val.buildingName}</div></button>`).join('')}
+                    <div style="flex:1; display:flex; overflow:hidden; min-height:0;">
+                        <div class="heatmap-sidebar">
+                            <div class="section">
+                                <div class="section-title"><i class="fas fa-layer-group text-orange-400 mr-1"></i>区域</div>
+                                <div id="heatmapZoneButtons">
+                                    ${Object.entries(zones).map(([id,val])=>`<button class="zone-btn-sm ${parseInt(id)===heatmapCurrentZone?'active':''}" data-zone-id="${id}">${val.icon} ${val.name}</button>`).join('')}
                                 </div>
                             </div>
-                            <div class="p-3 border-b border-slate-700/50">
-                                <h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-arrow-up-down text-orange-400 mr-1"></i>楼层选择</h2>
-                                <div class="grid grid-cols-4 gap-1.5" id="floorTabsContainer">
-                                    ${Array.from({length:maxFloor},(_,i)=>`<button class="floor-tab px-2 py-1.5 rounded-md text-center text-xs bg-slate-800/50 ${i+1===heatmapCurrentFloor?'active':'text-slate-400'}" data-floor="${i+1}">${i+1}F</button>`).join('')}
+                            <div class="section">
+                                <div class="section-title"><i class="fas fa-arrow-up-down text-orange-400 mr-1"></i>楼层</div>
+                                <div class="floor-grid" id="floorTabsContainer">
+                                    ${Array.from({length:maxFloor},(_,i)=>`<button class="floor-btn ${i+1===heatmapCurrentFloor?'active':''}" data-floor="${i+1}">${i+1}F</button>`).join('')}
                                 </div>
                             </div>
-                            <div class="p-3 flex-1">
-                                <h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-chart-pie text-orange-400 mr-1"></i>实时统计</h2>
-                                <div class="space-y-2">
-                                    <div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">当前楼层人数</div><div class="text-xl font-bold text-white" id="heatmapFloorTotal">0</div></div>
-                                    <div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">最拥挤区域</div><div class="text-xs font-semibold text-red-400" id="heatmapHotestArea">-</div><div class="w-full bg-slate-700 rounded-full h-1 mt-1"><div class="bg-red-500 h-1 rounded-full" id="heatmapHotBar" style="width:0%"></div></div></div>
-                                    <div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">平均密度</div><div class="text-base font-bold text-orange-400" id="heatmapAvgDensity">0 人/m²</div></div>
-                                </div>
+                            <div class="section" style="flex:1;">
+                                <div class="section-title"><i class="fas fa-chart-pie text-orange-400 mr-1"></i>实时统计</div>
+                                <div class="stat-item-sm">当前楼层人数 <span class="num" id="heatmapFloorTotal">0</span></div>
+                                <div class="stat-item-sm">最拥挤区域 <span class="num red" id="heatmapHotestArea">-</span></div>
+                                <div class="stat-bar"><div class="fill red" id="heatmapHotBar" style="width:0%"></div></div>
+                                <div class="stat-item-sm" style="margin-top:4px;">平均密度 <span class="num orange" id="heatmapAvgDensity">0 人/m²</span></div>
                             </div>
                         </div>
                         <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
-                            <div class="h-12 glass-panel border-b border-slate-700/50 flex items-center justify-between px-4">
-                                <div class="flex gap-2">
-                                    <button class="px-3 py-1 rounded-md text-xs font-medium bg-orange-600 text-white" id="heatmapViewHeatmap">热力图</button>
-                                    <button class="px-3 py-1 rounded-md text-xs font-medium text-slate-400" id="heatmapViewScatter">散点图</button>
+                            <div class="h-10 glass-panel border-b border-slate-700/50 flex items-center justify-between px-3 flex-shrink-0" style="background:rgba(30,41,59,0.5);">
+                                <div class="flex gap-1.5">
+                                    <button class="px-2.5 py-0.5 rounded text-[10px] font-medium bg-orange-600 text-white" id="heatmapViewHeatmap">热力图</button>
+                                    <button class="px-2.5 py-0.5 rounded text-[10px] font-medium text-slate-400 hover:bg-slate-700/30" id="heatmapViewScatter">散点图</button>
                                 </div>
-                                <div><span id="heatmapCurrentZoneTitle" class="text-xs text-orange-400 font-semibold">${zone.icon} ${zone.name} · ${building?.name||''} 1F</span></div>
-                                <div class="flex gap-2">
-                                    <button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapZoomIn"><i class="fas fa-plus text-xs"></i></button>
-                                    <button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapZoomOut"><i class="fas fa-minus text-xs"></i></button>
-                                    <button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapResetView"><i class="fas fa-expand text-xs"></i></button>
+                                <div><span id="heatmapCurrentZoneTitle" class="text-[10px] text-orange-400 font-semibold">${zone.icon} ${zone.name} · ${building?.name||''} ${heatmapCurrentFloor}F</span></div>
+                                <div class="flex gap-1.5">
+                                    <button class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center" id="heatmapZoomIn"><i class="fas fa-plus text-[10px]"></i></button>
+                                    <button class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center" id="heatmapZoomOut"><i class="fas fa-minus text-[10px]"></i></button>
+                                    <button class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 flex items-center justify-center" id="heatmapResetView"><i class="fas fa-expand text-[10px]"></i></button>
                                 </div>
                             </div>
-                            <div class="flex-1 relative p-3 grid-bg">
-                                <div class="w-full h-full" id="heatmapChart"></div>
-                                <div class="absolute bottom-3 right-3 glass-panel rounded-lg p-1.5">
+                            <div class="heatmap-chart-wrapper">
+                                <div id="heatmapChart" class="chart-container"></div>
+                                <div class="absolute bottom-2 right-3 glass-panel rounded-lg p-1" style="background:rgba(15,23,42,0.8);">
                                     <div class="flex items-center gap-1">
-                                        <div class="w-16 h-1.5 legend-gradient rounded"></div>
-                                        <span class="text-[8px] text-slate-400 ml-1">低 → 高</span>
+                                        <div class="w-14 h-1 legend-gradient rounded"></div>
+                                        <span class="text-[7px] text-slate-400 ml-0.5">低→高</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="h-20 glass-panel border-t border-slate-700/50 px-4 py-2">
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-[9px] text-slate-400">时间轴</span>
+                            <div class="h-16 glass-panel border-t border-slate-700/50 px-3 py-1.5 flex-shrink-0" style="background:rgba(30,41,59,0.5);">
+                                <div class="flex justify-between items-center mb-0.5">
+                                    <span class="text-[8px] text-slate-400">时间轴</span>
                                     <div class="flex gap-1">
-                                        <button id="heatmapPrevTime" class="w-6 h-6 rounded bg-slate-700 text-xs"><i class="fas fa-chevron-left"></i></button>
-                                        <button id="heatmapPlayBtn" class="w-6 h-6 rounded bg-orange-600 text-xs"><i class="fas fa-play"></i></button>
-                                        <button id="heatmapNextTime" class="w-6 h-6 rounded bg-slate-700 text-xs"><i class="fas fa-chevron-right"></i></button>
+                                        <button id="heatmapPrevTime" class="w-5 h-5 rounded bg-slate-700 text-[9px] flex items-center justify-center hover:bg-slate-600"><i class="fas fa-chevron-left"></i></button>
+                                        <button id="heatmapPlayBtn" class="w-5 h-5 rounded bg-orange-600 text-[9px] flex items-center justify-center hover:bg-orange-500"><i class="fas fa-play"></i></button>
+                                        <button id="heatmapNextTime" class="w-5 h-5 rounded bg-slate-700 text-[9px] flex items-center justify-center hover:bg-slate-600"><i class="fas fa-chevron-right"></i></button>
                                     </div>
                                 </div>
-                                <input type="range" min="0" max="23" value="14" class="slider-track w-full" id="heatmapTimeSlider">
-                                <div class="flex justify-between mt-1 text-[8px] text-slate-500">
+                                <input type="range" min="0" max="23" value="14" class="slider-track w-full" style="height:3px;" id="heatmapTimeSlider">
+                                <div class="flex justify-between mt-0.5 text-[7px] text-slate-500">
                                     <span>8:00</span><span>10:00</span><span>12:00</span><span class="text-orange-400">14:00</span><span>16:00</span><span>18:00</span><span>20:00</span>
                                 </div>
                             </div>
@@ -693,28 +2248,188 @@
                     </div>
                 </div>`;
             modal.classList.add('active');
-            setTimeout(() => { initHeatmapChart(); bindHeatmapEvents(); }, 150);
+            setTimeout(() => { initHeatmapChart();
+                bindHeatmapEvents();
+                setTimeout(() => { heatmapChart?.resize(); }, 100); }, 150);
         }
-        
+
         function bindHeatmapEvents() {
-            document.querySelectorAll('.zone-heatmap-btn').forEach(btn => { btn.onclick = () => { const z=parseInt(btn.dataset.zoneId); heatmapCurrentZone=z; heatmapCurrentFloor=1; const zone=zones[z]; const building=buildingLayouts[z]; const maxFloor=zone?.floors||(building?.floors?Object.keys(building.floors).length:4); document.querySelectorAll('.zone-heatmap-btn').forEach(b=>b.classList.remove('bg-orange-500/20','border-orange-500','text-orange-400')); btn.classList.add('bg-orange-500/20','border-orange-500','text-orange-400'); const floorContainer=document.getElementById('floorTabsContainer'); if(floorContainer){ floorContainer.innerHTML=Array.from({length:maxFloor},(_,i)=>`<button class="floor-tab px-2 py-1.5 rounded-md text-center text-xs bg-slate-800/50 ${i+1===heatmapCurrentFloor?'active':'text-slate-400'}" data-floor="${i+1}">${i+1}F</button>`).join(''); document.querySelectorAll('.floor-tab').forEach(t=>{ t.onclick=()=>{ heatmapCurrentFloor=parseInt(t.dataset.floor); document.querySelectorAll('.floor-tab').forEach(ft=>ft.classList.remove('active')); t.classList.add('active'); updateHeatmapChart(); showToast('楼层切换',`切换到 ${heatmapCurrentFloor}F`); }; }); } updateHeatmapChart(); showToast('区域联动',`切换到 ${zones[z].name}`); }; });
-            document.getElementById('heatmapViewHeatmap').onclick = () => { heatmapCurrentView='heatmap'; updateHeatmapChart(); };
-            document.getElementById('heatmapViewScatter').onclick = () => { heatmapCurrentView='scatter'; updateHeatmapChart(); };
-            document.getElementById('heatmapTimeSlider').oninput = (e) => { heatmapCurrentTime = parseInt(e.target.value); updateHeatmapChart(); };
-            document.getElementById('heatmapPrevTime').onclick = () => { heatmapCurrentTime = Math.max(0, heatmapCurrentTime-1); document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); };
-            document.getElementById('heatmapNextTime').onclick = () => { heatmapCurrentTime = Math.min(23, heatmapCurrentTime+1); document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); };
-            document.getElementById('heatmapPlayBtn').onclick = () => { heatmapIsPlaying = !heatmapIsPlaying; if(heatmapIsPlaying) heatmapPlayInterval = setInterval(() => { heatmapCurrentTime = (heatmapCurrentTime + 1) % 24; document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); }, 800); else clearInterval(heatmapPlayInterval); document.getElementById('heatmapPlayBtn').innerHTML = heatmapIsPlaying ? '<i class="fas fa-pause text-xs"></i>' : '<i class="fas fa-play text-xs"></i>'; };
-            document.getElementById('heatmapZoomIn').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom', start: 15, end: 85 });
-            document.getElementById('heatmapZoomOut').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+            document.querySelectorAll('.zone-btn-sm').forEach(btn => {
+                btn.onclick = () => {
+                    const z = parseInt(btn.dataset.zoneId);
+                    heatmapCurrentZone = z;
+                    heatmapCurrentFloor = 1;
+                    const zone = zones[z];
+                    const building = buildingLayouts[z];
+                    const maxFloor = zone?.floors || (building?.floors ? Object.keys(building.floors).length :
+                    4);
+                    document.querySelectorAll('.zone-btn-sm').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const floorContainer = document.getElementById('floorTabsContainer');
+                    if (floorContainer) {
+                        floorContainer.innerHTML = Array.from({ length: maxFloor }, (_, i) =>
+                            `<button class="floor-btn ${i+1===heatmapCurrentFloor?'active':''}" data-floor="${i+1}">${i+1}F</button>`
+                            ).join('');
+                        document.querySelectorAll('.floor-btn').forEach(t => {
+                            t.onclick = () => {
+                                heatmapCurrentFloor = parseInt(t.dataset.floor);
+                                document.querySelectorAll('.floor-btn').forEach(ft => ft.classList
+                                    .remove('active'));
+                                t.classList.add('active');
+                                updateHeatmapChart();
+                                showToast('楼层切换', `切换到 ${heatmapCurrentFloor}F`);
+                            };
+                        });
+                    }
+                    updateHeatmapChart();
+                    showToast('区域联动', `切换到 ${zones[z].name}`);
+                };
+            });
+            document.querySelectorAll('.floor-btn').forEach(t => {
+                t.onclick = () => {
+                    heatmapCurrentFloor = parseInt(t.dataset.floor);
+                    document.querySelectorAll('.floor-btn').forEach(ft => ft.classList.remove('active'));
+                    t.classList.add('active');
+                    updateHeatmapChart();
+                    showToast('楼层切换', `切换到 ${heatmapCurrentFloor}F`);
+                };
+            });
+            document.getElementById('heatmapViewHeatmap').onclick = () => { heatmapCurrentView = 'heatmap';
+                updateHeatmapChart(); };
+            document.getElementById('heatmapViewScatter').onclick = () => { heatmapCurrentView = 'scatter';
+                updateHeatmapChart(); };
+            document.getElementById('heatmapTimeSlider').oninput = (e) => { heatmapCurrentTime = parseInt(e.target
+                    .value);
+                updateHeatmapChart(); };
+            document.getElementById('heatmapPrevTime').onclick = () => { heatmapCurrentTime = Math.max(0,
+                    heatmapCurrentTime - 1);
+                document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime;
+                updateHeatmapChart(); };
+            document.getElementById('heatmapNextTime').onclick = () => { heatmapCurrentTime = Math.min(23,
+                    heatmapCurrentTime + 1);
+                document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime;
+                updateHeatmapChart(); };
+            document.getElementById('heatmapPlayBtn').onclick = () => {
+                heatmapIsPlaying = !heatmapIsPlaying;
+                if (heatmapIsPlaying) heatmapPlayInterval = setInterval(() => {
+                    heatmapCurrentTime = (heatmapCurrentTime + 1) % 24;
+                    document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime;
+                    updateHeatmapChart();
+                }, 800);
+                else clearInterval(heatmapPlayInterval);
+                document.getElementById('heatmapPlayBtn').innerHTML = heatmapIsPlaying ?
+                    '<i class="fas fa-pause text-[9px]"></i>' : '<i class="fas fa-play text-[9px]"></i>';
+            };
+            document.getElementById('heatmapZoomIn').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom',
+                start: 15, end: 85 });
+            document.getElementById('heatmapZoomOut').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom',
+                start: 0, end: 100 });
             document.getElementById('heatmapResetView').onclick = () => heatmapChart?.dispatchAction({ type: 'restore' });
-            document.getElementById('closeHeatmapModalBtn').onclick = () => { document.getElementById('heatmapModal').classList.remove('active'); if(heatmapPlayInterval) clearInterval(heatmapPlayInterval); };
-            document.getElementById('heatmapModal').onclick = (e) => { if(e.target === document.getElementById('heatmapModal')) { document.getElementById('heatmapModal').classList.remove('active'); if(heatmapPlayInterval) clearInterval(heatmapPlayInterval); } };
-            document.querySelectorAll('.floor-tab').forEach(t=>{ t.onclick=()=>{ heatmapCurrentFloor=parseInt(t.dataset.floor); document.querySelectorAll('.floor-tab').forEach(ft=>ft.classList.remove('active')); t.classList.add('active'); updateHeatmapChart(); showToast('楼层切换',`切换到 ${heatmapCurrentFloor}F`); }; });
+            document.getElementById('closeHeatmapModalBtn').onclick = () => {
+                document.getElementById('heatmapModal').classList.remove('active');
+                if (heatmapPlayInterval) clearInterval(heatmapPlayInterval);
+            };
+            document.getElementById('heatmapModal').onclick = (e) => {
+                if (e.target === document.getElementById('heatmapModal')) {
+                    document.getElementById('heatmapModal').classList.remove('active');
+                    if (heatmapPlayInterval) clearInterval(heatmapPlayInterval);
+                }
+            };
         }
-        
-        buildSidebar(); renderMonitorGrid(); renderAlerts(); renderTeam(); setScenario('normal');
+
+        // ==================== 上报事件绑定 ====================
+        document.getElementById('reportContent').addEventListener('input', function() {
+            const len = this.value.length;
+            document.getElementById('reportCharCount').textContent = len + ' / 500';
+            if (len > 500) this.value = this.value.substring(0, 500);
+        });
+
+        document.getElementById('reportSubmitBtn').addEventListener('click', submitReport);
+
+        document.getElementById('reportContent').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                submitReport();
+            }
+        });
+
+        // ==================== 3D 地图事件绑定 ====================
+        document.getElementById('open3DMapBtn').addEventListener('click', open3DMap);
+        document.getElementById('close3DMapModalBtn').addEventListener('click', close3DMap);
+        document.getElementById('map3dModal').addEventListener('click', function(e) {
+            if (e.target === this) { close3DMap(); }
+        });
+
+        // ==================== 初始化 ====================
+        buildSidebar();
+        renderMonitorGrid();
+        renderTeam();
+        updateAlertList('normal', zones[currentZoneId].name);
+        setScenario('normal');
+        renderReportList();
+        document.getElementById('reportCount').textContent = '0 条';
+
         document.getElementById('openHeatmapBtn').addEventListener('click', openHeatmapModal);
         document.getElementById('emergencyBtn').addEventListener('click', triggerEmergency);
+
+        // 窗口尺寸变化时重新调整3D
+        window.addEventListener('resize', function() {
+            if (is3DInitialized && renderer3d && camera3d) {
+                const container = document.getElementById('three-container');
+                if (container) {
+                    const w = container.clientWidth;
+                    const h = container.clientHeight;
+                    if (w > 10 && h > 10) {
+                        camera3d.aspect = w / h;
+                        camera3d.updateProjectionMatrix();
+                        renderer3d.setSize(w, h);
+                    }
+                }
+            }
+        });
+
+        // ============================================================
+        // ★★★ 事故弹窗逻辑（新增） ★★★
+        // ============================================================
+        window.addEventListener('load', function() {
+            const now = new Date();
+            document.getElementById('incidentTime').textContent = '⏱ 事发时间：' + now.toLocaleTimeString();
+            setTimeout(function() {
+                document.getElementById('incidentModal').classList.add('active');
+                showToast('🚨 事故警报', '教学楼区东侧走廊发生火情，请立即查看！', 'fire');
+            }, 300);
+        });
+
+        document.getElementById('incidentGotoBtn').addEventListener('click', function() {
+            document.getElementById('incidentModal').classList.remove('active');
+            // 跳转到教学楼区
+            switchZone(1);
+            setTimeout(function() {
+                // 使用 openCameraModal 直接打开教学楼-1 的视频
+                openCameraModal('教学楼区 · 摄像头1', 1, 1);
+                showToast('📹 已跳转', '正在查看事故地监控画面（教学楼区 · 摄像头1）', 'info');
+            }, 200);
+        });
+
+        document.getElementById('incidentDismissBtn').addEventListener('click', function() {
+            document.getElementById('incidentModal').classList.remove('active');
+            showToast('⏳ 已推迟', '事故警报已推迟处理，可在预警列表查看', 'warning');
+        });
+
+        document.getElementById('incidentModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                showToast('⏳ 已推迟', '事故警报已推迟处理，可在预警列表查看', 'warning');
+            }
+        });
+
+        console.log('✅ 智慧安保指挥中心已启动 | 视频映射已加载');
+        console.log('📹 视频文件映射规则:');
+        console.log('  教学楼区 → jiaoshi1.mp4 ~ jiaoshi6.mp4');
+        console.log('  宿舍生活区 → sushe1.mp4 ~ sushe6.mp4');
+        console.log('  食堂餐饮区 → shitang1.mp4 ~ shitang6.mp4');
+        console.log('  体育运动区 → caochang1.mp4 ~ caochang6.mp4');
+        console.log('  图书馆区 → tushuguan1.mp4 ~ tushuguan6.mp4');
     </script>
 </body>
 </html>

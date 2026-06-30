@@ -2,716 +2,491 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校园安全智能监控系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>智慧安保指挥中心 | 小学多场景应急系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #050228 0%, #0a033d 50%, #070333 100%);
-            color: #e8edf7;
-            min-height: 100vh;
-            overflow-y: auto;
-        }
-
-        .header {
-            background: linear-gradient(90deg, #0f285f, #143d77);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-            padding: 18px 24px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 600;
-            color: #7fc8ff;
-            border-bottom: 1px solid rgba(127, 200, 255, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            letter-spacing: 2px;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 7px 16px;
-            background: linear-gradient(135deg, #2364d2, #1e54b8);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s ease;
-            box-shadow: 0 2px 8px rgba(30, 84, 184, 0.4);
-        }
-        .back-btn:hover {
-            background: linear-gradient(135deg, #2b72e8, #2364d2);
-            transform: translateY(-50%) scale(1.03);
-        }
-
-        .main-container {
-            display: flex;
-            padding: 20px;
-            gap: 20px;
-            min-height: calc(100vh - 76px);
-        }
-
-        .sidebar {
-            width: 240px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 94px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .card {
-            background: linear-gradient(145deg, #0e224e, #0b1c3f);
-            border-radius: 14px;
-            padding: 20px;
-            border: 1px solid rgba(127, 200, 255, 0.15);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-        }
-
-        .card h3 {
-            color: #9fcfff;
-            margin-bottom: 18px;
-            text-align: center;
-            font-size: 17px;
-            letter-spacing: 1px;
-            position: relative;
-        }
-        .card h3::after {
-            content: "";
-            display: block;
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #7fc8ff, transparent);
-            margin: 8px auto 0;
-        }
-
-        .menu-item {
-            padding: 12px 14px;
-            background: rgba(25, 58, 120, 0.4);
-            margin-bottom: 10px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s ease;
-            border: 1px solid transparent;
-        }
-        .menu-item:hover {
-            background: rgba(40, 88, 172, 0.6);
-            border-color: rgba(127, 200, 255, 0.3);
-            transform: translateX(4px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-        }
-
-        .weather-tip {
-            font-size: 13px;
-            color: #a0b8e0;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .weather-icon {
-            font-size: 56px;
-            text-align: center;
-            margin: 12px 0;
-        }
-        .weather-desc {
-            margin-top: 12px;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-        .weather-desc h4 {
-            color: #ffdd70;
-            margin: 10px 0 6px;
-            font-size: 15px;
-        }
-
-        .monitor-wrap {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .monitor-body {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-        .monitor-box {
-            background: #050e22;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid rgba(127, 200, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-        }
-        .monitor-box.warn {
-            border: 2px solid #ff4757;
-            box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
-        }
-        .monitor-box:hover {
-            border-color: rgba(127, 200, 255, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-        }
-        .monitor-box.warn:hover {
-            border-color: #ff4757;
-        }
-        .monitor-title {
-            background: linear-gradient(90deg, #10295c, #0e234f);
-            padding: 10px 14px;
-            font-size: 14px;
-            color: #c6e2ff;
-            border-bottom: 1px solid rgba(127, 200, 255, 0.15);
-        }
-        .monitor-screen {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-        }
-        .monitor-screen img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .page-bar {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            padding: 10px 0;
-        }
-        .page-btn {
-            padding: 8px 20px;
-            background: linear-gradient(135deg, #2364d2, #1e54b8);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            transition: 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-        }
-        .page-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #2b72e8, #2364d2);
-            transform: scale(1.04);
-        }
-        .page-btn:disabled {
-            background: #2a3b5f;
-            color: #8898b8;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 8, 22, 0.85);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            width: 75vw;
-            max-width: 1100px;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 12px;
-            border: 2px solid rgba(127, 200, 255, 0.4);
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-        }
-        .modal-content img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .report-box {
-            margin: 30px 20px 40px 260px;
-            background: linear-gradient(145deg, #0e224e, #0b1c3f);
-            border-radius: 14px;
-            padding: 22px;
-            border: 1px solid rgba(127, 200, 255, 0.15);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-        }
-        .report-title {
-            color: #9fcfff;
-            margin-bottom: 18px;
-            font-size: 17px;
-            position: relative;
-        }
-        .report-title::after {
-            content: "";
-            display: block;
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #7fc8ff, transparent);
-            margin: 8px 0 0;
-        }
-        .report-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .form-row {
-            display: flex;
-            width: 100%;
-            gap: 20px;
-        }
-        .form-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .form-item label {
-            font-size: 14px;
-            color: #b8d4f5;
-        }
-        .form-item select,
-        .form-item textarea {
-            background: rgba(25, 58, 120, 0.4);
-            border: 1px solid rgba(127, 200, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 12px;
-            color: #e8edf7;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-        .form-item select:focus,
-        .form-item textarea:focus {
-            outline: none;
-            border-color: rgba(127, 200, 255, 0.5);
-            box-shadow: 0 0 0 3px rgba(127, 200, 255, 0.15);
-        }
-        textarea {
-            resize: none;
-        }
-
-        .btn-group {
-            width: 100%;
-            display: flex;
-            gap: 14px;
-            margin-top: 12px;
-        }
-        .btn {
-            flex: 1;
-            padding: 11px;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-        }
-        .btn-blue {
-            background: linear-gradient(135deg, #2364d2, #1e54b8);
-        }
-        .btn-blue:hover {
-            background: linear-gradient(135deg, #2b72e8, #2364d2);
-        }
-        .btn-orange {
-            background: linear-gradient(135deg, #d88a20, #c07718);
-        }
-        .btn-orange:hover {
-            background: linear-gradient(135deg, #e6972b, #d88a20);
-        }
-        .btn-red {
-            background: linear-gradient(135deg, #d63031, #b72021);
-        }
-        .btn-red:hover {
-            background: linear-gradient(135deg, #e84243, #d63031);
-        }
-        .btn-plan {
-            background: linear-gradient(135deg, #27ae60, #219653);
-        }
-        .btn-plan:hover {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .ai-alert-wrap {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .ai-alert-box {
-            background: #0b1c3f;
-            border: 2px solid #ff4757;
-            border-radius: 16px;
-            padding: 30px;
-            width: 420px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255,71,87,0.4);
-        }
-        .ai-alert-title {
-            font-size: 20px;
-            color: #ff4757;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .ai-alert-desc {
-            font-size: 15px;
-            line-height: 1.8;
-            margin-bottom: 25px;
-            color: #e8edf7;
-        }
-        .ai-btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        .ai-btn {
-            padding: 10px 22px;
-            border-radius: 8px;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-jump {
-            background: linear-gradient(135deg, #ff4757, #e82c3c);
-            color: #fff;
-        }
-        .btn-jump:hover {
-            opacity: 0.9;
-        }
-        .btn-close {
-            background: #49566b;
-            color: #fff;
-        }
-        .btn-close:hover {
-            opacity: 0.9;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: #0a0f1a; color: #e2e8f0; overflow: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
+        .glass-card { background: rgba(20, 30, 55, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(0, 212, 255, 0.15); transition: all 0.3s ease; }
+        .monitor-card { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1); cursor: pointer; }
+        .monitor-card:hover { transform: translateY(-6px) scale(1.02); border-color: #3b82f6; box-shadow: 0 20px 35px -12px rgba(59, 130, 246, 0.4); }
+        .zone-item.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(0, 212, 255, 0.1)); border-left: 3px solid #3b82f6; }
+        .scenario-btn.active-scenario { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(0, 212, 255, 0.15)); border-color: #3b82f6; color: #60a5fa; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .status-critical { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1s infinite; }
+        .status-warning { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+        .status-normal { background: #10b981; box-shadow: 0 0 6px #10b981; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        .emergency-btn { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: linear-gradient(135deg, #ef4444, #dc2626); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; color: white; font-size: 28px; cursor: pointer; box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); transition: all 0.3s; z-index: 100; }
+        .emergency-btn:hover { transform: scale(1.1); }
+        .toast { position: fixed; top: 100px; right: 30px; background: rgba(15, 25, 45, 0.98); backdrop-filter: blur(12px); border-left: 4px solid #3b82f6; border-radius: 12px; padding: 14px 20px; min-width: 300px; transform: translateX(420px); transition: transform 0.4s ease; z-index: 200; }
+        .toast.show { transform: translateX(0); }
+        .heatmap-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0f1a; z-index: 1000; display: none; flex-direction: column; animation: fadeInModal 0.3s ease; }
+        .heatmap-modal.active { display: flex; }
+        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+        .modal-header-bar { background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(148, 163, 184, 0.2); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .modal-close-btn { width: 36px; height: 36px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 50%; color: #ef4444; font-size: 18px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .modal-close-btn:hover { background: #ef4444; color: white; transform: rotate(90deg); }
+        .heatmap-launch-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); border: none; transition: all 0.3s; }
+        .heatmap-launch-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
+        .slider-track { -webkit-appearance: none; appearance: none; height: 4px; background: #334155; border-radius: 2px; outline: none; }
+        .slider-track::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #f59e0b; border-radius: 50%; cursor: pointer; border: 2px solid #1e293b; }
+        .legend-gradient { background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444); }
+        .time-marker.active { color: #f59e0b; font-weight: 600; }
+        .grid-bg { background-image: linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px); background-size: 20px 20px; }
+        .floor-tab { transition: all 0.2s; cursor: pointer; }
+        .floor-tab.active { background: #f59e0b; color: #0f172a; font-weight: 600; }
+        .floor-tab:hover:not(.active) { background: rgba(245, 158, 11, 0.3); }
     </style>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+<body class="h-screen flex flex-col">
 
-<body>
-    <div class="ai-alert-wrap" id="aiAlert">
-        <div class="ai-alert-box">
-            <div class="ai-alert-title">⚠️ AI智能监控 事故预警</div>
-            <div class="ai-alert-desc" id="alertText"></div>
-            <div class="ai-btn-group">
-                <button class="ai-btn btn-jump" id="jumpBtn">跳转事故监控画面</button>
-                <button class="ai-btn btn-close" id="closeAlert">关闭提醒</button>
-            </div>
+    <header class="glass-panel h-14 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-shield-alt text-white text-sm"></i></div>
+            <div><h1 class="text-base font-bold text-white tracking-tight">小学多场景应急系统 · 智慧安保指挥中心</h1><p class="text-[10px] text-slate-400">Primary School Multi-Scenario Emergency | Security Command Center</p></div>
         </div>
+        <div class="flex items-center gap-4">
+            <button id="openHeatmapBtn" class="heatmap-launch-btn px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-fire"></i> 教学楼热力图</button>
+            <div class="flex items-center gap-2 text-xs"><span class="status-dot status-normal"></span><span class="text-slate-300">系统正常</span></div>
+            <div class="h-5 w-px bg-slate-700"></div>
+            <div class="text-right"><div class="text-sm font-mono text-cyan-400" id="currentTime">--:--:--</div><div class="text-[10px] text-slate-500" id="currentDate">----年--月--日</div></div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden p-4 gap-4">
+        <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0">
+            <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-cyan-400"></i> 监控区域</h2><div class="space-y-1.5" id="zoneMenu"></div></div>
+            <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-orange-400"></i> 应急场景模拟</h2><div class="space-y-1.5" id="scenarioMenu"></div></div>
+            <div class="p-4 flex-1"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-chart-line text-cyan-400"></i> 实时统计</h2><div class="space-y-3"><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">当前区域估算人数</div><div class="text-2xl font-bold text-white" id="zoneTotal">0</div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">⚠️ 最高风险区域</div><div class="text-sm font-semibold text-red-400" id="hotArea">-</div><div class="w-full bg-slate-700 rounded-full h-1.5 mt-2"><div class="bg-red-500 h-1.5 rounded-full" id="hotBar" style="width:0%"></div></div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">平均人群密度</div><div class="text-lg font-bold text-cyan-400" id="avgDensity">0 人/m²</div></div></div></div>
+        </aside>
+
+        <main class="flex-1 flex flex-col gap-4 min-w-0">
+            <div class="glass-card rounded-xl px-4 py-3 flex items-center justify-between flex-shrink-0"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center"><i class="fas fa-video text-cyan-400 text-sm"></i></div><div><div class="text-sm font-semibold text-white" id="zoneName">教学楼区</div><div class="text-[10px] text-slate-400" id="zoneDesc">24路摄像头 · 实时监控</div></div></div><div class="flex items-center gap-4 text-xs"><div><span class="text-slate-400">在线率</span> <span class="text-green-400 font-mono" id="onlineRate">100%</span></div><div><span class="text-slate-400">今日预警</span> <span class="text-orange-400 font-mono" id="todayAlerts">3</span></div></div></div>
+            <div class="grid grid-cols-3 gap-3 flex-1 min-h-0" id="monitorGrid"></div>
+        </main>
+
+        <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0"><div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-bell text-red-400"></i> 实时预警<span class="ml-auto text-[10px] text-red-400 animate-pulse">● LIVE</span></h2></div><div class="flex-1 overflow-y-auto p-3 space-y-2" id="alertList"></div><div class="p-3 border-t border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-cyan-400"></i> 执勤人员</h2><div class="space-y-2" id="teamList"></div></div></aside>
     </div>
 
-    <div class="modal" id="imgModal" onclick="closeModal()">
-        <div class="modal-content">
-            <img id="bigImg" src="" alt="监控大图">
-        </div>
-    </div>
+    <button id="emergencyBtn" class="emergency-btn"><i class="fas fa-bell"></i></button>
+    <div id="toast" class="toast"><div class="flex items-center gap-2"><i class="fas fa-info-circle text-cyan-400"></i><span class="text-sm font-semibold" id="toastTitle">系统通知</span></div><div class="text-xs text-slate-300 mt-1" id="toastMsg">消息内容</div></div>
+    <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[1000] hidden items-center justify-center" onclick="if(event.target===this) closeCameraModal()"><div class="w-[85vw] max-w-5xl glass-panel rounded-2xl overflow-hidden"><div class="p-4 border-b border-cyan-500/30 flex justify-between items-center"><h2 class="text-lg font-bold text-cyan-400"><i class="fas fa-camera mr-2"></i><span id="modalCameraName">监控画面</span></h2><button onclick="closeCameraModal()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40">✕</button></div><div class="p-6"><div class="aspect-video bg-black rounded-xl overflow-hidden"><img id="modalCameraImg" src="" class="w-full h-full object-cover"></div><div class="mt-4 text-sm text-slate-300" id="modalCameraDesc"></div></div></div></div>
 
-    <div class="header">
-        <button class="back-btn" onclick="location.href='login.html'">返回登录</button>
-        校园安全智能监控系统
-    </div>
+    <div id="heatmapModal" class="heatmap-modal"><div id="heatmapContent" style="flex:1; display: flex; flex-direction: column; overflow: hidden;"></div></div>
 
-    <div class="main-container">
-        <div class="sidebar">
-            <div class="card">
-                <h3>📹 监控分类</h3>
-                <div class="menu-item" onclick="loadTeach()">教学楼区域</div>
-                <div class="menu-item" onclick="loadDorm()">宿舍楼区域</div>
-                <div class="menu-item" onclick="loadCanteen()">食堂区域</div>
-                <div class="menu-item" onclick="loadClass()">普通教室区域</div>
-                <div class="menu-item" onclick="loadLab()">实验区域</div>
-                <div class="menu-item" onclick="loadPlayground()">操场&户外区域</div>
-                <div class="menu-item" onclick="loadGate()">校园大门区域</div>
-            </div>
-
-            <div class="card">
-                <h3>🌤 实时天气预报</h3>
-                <div class="weather-tip">系统自动预测 · 实时更新</div>
-                <div class="weather-icon" id="weatherIcon"></div>
-                <div class="weather-desc" id="weatherDesc"></div>
-            </div>
-        </div>
-
-        <div class="monitor-wrap">
-            <div class="monitor-body" id="monitorList"></div>
-            <div class="page-bar" id="pageBar" style="display: none;">
-                <button class="page-btn" id="prevPage" onclick="prevPage()">上一页</button>
-                <button class="page-btn" id="nextPage" onclick="nextPage()">下一页</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="report-box">
-        <h3 class="report-title">📝 安全事件上报</h3>
-        <div class="report-form">
-            <div class="form-row">
-                <div class="form-item">
-                    <label>监控位置</label>
-                    <select id="pos"></select>
-                </div>
-                <div class="form-item">
-                    <label>事件类型</label>
-                    <select id="eventType"></select>
-                </div>
-            </div>
-            <div class="form-item">
-                <label>事件描述</label>
-                <textarea rows="3"></textarea>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-blue" onclick="alert('上报成功')">确认上报</button>
-                <button class="btn-orange" onclick="alert('已标记误报')">误报</button>
-                <button class="btn btn-red" onclick="alert('已提交紧急上报')">紧急上报</button>
-                <button class="btn btn-plan" onclick="alert('已启动对应应急预案，正在执行处置流程')">启动预案处理</button>
-            </div>
-        </div>
-    </div>
-
-<script>
-const imgModal = document.getElementById("imgModal");
-const bigImg = document.getElementById("bigImg");
-const posSelect = document.getElementById("pos");
-const eventSelect = document.getElementById("eventType");
-const monitorList = document.getElementById("monitorList");
-const pageBar = document.getElementById("pageBar");
-const prevPageBtn = document.getElementById("prevPage");
-const nextPageBtn = document.getElementById("nextPage");
-const weatherIcon = document.getElementById("weatherIcon");
-const weatherDesc = document.getElementById("weatherDesc");
-
-const aiAlert = document.getElementById("aiAlert");
-const alertText = document.getElementById("alertText");
-const jumpBtn = document.getElementById("jumpBtn");
-const closeAlertBtn = document.getElementById("closeAlert");
-
-let currentKey = "";
-let currentPage = 1;
-const pageSize = 8;
-
-const accidentInfo = {
-    areaKey: "dorm",
-    areaName: "宿舍楼区域",
-    pointName: "2号宿舍1楼楼道",
-    accidentType: "学生摔倒事故"
-};
-
-const imgUrls = {
-    teach: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao1D.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao5.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao6.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao7.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiao8.jpg"
-    ],
-    dorm: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe5.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/sushe6.jpg"
-    ],
-    canteen: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang5.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shitang6.jpg"
-    ],
-    class: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi5.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi6.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi7.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/jiaoshi8.jpg"
-    ],
-    lab: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/shiyanshi5.jpg"
-    ],
-    playground: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang5.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/caochang6.jpg"
-    ],
-    gate: [
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/xiaomen1.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/xiaomen2.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/xiaomen3.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/xiaomen4.jpg",
-        "https://yinjigl.oss-cn-beijing.aliyuncs.com/xiaomen5.jpg"
-    ]
-};
-
-const areaData = {
-    teach: {
-        points: ["教学楼1楼东走廊","教学楼1楼西走廊","教学楼2楼走廊","教学楼3楼走廊","教学楼主楼梯口","教学楼侧楼梯口","教学楼正门入口","教学楼后侧通道"],
-        events: ["学生摔倒","拥挤踩踏危险","火情隐患","高空坠物","学生冲突"]
-    },
-    dorm: {
-        points: ["1号宿舍1楼楼道","1号宿舍2楼楼道","2号宿舍1楼楼道","2号宿舍大门","宿舍园区主干道","宿舍楼下休闲区"],
-        events: ["学生摔倒","火情隐患","外来人员闯入","电器类设施异常"]
-    },
-    canteen: {
-        points: ["食堂正门入口","食堂打餐区1","食堂打餐区2","食堂就餐区","食堂后厨通道","食堂外侧走廊"],
-        events: ["人群拥挤","地面湿滑摔倒","火情隐患","食材异常"]
-    },
-    class: {
-        points: ["一年级1班教室","一年级2班教室","二年级1班教室","二年级2班教室","三年级1班教室","三年级2班教室","四年级1班教室","四年级2班教室"],
-        events: ["学生打闹","物品坠落","电器故障","火情隐患","学生冲突"]
-    },
-    lab: {
-        points: ["化学实验室","物理实验室","生物实验室","实验楼走廊","实验楼出入口"],
-        events: ["化学品泄漏","仪器故障","试剂倾倒","火情隐患","人员操作失误","物品坠落"]
-    },
-    playground: {
-        points: ["塑胶跑道区域","篮球场","足球场","操场看台","操场西侧小路","体育器材室门口"],
-        events: ["运动摔伤","高空坠物","人员聚集拥堵"]
-    },
-    gate: {
-        points: ["学校正门","正门门卫室","大门左侧通道","大门右侧通道","校外路口监控"],
-        events: ["外来人员闯入","人员拥堵","门禁异常"]
-    }
-};
-
-const weatherList = [
-    { icon: '<i class="fas fa-sun" style="color:#ffd000"></i>', name: "晴天", prevent: "正常开展校园各项活动，提醒师生做好防晒、及时补水。", handle: "无特殊风险，安保人员执行常规巡逻即可。" },
-    { icon: '<i class="fas fa-cloud" style="color:#cccccc"></i>', name: "阴天", prevent: "气温舒适，可正常安排户外活动，持续监测天气变化。", handle: "加强室外区域巡检，提前排查道路、设施安全隐患。" },
-    { icon: '<i class="fas fa-cloud-rain" style="color:#74b9ff"></i>', name: "小雨", prevent: "关闭室外电器设备，提醒师生慢行防滑，备好雨具。", handle: "及时清理路面积水，检查屋檐、排水口是否堵塞。" },
-    { icon: '<i class="fas fa-cloud-showers-heavy" style="color:#0984e3"></i>', name: "暴雨", prevent: "立即停止一切室外活动，关闭门窗、切断室外电源；重点检查低洼区域、地下空间防水防护。", handle: "安排专人值守排水系统，发现积水、漏水第一时间处置；密切监测围墙、树木，防范坍塌倒伏。" },
-    { icon: '<i class="fas fa-bolt" style="color:#fdcb6e"></i>', name: "雷阵雨", prevent: "禁止师生在操场、大树、广告牌下逗留，远离金属设施，关闭户外用电设备。", handle: "雷电期间减少室外巡逻，雨停后全面检查电路、避雷装置是否完好。" },
-    { icon: '<i class="fas fa-wind" style="color:#b2bec3"></i>', name: "大风", prevent: "收好室外悬挂物、宣传栏，加固门窗，暂停高空作业与大型室外活动。", handle: "全面巡查树木、围栏、临时棚架，发现松动、倾斜立即加固或隔离警戒。" }
-];
-
-function autoGetWeather(){
-    let randomIdx = Math.floor(Math.random() * weatherList.length);
-    let nowWeather = weatherList[randomIdx];
-    weatherIcon.innerHTML = nowWeather.icon;
-    weatherDesc.innerHTML = `<h4>当前天气：${nowWeather.name}</h4><p>预防措施：${nowWeather.prevent}</p><p>应急处理：${nowWeather.handle}</p>`;
-}
-
-function loadTeach() { renderArea("teach"); }
-function loadDorm() { renderArea("dorm"); }
-function loadCanteen() { renderArea("canteen"); }
-function loadClass() { renderArea("class"); }
-function loadLab() { renderArea("lab"); }
-function loadPlayground() { renderArea("playground"); }
-function loadGate() { renderArea("gate"); }
-
-function renderArea(key) {
-    currentKey = key;
-    currentPage = 1;
-    const data = areaData[key];
-    pageBar.style.display = "none";
-    eventSelect.innerHTML = "";
-    data.events.forEach(ev => {
-        let o = document.createElement("option");
-        o.innerText = ev;
-        eventSelect.appendChild(o);
-    });
-    renderPage(data.points);
-}
-
-function renderPage(allPoints) {
-    monitorList.innerHTML = "";
-    posSelect.innerHTML = "";
-    const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-    const pageData = allPoints.slice(start, end);
-    const imgList = imgUrls[currentKey];
-    pageData.forEach((name, idx) => {
-        let opt = document.createElement("option");
-        opt.innerText = name;
-        posSelect.appendChild(opt);
-        let box = document.createElement("div");
-        box.className = "monitor-box";
-        if(currentKey === accidentInfo.areaKey && name === accidentInfo.pointName){
-            box.classList.add("warn");
-        }
-        let imgSrc = imgList[idx] || imgList[0];
-        box.innerHTML = `<div class="monitor-title">${name}</div><div class="monitor-screen"><img src="${imgSrc}" alt="监控"></div>`;
-        box.onclick = () => {
-            bigImg.src = imgSrc;
-            imgModal.style.display = "flex";
+    <script>
+        // ==================== 主界面数据 ====================
+        const zones = {
+            1: { name: "教学楼区", desc: "24路摄像头", icon: "🏫", cameras: 24, online: 24, alerts: 2, camPrefix: "教学楼", buildingName: "知行教学楼", floors: 4 },
+            2: { name: "宿舍生活区", desc: "32路摄像头", icon: "🏠", cameras: 32, online: 31, alerts: 1, camPrefix: "宿舍楼", buildingName: "明德公寓", floors: 4 },
+            3: { name: "食堂餐饮区", desc: "18路摄像头", icon: "🍽️", cameras: 18, online: 18, alerts: 0, camPrefix: "食堂", buildingName: "思源餐厅", floors: 2 },
+            4: { name: "体育运动区", desc: "16路摄像头", icon: "⚽", cameras: 16, online: 16, alerts: 1, camPrefix: "体育场", buildingName: "健体运动场", floors: 1 },
+            5: { name: "图书馆区", desc: "12路摄像头", icon: "📚", cameras: 12, online: 11, alerts: 2, camPrefix: "图书馆", buildingName: "博雅图书馆", floors: 3 }
         };
-        monitorList.appendChild(box);
-    });
-    const total = Math.ceil(allPoints.length / pageSize);
-    prevPageBtn.disabled = currentPage <= 1;
-    nextPageBtn.disabled = currentPage >= total;
-}
-
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        renderPage(areaData[currentKey].points);
-    }
-}
-function nextPage() {
-    const total = Math.ceil(areaData[currentKey].points.length / pageSize);
-    if (currentPage < total) {
-        currentPage++;
-        renderPage(areaData[currentKey].points);
-    }
-}
-function closeModal() {
-    imgModal.style.display = "none";
-}
-
-closeAlertBtn.addEventListener("click", () => {
-    aiAlert.style.display = "none";
-});
-
-jumpBtn.addEventListener("click", () => {
-    aiAlert.style.display = "none";
-    renderArea(accidentInfo.areaKey);
-});
-
-window.onload = function () {
-    loadTeach();
-    autoGetWeather();
-    alertText.innerText = `检测位置：${accidentInfo.areaName} → ${accidentInfo.pointName}\n事故类型：${accidentInfo.accidentType}`;
-    aiAlert.style.display = "flex";
-};
-</script>
+        
+        let currentZoneId = 1;
+        let currentScenario = 'normal';
+        
+        function showToast(title, msg) { const t=document.getElementById('toast'); document.getElementById('toastTitle').innerHTML=title; document.getElementById('toastMsg').innerHTML=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+        function updateTime() { const n=new Date(); document.getElementById('currentTime').innerHTML=n.toLocaleTimeString(); document.getElementById('currentDate').innerHTML=n.toLocaleDateString(); }
+        setInterval(updateTime,1000); updateTime();
+        
+        function switchZone(zoneId) { currentZoneId=zoneId; document.querySelectorAll('.zone-item').forEach(el=>{if(parseInt(el.dataset.zone)===zoneId)el.classList.add('active'); else el.classList.remove('active');}); renderMonitorGrid(); updateZoneStats(); }
+        function updateZoneStats() { const z=zones[currentZoneId]; document.getElementById('zoneName').innerHTML=`${z.icon} ${z.name}`; document.getElementById('zoneDesc').innerHTML=z.desc; document.getElementById('onlineRate').innerHTML=`${Math.round(z.online/z.cameras*100)}%`; document.getElementById('todayAlerts').innerHTML=z.alerts; document.getElementById('zoneTotal').innerHTML=Math.floor(Math.random()*200+80); document.getElementById('avgDensity').innerHTML=(Math.random()*0.7+0.3).toFixed(2); document.getElementById('hotArea').innerHTML=`${z.name} 中心区`; document.getElementById('hotBar').style.width=`${Math.floor(Math.random()*70+25)}%`; }
+        function renderMonitorGrid() { const z=zones[currentZoneId]; let h=''; for(let i=1;i<=6;i++){const cId=`${z.camPrefix}-${i}`; const cName=`${z.name} · 摄像头${i}`; const a=(z.alerts>0&&(i===2||i===5)); h+=`<div class="glass-card rounded-xl overflow-hidden monitor-card" data-cam-id="${cId}" data-cam-name="${cName}"><div class="px-3 py-2 border-b border-slate-700/50 flex justify-between items-center"><span class="text-[11px] font-medium">📹 ${cName}</span>${a?'<span class="text-[9px] text-red-400 animate-pulse">⚠️ 预警</span>':'<span class="text-[9px] text-green-400">● 正常</span>'}</div><div class="aspect-video bg-slate-900 relative"><img src="https://picsum.photos/seed/${cId}/400/225" class="w-full h-full object-cover opacity-85"><div class="absolute bottom-1 left-1 text-[8px] bg-black/60 px-1 rounded">${new Date().toLocaleTimeString()}</div></div></div>`; }
+            document.getElementById('monitorGrid').innerHTML=h; document.querySelectorAll('.monitor-card').forEach(c=>c.addEventListener('click',()=>{openCameraModal(c.dataset.camName,c.dataset.camId);})); updateZoneStats(); }
+        function openCameraModal(name,id){const m=document.getElementById('cameraModal'); document.getElementById('modalCameraName').innerHTML=`📹 ${name}`; document.getElementById('modalCameraImg').src=`https://picsum.photos/seed/${id}/1200/675`; document.getElementById('modalCameraDesc').innerHTML=`📍 位置：${name} | 状态：${currentScenario!=='normal'?'应急模式':'正常监控'} | 时间：${new Date().toLocaleString()}`; m.classList.remove('hidden'); m.style.display='flex'; }
+        function closeCameraModal(){const m=document.getElementById('cameraModal'); m.classList.add('hidden'); m.style.display='none';}
+        function setScenario(s){currentScenario=s; document.querySelectorAll('.scenario-btn').forEach(b=>{if(b.dataset.scenario===s)b.classList.add('active-scenario'); else b.classList.remove('active-scenario');}); showToast('应急场景',`${s==='normal'?'日常模式':s==='fire'?'消防疏散演习':s==='earthquake'?'地震避险模式':'校园封闭应急'} 已激活`);}
+        function renderAlerts(){const a=[{type:'⚠️ 警告',msg:'教学楼东侧楼梯人群聚集',time:'2分钟前'},{type:'📢 提示',msg:'图书馆入口人流密度上升',time:'5分钟前'},{type:'⚠️ 警告',msg:'食堂后厨烟雾传感器触发',time:'12分钟前'}]; document.getElementById('alertList').innerHTML=a.map(x=>`<div class="bg-slate-800/40 rounded-lg p-2 border-l-4 border-orange-500"><div class="text-[10px] font-bold text-orange-400">${x.type}</div><div class="text-[11px] mt-1">${x.msg}</div><div class="text-[9px] text-slate-500 mt-1">${x.time}</div></div>`).join('');}
+        function renderTeam(){const t=[{name:'张队长',role:'总指挥'},{name:'李副队',role:'巡逻组长'},{name:'王队员',role:'监控员'}]; document.getElementById('teamList').innerHTML=t.map(m=>`<div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-xs font-bold">${m.name[0]}</div><div class="flex-1"><div class="text-xs font-medium">${m.name}</div><div class="text-[9px] text-slate-400">${m.role}</div></div><div class="w-2 h-2 rounded-full bg-green-400"></div></div>`).join('');}
+        function buildSidebar(){const zc=document.getElementById('zoneMenu'); zc.innerHTML=''; Object.entries(zones).forEach(([id,val])=>{const b=document.createElement('button'); b.className=`zone-item w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 ${parseInt(id)===currentZoneId?'active':''}`; b.dataset.zone=id; b.innerHTML=`<span>${val.icon}</span><span>${val.name}</span><span class="ml-auto text-[9px] text-slate-400">${val.cameras}路</span>`; b.onclick=()=>switchZone(parseInt(id)); zc.appendChild(b);}); const sc=document.getElementById('scenarioMenu'); sc.innerHTML=''; const scs=[{id:'normal',name:'日常模式',icon:'check-circle'},{id:'fire',name:'消防疏散演习',icon:'fire'},{id:'earthquake',name:'地震避险模式',icon:'mountain'},{id:'lockdown',name:'校园封闭应急',icon:'lock'}]; scs.forEach(s=>{const b=document.createElement('button'); b.className=`scenario-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 bg-slate-800/30 border ${s.id==='normal'?'border-cyan-500/30 active-scenario':'border-transparent'}`; b.dataset.scenario=s.id; b.innerHTML=`<i class="fas fa-${s.icon} text-xs"></i> ${s.name}`; b.onclick=()=>setScenario(s.id); sc.appendChild(b);});}
+        function triggerEmergency(){showToast('⚠️ 紧急预案启动','所有安保人员立即就位！请遵循疏散指引！'); if(currentScenario==='normal')setScenario('fire');}
+        
+        // ==================== 多楼层建筑布局数据 ====================
+        const buildingLayouts = {
+            1: {
+                name: "知行教学楼",
+                floors: { 1: [ {id:"A101",name:"一年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},{id:"A102",name:"一年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},{id:"A103",name:"一年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},{id:"A104",name:"教师办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:15},{id:"B101",name:"美术教室",type:"专用教室",x:50,y:170,w:100,h:90,cap:40},{id:"B102",name:"音乐教室",type:"专用教室",x:50,y:280,w:100,h:90,cap:40},{id:"C101",name:"科学实验室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},{id:"C102",name:"计算机教室",type:"机房",x:470,y:280,w:100,h:90,cap:50},{id:"HALL",name:"中央大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:120},{id:"CORR1",name:"东走廊",type:"走廊",x:440,y:50,w:30,h:320,cap:80},{id:"CORR2",name:"西走廊",type:"走廊",x:30,y:50,w:30,h:320,cap:80},{id:"STAIR1",name:"东楼梯",type:"楼梯间",x:460,y:140,w:25,h:35,cap:30},{id:"STAIR2",name:"西楼梯",type:"楼梯间",x:25,y:140,w:25,h:35,cap:30},{id:"WC1",name:"卫生间(东)",type:"卫生间",x:490,y:340,w:40,h:50,cap:20},{id:"WC2",name:"卫生间(西)",type:"卫生间",x:40,y:340,w:40,h:50,cap:20}],
+                2: [ {id:"A201",name:"二年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},{id:"A202",name:"二年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},{id:"A203",name:"二年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},{id:"A204",name:"年级办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:12},{id:"B201",name:"书法教室",type:"专用教室",x:50,y:170,w:100,h:90,cap:40},{id:"B202",name:"劳技教室",type:"专用教室",x:50,y:280,w:100,h:90,cap:40},{id:"C201",name:"自然教室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},{id:"C202",name:"录播教室",type:"专用教室",x:470,y:280,w:100,h:90,cap:45},{id:"HALL2",name:"二层大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:100},{id:"CORR1_2",name:"东走廊",type:"走廊",x:440,y:50,w:30,h:320,cap:80},{id:"CORR2_2",name:"西走廊",type:"走廊",x:30,y:50,w:30,h:320,cap:80},{id:"STAIR1_2",name:"东楼梯",type:"楼梯间",x:460,y:140,w:25,h:35,cap:30},{id:"STAIR2_2",name:"西楼梯",type:"楼梯间",x:25,y:140,w:25,h:35,cap:30}],
+                3: [ {id:"A301",name:"三年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},{id:"A302",name:"三年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},{id:"A303",name:"三年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},{id:"A304",name:"教研组",type:"办公室",x:420,y:50,w:80,h:80,cap:12},{id:"B301",name:"英语角",type:"活动室",x:50,y:170,w:100,h:90,cap:40},{id:"B302",name:"少先队室",type:"活动室",x:50,y:280,w:100,h:90,cap:40},{id:"C301",name:"探究实验室",type:"实验室",x:470,y:170,w:100,h:90,cap:35},{id:"C302",name:"未来教室",type:"专用教室",x:470,y:280,w:100,h:90,cap:45},{id:"HALL3",name:"三层大厅",type:"大厅",x:230,y:170,w:220,h:100,cap:100}],
+                4: [ {id:"A401",name:"六年级(1)班",type:"教室",x:60,y:50,w:100,h:80,cap:45},{id:"A402",name:"六年级(2)班",type:"教室",x:180,y:50,w:100,h:80,cap:45},{id:"A403",name:"六年级(3)班",type:"教室",x:300,y:50,w:100,h:80,cap:45},{id:"A404",name:"毕业班办公室",type:"办公室",x:420,y:50,w:80,h:80,cap:12},{id:"B401",name:"心理辅导室",type:"专用教室",x:50,y:170,w:100,h:90,cap:30},{id:"B402",name:"多功能厅",type:"活动室",x:50,y:280,w:100,h:90,cap:80},{id:"C401",name:"STEAM教室",type:"实验室",x:470,y:170,w:100,h:90,cap:40},{id:"C402",name:"考试指挥中心",type:"办公室",x:470,y:280,w:100,h:90,cap:20}]
+                }
+            },
+            2: {
+                name: "明德公寓",
+                floors: { 1: [ {id:"101",name:"男生宿舍101",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},{id:"102",name:"男生宿舍102",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},{id:"103",name:"男生宿舍103",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},{id:"104",name:"宿管值班室",type:"办公室",x:350,y:60,w:70,h:70,cap:4},{id:"105",name:"男生宿舍105",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},{id:"106",name:"洗衣房",type:"服务",x:80,y:160,w:70,h:70,cap:10},{id:"107",name:"公共浴室",type:"浴室",x:170,y:160,w:70,h:70,cap:20},{id:"108",name:"活动室",type:"活动室",x:260,y:160,w:160,h:70,cap:50},{id:"CORR_D1",name:"一层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}],
+                    2: [ {id:"201",name:"女生宿舍201",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},{id:"202",name:"女生宿舍202",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},{id:"203",name:"女生宿舍203",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},{id:"204",name:"女生宿舍204",type:"宿舍",x:350,y:60,w:70,h:70,cap:8},{id:"205",name:"女生宿舍205",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},{id:"206",name:"自习室",type:"自习室",x:80,y:160,w:160,h:70,cap:40},{id:"207",name:"心理驿站",type:"活动室",x:260,y:160,w:100,h:70,cap:20},{id:"CORR_D2",name:"二层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}],
+                    3: [ {id:"301",name:"混合宿舍301",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},{id:"302",name:"混合宿舍302",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},{id:"303",name:"混合宿舍303",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},{id:"304",name:"教师宿舍",type:"宿舍",x:350,y:60,w:160,h:70,cap:16},{id:"305",name:"活动室",type:"活动室",x:80,y:160,w:160,h:70,cap:40},{id:"306",name:"阅览室",type:"阅览室",x:260,y:160,w:100,h:70,cap:30},{id:"CORR_D3",name:"三层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}],
+                    4: [ {id:"401",name:"高年级宿舍401",type:"宿舍",x:80,y:60,w:70,h:70,cap:8},{id:"402",name:"高年级宿舍402",type:"宿舍",x:170,y:60,w:70,h:70,cap:8},{id:"403",name:"高年级宿舍403",type:"宿舍",x:260,y:60,w:70,h:70,cap:8},{id:"404",name:"高年级宿舍404",type:"宿舍",x:350,y:60,w:70,h:70,cap:8},{id:"405",name:"高年级宿舍405",type:"宿舍",x:440,y:60,w:70,h:70,cap:8},{id:"406",name:"天台活动区",type:"活动室",x:80,y:160,w:250,h:70,cap:60},{id:"CORR_D4",name:"四层走廊",type:"走廊",x:50,y:30,w:480,h:25,cap:100}]
+                }
+            },
+            5: {
+                name: "博雅图书馆",
+                floors: { 1: [ {id:"R101",name:"低年级阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:60},{id:"R102",name:"绘本馆",type:"阅览室",x:250,y:50,w:150,h:100,cap:50},{id:"R103",name:"报刊阅览室",type:"阅览室",x:420,y:50,w:130,h:100,cap:40},{id:"STACK1",name:"藏书库",type:"书库",x:80,y:180,w:100,h:100,cap:20},{id:"CIRC",name:"借阅台",type:"服务台",x:200,y:180,w:60,h:60,cap:10},{id:"COMP1",name:"电子阅览室",type:"机房",x:280,y:180,w:130,h:100,cap:40},{id:"OFFICE1",name:"馆长室",type:"办公室",x:430,y:180,w:120,h:80,cap:8},{id:"CORR_L1",name:"一层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}],
+                    2: [ {id:"R201",name:"高年级阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:60},{id:"R202",name:"教师阅览室",type:"阅览室",x:250,y:50,w:150,h:100,cap:40},{id:"R203",name:"参考阅览室",type:"阅览室",x:420,y:50,w:130,h:100,cap:35},{id:"STACK2",name:"密集书库",type:"书库",x:80,y:180,w:100,h:100,cap:20},{id:"STUDY",name:"小组研讨室",type:"研讨室",x:200,y:180,w:80,h:80,cap:12},{id:"COMP2",name:"多媒体室",type:"机房",x:300,y:180,w:110,h:100,cap:30},{id:"CORR_L2",name:"二层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}],
+                    3: [ {id:"R301",name:"特藏阅览室",type:"阅览室",x:80,y:50,w:150,h:100,cap:40},{id:"R302",name:"研修室A",type:"研修室",x:250,y:50,w:70,h:100,cap:15},{id:"R303",name:"研修室B",type:"研修室",x:340,y:50,w:70,h:100,cap:15},{id:"R304",name:"学术报告厅",type:"报告厅",x:430,y:50,w:120,h:150,cap:80},{id:"STACK3",name:"古籍书库",type:"书库",x:80,y:180,w:100,h:100,cap:15},{id:"OFFICE2",name:"采编室",type:"办公室",x:200,y:180,w:100,h:80,cap:10},{id:"CORR_L3",name:"三层大厅",type:"大厅",x:70,y:30,w:500,h:20,cap:80}]
+                }
+            }
+        };
+        
+        let heatmapChart = null, heatmapTrendChart = null;
+        let heatmapCurrentZone = 1, heatmapCurrentFloor = 1, heatmapCurrentTime = 14;
+        let heatmapIsPlaying = false, heatmapPlayInterval, heatmapCurrentView = 'heatmap';
+        
+        function getCurrentRooms() { const layout = buildingLayouts[heatmapCurrentZone]; if(!layout || !layout.floors[heatmapCurrentFloor]) return []; return layout.floors[heatmapCurrentFloor]; }
+        
+        // ==================== 核心修复：真实人数模拟 ====================
+        function generateHeatmapData() {
+            const rooms = getCurrentRooms();
+            if(!rooms.length) return [];
+            const data = [];
+            let baseFactor = currentScenario === 'fire' ? 1.3 : currentScenario === 'earthquake' ? 0.6 : currentScenario === 'lockdown' ? 1.15 : 1.0;
+            
+            rooms.forEach(room => {
+                // ===== 1. 根据时间段计算基础占用率 =====
+                let occ = 0.25; // 基础占用率（非上课时段也有少量人）
+                const hour = heatmapCurrentTime;
+                
+                // 上课时段（8:00-12:00, 14:00-17:00）高占用
+                if (hour >= 8 && hour < 12) occ = 0.75;
+                else if (hour >= 14 && hour < 17) occ = 0.70;
+                // 午休时段（12:00-14:00）中等占用
+                else if (hour >= 12 && hour < 14) occ = 0.50;
+                // 晚自习/课后（17:00-19:00）中等偏低
+                else if (hour >= 17 && hour < 19) occ = 0.40;
+                // 早晨（7:00-8:00）逐渐进入
+                else if (hour >= 7 && hour < 8) occ = 0.30;
+                // 晚间（19:00-22:00）少量
+                else if (hour >= 19 && hour < 22) occ = 0.20;
+                // 深夜/凌晨（22:00-7:00）极少
+                else occ = 0.08;
+                
+                // ===== 2. 根据房间类型调整占用率 =====
+                const typeMultiplier = {
+                    '教室': 1.0,
+                    '专用教室': 1.0,
+                    '实验室': 0.95,
+                    '机房': 0.90,
+                    '办公室': 0.70,
+                    '活动室': 0.60,
+                    '大厅': 0.55,
+                    '走廊': 0.30,
+                    '楼梯间': 0.25,
+                    '卫生间': 0.20,
+                    '宿舍': 0.60,
+                    '阅览室': 0.65,
+                    '书库': 0.40,
+                    '报告厅': 0.50,
+                    '研讨室': 0.55,
+                    '服务台': 0.50
+                };
+                const mult = typeMultiplier[room.type] || 0.50;
+                occ = occ * mult;
+                
+                // ===== 3. 应急场景修正 =====
+                occ = Math.min(0.95, Math.max(0.05, occ * baseFactor));
+                
+                // ===== 4. 计算实际人数（与容量成正比） =====
+                let count = Math.floor(room.cap * occ);
+                
+                // ===== 5. 确保每个房间至少有合理人数 =====
+                // 教室：至少10人（让教室看起来有人气）
+                if (room.type === '教室' || room.type === '专用教室' || room.type === '实验室') {
+                    count = Math.max(10, count);
+                }
+                // 办公室：至少3人
+                else if (room.type === '办公室') {
+                    count = Math.max(3, count);
+                }
+                // 大厅：至少8人
+                else if (room.type === '大厅') {
+                    count = Math.max(8, count);
+                }
+                // 其他房间：至少2人
+                else {
+                    count = Math.max(2, count);
+                }
+                
+                // 防止超出容量太多
+                count = Math.min(room.cap, count);
+                
+                // ===== 6. 生成热力点 =====
+                // 安全边界（内边距，让点不紧贴墙壁）
+                const padX = Math.max(4, (room.w || 70) * 0.06);
+                const padY = Math.max(4, (room.h || 70) * 0.06);
+                const minX = room.x + padX;
+                const maxX = room.x + (room.w || 70) - padX;
+                const minY = room.y + padY;
+                const maxY = room.y + (room.h || 70) - padY;
+                
+                // 如果房间太小，在中心生成
+                if (maxX <= minX || maxY <= minY) {
+                    const cx = room.x + (room.w || 70) / 2;
+                    const cy = room.y + (room.h || 70) / 2;
+                    for (let i = 0; i < Math.min(count, 30); i++) {
+                        data.push([cx + (Math.random() - 0.5) * 8, cy + (Math.random() - 0.5) * 8, 35 + occ * 55]);
+                    }
+                    return;
+                }
+                
+                // 生成 points
+                for (let i = 0; i < count; i++) {
+                    let x, y;
+                    if (Math.random() > 0.25) {
+                        // 均匀分布
+                        x = minX + Math.random() * (maxX - minX);
+                        y = minY + Math.random() * (maxY - minY);
+                    } else {
+                        // 倾向中心聚集（模拟自然聚集）
+                        const cx = (minX + maxX) / 2;
+                        const cy = (minY + maxY) / 2;
+                        const rx = (maxX - minX) / 3;
+                        const ry = (maxY - minY) / 3;
+                        x = cx + (Math.random() - 0.5) * rx * 1.8;
+                        y = cy + (Math.random() - 0.5) * ry * 1.8;
+                        x = Math.max(minX, Math.min(maxX, x));
+                        y = Math.max(minY, Math.min(maxY, y));
+                    }
+                    // 强度与占用率相关，加入随机波动让热力更自然
+                    const intensity = 30 + occ * 60 + (Math.random() - 0.5) * 15;
+                    data.push([x, y, Math.max(15, Math.min(100, intensity))]);
+                }
+            });
+            return data;
+        }
+        
+        function initHeatmapChart() { 
+            const dom = document.getElementById('heatmapChart'); 
+            if(!dom) return; 
+            if (heatmapChart) { heatmapChart.dispose(); heatmapChart = null; }
+            heatmapChart = echarts.init(dom); 
+            if (document.getElementById('heatmapTrendChart')) {
+                if (heatmapTrendChart) { heatmapTrendChart.dispose(); heatmapTrendChart = null; }
+                heatmapTrendChart = echarts.init(document.getElementById('heatmapTrendChart')); 
+            }
+            updateHeatmapChart(); 
+            if (heatmapTrendChart) updateHeatmapTrendChart(); 
+            window.addEventListener('resize',()=>{ heatmapChart?.resize(); heatmapTrendChart?.resize(); }); 
+            heatmapChart.on('click',(p)=>{ if(p.data && p.data.length >= 3) showHeatmapRoomDetails(p.data); }); 
+        }
+        
+        function updateHeatmapChart() {
+            if (!heatmapChart) return;
+            const rooms = getCurrentRooms();
+            const data = generateHeatmapData();
+            const zone = zones[heatmapCurrentZone];
+            const building = buildingLayouts[heatmapCurrentZone];
+            
+            const graphicElements = rooms.map(r => ({ 
+                type:'rect', 
+                shape:{ x:r.x, y:r.y, width:r.w||70, height:r.h||70 }, 
+                style:{ 
+                    fill: r.type === '走廊' ? 'rgba(100,116,139,0.08)' : 
+                           r.type === '大厅' ? 'rgba(59,130,246,0.05)' : 
+                           r.type === '楼梯间' ? 'rgba(148,163,184,0.06)' : 'transparent', 
+                    stroke: r.type === '走廊' ? 'rgba(148,163,184,0.2)' : 
+                            r.type === '大厅' ? 'rgba(59,130,246,0.25)' : 
+                            'rgba(148,163,184,0.3)', 
+                    lineWidth: r.type === '大厅' ? 1.5 : 1,
+                    lineDash: r.type === '走廊' ? [3,3] : undefined
+                } 
+            }));
+            
+            rooms.forEach(r => { 
+                let name = r.name.length > 8 ? r.name.slice(0,6)+'..' : r.name; 
+                if (r.type === '走廊' || r.type === '大厅') name = r.name;
+                graphicElements.push({ 
+                    type:'text', 
+                    style:{ 
+                        text: name, 
+                        x: r.x + (r.w||70)/2, 
+                        y: r.y + (r.h||70)/2, 
+                        textAlign:'center', 
+                        textVerticalAlign:'middle', 
+                        fill: r.type === '走廊' ? 'rgba(255,255,255,0.2)' : 
+                              r.type === '大厅' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.45)', 
+                        fontSize: r.type === '走廊' ? 7 : (r.type === '大厅' ? 10 : 9),
+                        fontWeight: r.type === '大厅' ? 'bold' : 'normal'
+                    }, 
+                    silent:true 
+                }); 
+            });
+            
+            graphicElements.push({ 
+                type:'rect', 
+                shape:{ x:15, y:15, width:620, height:420 }, 
+                style:{ fill:'none', stroke:'#f59e0b', lineWidth:1.5, lineDash:[6,4], opacity:0.3 } 
+            });
+            graphicElements.push({ 
+                type:'text', 
+                left:30, 
+                top:5, 
+                style:{ text:`🏫 ${building?.name||zone.name} · ${heatmapCurrentFloor}F 平面图 (点击区域查看详情)`, fill:'#f59e0b', fontSize:11, fontWeight:'bold' } 
+            });
+            
+            const option = { 
+                backgroundColor:'#0f172a', 
+                tooltip:{ 
+                    trigger:'item', 
+                    backgroundColor:'rgba(15,23,42,0.96)', 
+                    borderColor:'#f59e0b', 
+                    formatter:(p)=>p.data && p.data.length >= 3 ? 
+                        `<b>🔥 热力点</b><br/>密度指数: ${Math.round(p.data[2])}<br/>位置: (${Math.round(p.data[0])}, ${Math.round(p.data[1])})` : 
+                        '点击查看区域详情' 
+                }, 
+                xAxis:{ show:false, min:0, max:650 }, 
+                yAxis:{ show:false, min:0, max:450 }, 
+                graphic:graphicElements, 
+                visualMap:{ 
+                    min:15, 
+                    max:100, 
+                    calculable:true, 
+                    orient:'horizontal', 
+                    left:'center', 
+                    bottom:5, 
+                    inRange:{ color:['#3b82f6','#10b981','#facc15','#f97316','#ef4444'] }, 
+                    textStyle:{ color:'#94a3b8', fontSize:10 } 
+                }, 
+                series:[{ 
+                    type: heatmapCurrentView === 'heatmap' ? 'heatmap' : 'scatter', 
+                    data: data, 
+                    blurSize: heatmapCurrentView === 'heatmap' ? 18 : 0, 
+                    pointSize: heatmapCurrentView === 'scatter' ? 8 : 0, 
+                    itemStyle: heatmapCurrentView === 'scatter' ? { 
+                        color: (p) => {
+                            const val = p.data && p.data.length >= 3 ? p.data[2] : 50;
+                            return val > 75 ? '#ef4444' : val > 45 ? '#f59e0b' : '#10b981';
+                        },
+                        opacity: 0.85
+                    } : undefined 
+                }] 
+            };
+            heatmapChart.setOption(option);
+            
+            const total = data.length; 
+            const avgDens = total > 0 ? (total / (620 * 420) * 10000).toFixed(1) : '0.0'; 
+            let maxOcc = 0, hotRoom = '';
+            rooms.forEach(r => { 
+                const cnt = data.filter(d => d[0] >= r.x && d[0] <= r.x + (r.w||70) && d[1] >= r.y && d[1] <= r.y + (r.h||70)).length; 
+                const occ = r.cap > 0 ? cnt / r.cap : 0; 
+                if(occ > maxOcc && r.type !== '走廊' && r.type !== '楼梯间'){ 
+                    maxOcc = occ; 
+                    hotRoom = r.name; 
+                } 
+            });
+            document.getElementById('heatmapFloorTotal').textContent = total;
+            document.getElementById('heatmapHotestArea').textContent = hotRoom || '暂无数据';
+            document.getElementById('heatmapAvgDensity').textContent = `${avgDens} 人/m²`;
+            document.getElementById('heatmapCurrentZoneTitle').innerHTML = `${zone.icon} ${zone.name} · ${building?.name||''} ${heatmapCurrentFloor}F`;
+        }
+        
+        function updateHeatmapTrendChart() { 
+            if (!heatmapTrendChart) return;
+            const hours=['8:00','10:00','12:00','14:00','16:00','18:00','20:00']; 
+            const vals=hours.map(()=>40+Math.random()*80); 
+            heatmapTrendChart.setOption({ 
+                backgroundColor:'transparent', 
+                grid:{left:0,right:0,top:5,bottom:5}, 
+                xAxis:{data:hours,show:false}, 
+                yAxis:{show:false}, 
+                series:[{
+                    data:vals,type:'line',smooth:true,symbol:'none',
+                    lineStyle:{color:'#f59e0b',width:2},
+                    areaStyle:{opacity:0.25,color:'#f59e0b'}
+                }] 
+            }); 
+        }
+        
+        function showHeatmapRoomDetails(point) {
+            if (!point || point.length < 2) return;
+            const rooms = getCurrentRooms(); 
+            const room = rooms.find(r => point[0] >= r.x && point[0] <= r.x + (r.w||70) && point[1] >= r.y && point[1] <= r.y + (r.h||70));
+            if(!room) return; 
+            // 根据点击位置估算当前人数（用实际数据中的点数来估算）
+            const cnt = data.filter(d => d[0] >= room.x && d[0] <= room.x + (room.w||70) && d[1] >= room.y && d[1] <= room.y + (room.h||70)).length;
+            const occ = Math.min(room.cap, Math.max(3, cnt));
+            const pct = Math.round((occ / room.cap) * 100);
+            const status = pct > 75 ? '拥挤' : (pct > 45 ? '适中' : '空闲');
+            const color = pct > 75 ? 'red-500' : (pct > 45 ? 'yellow-500' : 'green-500');
+            document.getElementById('heatmapRoomDetails').innerHTML = `
+                <div class="bg-slate-800/40 rounded-lg p-3 border-l-4 border-${color}">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-white text-sm">${room.name}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-${color}/20 text-${color}">${status}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400">${room.type} · 容量 ${room.cap} 人</div>
+                    <div class="mt-2">
+                        <div class="flex justify-between text-[10px]">
+                            <span>当前估算人数</span>
+                            <span>${occ} / ${room.cap}</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-1.5 mt-1">
+                            <div class="h-1.5 rounded-full bg-${color}" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        // 缓存数据用于详情显示
+        let data = [];
+        
+        function openHeatmapModal() {
+            const modal = document.getElementById('heatmapModal');
+            const content = document.getElementById('heatmapContent');
+            const zone = zones[heatmapCurrentZone];
+            const building = buildingLayouts[heatmapCurrentZone];
+            const maxFloor = zone?.floors || (building?.floors ? Object.keys(building.floors).length : 4);
+            content.innerHTML = `
+                <div style="height:100%; display:flex; flex-direction:column;">
+                    <div class="modal-header-bar"><div class="flex items-center gap-3"><div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center"><i class="fas fa-building text-white"></i></div><div><h1 class="text-lg font-bold text-white">多楼层热力图监控系统 · 真实建筑布局</h1><p class="text-xs text-slate-400">专业平面图 | 实时人流热力分析 | 支持多楼层切换</p></div></div><button id="closeHeatmapModalBtn" class="modal-close-btn">✕</button></div>
+                    <div style="flex:1; display:flex; overflow:hidden;">
+                        <div class="w-56 glass-panel flex flex-col border-r border-slate-700/50" style="background:rgba(30,41,59,0.9);">
+                            <div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-layer-group text-orange-400 mr-1"></i>区域选择</h2>
+                            <div class="space-y-1.5" id="heatmapZoneButtons">${Object.entries(zones).map(([id,val])=>`<button class="zone-heatmap-btn w-full text-left px-3 py-2 rounded-lg text-xs transition-all ${parseInt(id)===heatmapCurrentZone?'bg-orange-500/20 border-orange-500 text-orange-400 border':'border-transparent text-slate-400 hover:bg-slate-700/50'}" data-zone-id="${id}"><div>${val.icon} ${val.name}</div><div class="text-[9px] text-slate-500">${val.buildingName}</div></button>`).join('')}</div></div>
+                            <div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-arrow-up-down text-orange-400 mr-1"></i>楼层选择</h2><div class="grid grid-cols-4 gap-1.5" id="floorTabsContainer">${Array.from({length:maxFloor},(_,i)=>`<button class="floor-tab px-2 py-1.5 rounded-md text-center text-xs bg-slate-800/50 ${i+1===heatmapCurrentFloor?'active':'text-slate-400'}" data-floor="${i+1}">${i+1}F</button>`).join('')}</div></div>
+                            <div class="p-3 flex-1"><h2 class="text-xs font-semibold text-slate-300 mb-2"><i class="fas fa-chart-pie text-orange-400 mr-1"></i>实时统计</h2><div class="space-y-2"><div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">当前楼层人数</div><div class="text-xl font-bold text-white" id="heatmapFloorTotal">0</div></div><div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">最拥挤区域</div><div class="text-xs font-semibold text-red-400" id="heatmapHotestArea">-</div><div class="w-full bg-slate-700 rounded-full h-1 mt-1"><div class="bg-red-500 h-1 rounded-full" id="heatmapHotBar" style="width:0%"></div></div></div><div class="bg-slate-800/40 rounded-lg p-2"><div class="text-[9px] text-slate-400">平均密度</div><div class="text-base font-bold text-orange-400" id="heatmapAvgDensity">0 人/m²</div></div></div></div>
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+                            <div class="h-12 glass-panel border-b border-slate-700/50 flex items-center justify-between px-4"><div class="flex gap-2"><button class="px-3 py-1 rounded-md text-xs font-medium bg-orange-600 text-white" id="heatmapViewHeatmap">热力图</button><button class="px-3 py-1 rounded-md text-xs font-medium text-slate-400" id="heatmapViewScatter">散点图</button></div><div><span id="heatmapCurrentZoneTitle" class="text-xs text-orange-400 font-semibold">${zone.icon} ${zone.name} · ${building?.name||''} 1F</span></div><div class="flex gap-2"><button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapZoomIn"><i class="fas fa-plus text-xs"></i></button><button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapZoomOut"><i class="fas fa-minus text-xs"></i></button><button class="w-7 h-7 rounded-lg bg-slate-800" id="heatmapResetView"><i class="fas fa-expand text-xs"></i></button></div></div>
+                            <div class="flex-1 relative p-3 grid-bg"><div class="w-full h-full" id="heatmapChart"></div><div class="absolute bottom-3 right-3 glass-panel rounded-lg p-1.5"><div class="flex items-center gap-1"><div class="w-16 h-1.5 legend-gradient rounded"></div><span class="text-[8px] text-slate-400 ml-1">低 → 高</span></div></div></div>
+                            <div class="h-20 glass-panel border-t border-slate-700/50 px-4 py-2"><div class="flex justify-between mb-1"><span class="text-[9px] text-slate-400">时间轴</span><div class="flex gap-1"><button id="heatmapPrevTime" class="w-6 h-6 rounded bg-slate-700 text-xs"><i class="fas fa-chevron-left"></i></button><button id="heatmapPlayBtn" class="w-6 h-6 rounded bg-orange-600 text-xs"><i class="fas fa-play"></i></button><button id="heatmapNextTime" class="w-6 h-6 rounded bg-slate-700 text-xs"><i class="fas fa-chevron-right"></i></button></div></div><input type="range" min="0" max="23" value="14" class="slider-track w-full" id="heatmapTimeSlider"><div class="flex justify-between mt-1 text-[8px] text-slate-500"><span>8:00</span><span>10:00</span><span>12:00</span><span class="text-orange-400">14:00</span><span>16:00</span><span>18:00</span><span>20:00</span></div></div>
+                        </div>
+                        <div class="w-64 glass-panel border-l border-slate-700/50 flex flex-col"><div class="p-2 border-b"><h2 class="text-xs font-semibold text-slate-300">区域详情</h2><p class="text-[9px] text-slate-500">点击热力区域查看</p></div><div class="flex-1 overflow-y-auto p-2 space-y-2" id="heatmapRoomDetails"><div class="text-center text-slate-500 py-6 text-xs"><i class="fas fa-mouse-pointer text-xl mb-1"></i><p>点击地图查看</p></div></div><div class="p-2 border-t"><h3 class="text-[10px] font-semibold text-slate-400 mb-1">今日趋势</h3><div id="heatmapTrendChart" style="height:80px;"></div></div></div>
+                    </div>
+                </div>`;
+            modal.classList.add('active');
+            setTimeout(() => { initHeatmapChart(); bindHeatmapEvents(); }, 150);
+        }
+        
+        function bindHeatmapEvents() {
+            document.querySelectorAll('.zone-heatmap-btn').forEach(btn => { btn.onclick = () => { const z=parseInt(btn.dataset.zoneId); heatmapCurrentZone=z; heatmapCurrentFloor=1; const zone=zones[z]; const building=buildingLayouts[z]; const maxFloor=zone?.floors||(building?.floors?Object.keys(building.floors).length:4); document.querySelectorAll('.zone-heatmap-btn').forEach(b=>b.classList.remove('bg-orange-500/20','border-orange-500','text-orange-400')); btn.classList.add('bg-orange-500/20','border-orange-500','text-orange-400'); const floorContainer=document.getElementById('floorTabsContainer'); if(floorContainer){ floorContainer.innerHTML=Array.from({length:maxFloor},(_,i)=>`<button class="floor-tab px-2 py-1.5 rounded-md text-center text-xs bg-slate-800/50 ${i+1===heatmapCurrentFloor?'active':'text-slate-400'}" data-floor="${i+1}">${i+1}F</button>`).join(''); document.querySelectorAll('.floor-tab').forEach(t=>{ t.onclick=()=>{ heatmapCurrentFloor=parseInt(t.dataset.floor); document.querySelectorAll('.floor-tab').forEach(ft=>ft.classList.remove('active')); t.classList.add('active'); updateHeatmapChart(); showToast('楼层切换',`切换到 ${heatmapCurrentFloor}F`); }; }); } updateHeatmapChart(); showToast('区域联动',`切换到 ${zones[z].name}`); }; });
+            document.getElementById('heatmapViewHeatmap').onclick = () => { heatmapCurrentView='heatmap'; updateHeatmapChart(); };
+            document.getElementById('heatmapViewScatter').onclick = () => { heatmapCurrentView='scatter'; updateHeatmapChart(); };
+            document.getElementById('heatmapTimeSlider').oninput = (e) => { heatmapCurrentTime = parseInt(e.target.value); updateHeatmapChart(); };
+            document.getElementById('heatmapPrevTime').onclick = () => { heatmapCurrentTime = Math.max(0, heatmapCurrentTime-1); document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); };
+            document.getElementById('heatmapNextTime').onclick = () => { heatmapCurrentTime = Math.min(23, heatmapCurrentTime+1); document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); };
+            document.getElementById('heatmapPlayBtn').onclick = () => { heatmapIsPlaying = !heatmapIsPlaying; if(heatmapIsPlaying) heatmapPlayInterval = setInterval(() => { heatmapCurrentTime = (heatmapCurrentTime + 1) % 24; document.getElementById('heatmapTimeSlider').value = heatmapCurrentTime; updateHeatmapChart(); }, 800); else clearInterval(heatmapPlayInterval); document.getElementById('heatmapPlayBtn').innerHTML = heatmapIsPlaying ? '<i class="fas fa-pause text-xs"></i>' : '<i class="fas fa-play text-xs"></i>'; };
+            document.getElementById('heatmapZoomIn').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom', start: 15, end: 85 });
+            document.getElementById('heatmapZoomOut').onclick = () => heatmapChart?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
+            document.getElementById('heatmapResetView').onclick = () => heatmapChart?.dispatchAction({ type: 'restore' });
+            document.getElementById('closeHeatmapModalBtn').onclick = () => { document.getElementById('heatmapModal').classList.remove('active'); if(heatmapPlayInterval) clearInterval(heatmapPlayInterval); };
+            document.getElementById('heatmapModal').onclick = (e) => { if(e.target === document.getElementById('heatmapModal')) { document.getElementById('heatmapModal').classList.remove('active'); if(heatmapPlayInterval) clearInterval(heatmapPlayInterval); } };
+            document.querySelectorAll('.floor-tab').forEach(t=>{ t.onclick=()=>{ heatmapCurrentFloor=parseInt(t.dataset.floor); document.querySelectorAll('.floor-tab').forEach(ft=>ft.classList.remove('active')); t.classList.add('active'); updateHeatmapChart(); showToast('楼层切换',`切换到 ${heatmapCurrentFloor}F`); }; });
+        }
+        
+        buildSidebar(); renderMonitorGrid(); renderAlerts(); renderTeam(); setScenario('normal');
+        document.getElementById('openHeatmapBtn').addEventListener('click', openHeatmapModal);
+        document.getElementById('emergencyBtn').addEventListener('click', triggerEmergency);
+    </script>
 </body>
 </html>

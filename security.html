@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>安保端 · 智慧安保指挥中心</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
@@ -12,53 +12,248 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js">
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+        /* 样式保持不变 */
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
-        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background: #0a0f1a; color: #e2e8f0; overflow: hidden; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
-        .glass-card { background: rgba(20, 30, 55, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(0, 212, 255, 0.15); transition: all 0.3s ease; }
-        .monitor-card { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1); cursor: pointer; }
-        .monitor-card:hover { transform: translateY(-6px) scale(1.02); border-color: #3b82f6; box-shadow: 0 20px 35px -12px rgba(59, 130, 246, 0.4); }
-        .zone-item.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(0, 212, 255, 0.1)); border-left: 3px solid #3b82f6; }
-        .scenario-btn.active-scenario { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(0, 212, 255, 0.15)); border-color: #3b82f6; color: #60a5fa; }
-        .scenario-btn.fire-active { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); border-color: #ef4444; color: #f87171; }
-        .scenario-btn.earthquake-active { background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(202, 138, 4, 0.1)); border-color: #eab308; color: #fbbf24; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; transition: all 0.3s ease; }
-        .status-critical { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1s infinite; }
-        .status-warning { background: #eab308; box-shadow: 0 0 8px #eab308; animation: pulse 1.2s infinite; }
-        .status-normal { background: #10b981; box-shadow: 0 0 6px #10b981; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        .emergency-btn { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: linear-gradient(135deg, #ef4444, #dc2626); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; color: white; font-size: 28px; cursor: pointer; box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); transition: all 0.3s; z-index: 100; }
-        .emergency-btn:hover { transform: scale(1.1); }
-        .toast { position: fixed; top: 100px; right: 30px; background: rgba(15, 25, 45, 0.98); backdrop-filter: blur(12px); border-left: 4px solid #3b82f6; border-radius: 12px; padding: 14px 20px; min-width: 300px; transform: translateX(420px); transition: transform 0.4s ease; z-index: 200; }
-        .toast.show { transform: translateX(0); }
-        .heatmap-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0f1a; z-index: 1000; display: none; flex-direction: column; animation: fadeInModal 0.3s ease; }
-        .heatmap-modal.active { display: flex; }
-        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
-        .modal-header-bar { background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(148, 163, 184, 0.2); padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .modal-close-btn { width: 32px; height: 32px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 50%; color: #ef4444; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
-        .modal-close-btn:hover { background: #ef4444; color: white; transform: rotate(90deg); }
-        .heatmap-launch-btn { background: linear-gradient(135deg, #f59e0b, #ea580c); border: none; transition: all 0.3s; }
-        .heatmap-launch-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); }
-        .slider-track { -webkit-appearance: none; appearance: none; height: 3px; background: #334155; border-radius: 2px; outline: none; }
-        .slider-track::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #f59e0b; border-radius: 50%; cursor: pointer; border: 2px solid #1e293b; }
-        .legend-gradient { background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444); }
-        .floor-tab { transition: all 0.2s; cursor: pointer; }
-        .floor-tab.active { background: #f59e0b; color: #0f172a; font-weight: 600; }
-        .floor-tab:hover:not(.active) { background: rgba(245, 158, 11, 0.3); }
-        .monitor-card video { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; background: #0a0f1a; }
-        .monitor-card video:hover { opacity: 0.95; }
-
-        .scene-fire .glass-card { border-color: rgba(239, 68, 68, 0.25); }
-        .scene-fire .monitor-card { border-color: rgba(239, 68, 68, 0.15); }
-        .scene-earthquake .glass-card { border-color: rgba(234, 179, 8, 0.2); }
-        .scene-earthquake .monitor-card { border-color: rgba(234, 179, 8, 0.12); }
-
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #0a0f1a;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card {
+            background: rgba(20, 30, 55, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        .monitor-card {
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+        }
+        .monitor-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 35px -12px rgba(59, 130, 246, 0.4);
+        }
+        .zone-item.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(0, 212, 255, 0.1));
+            border-left: 3px solid #3b82f6;
+        }
+        .scenario-btn.active-scenario {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(0, 212, 255, 0.15));
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+        .scenario-btn.fire-active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1));
+            border-color: #ef4444;
+            color: #f87171;
+        }
+        .scenario-btn.earthquake-active {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(202, 138, 4, 0.1));
+            border-color: #eab308;
+            color: #fbbf24;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .status-critical {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: pulse 1s infinite;
+        }
+        .status-warning {
+            background: #eab308;
+            box-shadow: 0 0 8px #eab308;
+            animation: pulse 1.2s infinite;
+        }
+        .status-normal {
+            background: #10b981;
+            box-shadow: 0 0 6px #10b981;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        .emergency-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .emergency-btn:hover {
+            transform: scale(1.1);
+        }
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: rgba(15, 25, 45, 0.98);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid #3b82f6;
+            border-radius: 12px;
+            padding: 14px 20px;
+            min-width: 300px;
+            transform: translateX(420px);
+            transition: transform 0.4s ease;
+            z-index: 200;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .heatmap-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0f1a;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            animation: fadeInModal 0.3s ease;
+        }
+        .heatmap-modal.active {
+            display: flex;
+        }
+        @keyframes fadeInModal {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-header-bar {
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .modal-close-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 50%;
+            color: #ef4444;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: rotate(90deg);
+        }
+        .heatmap-launch-btn {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            border: none;
+            transition: all 0.3s;
+        }
+        .heatmap-launch-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+        }
+        .slider-track {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 3px;
+            background: #334155;
+            border-radius: 2px;
+            outline: none;
+        }
+        .slider-track::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #f59e0b;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #1e293b;
+        }
+        .legend-gradient {
+            background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444);
+        }
+        .floor-tab {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .floor-tab.active {
+            background: #f59e0b;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .floor-tab:hover:not(.active) {
+            background: rgba(245, 158, 11, 0.3);
+        }
+        .monitor-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            background: #0a0f1a;
+        }
+        .monitor-card video:hover {
+            opacity: 0.95;
+        }
+        .scene-fire .glass-card {
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+        .scene-fire .monitor-card {
+            border-color: rgba(239, 68, 68, 0.15);
+        }
+        .scene-earthquake .glass-card {
+            border-color: rgba(234, 179, 8, 0.2);
+        }
+        .scene-earthquake .monitor-card {
+            border-color: rgba(234, 179, 8, 0.12);
+        }
         .heatmap-chart-wrapper {
             flex: 1;
             width: 100%;
@@ -74,67 +269,164 @@
         .heatmap-sidebar {
             width: 170px;
             flex-shrink: 0;
-            background: rgba(30,41,59,0.9);
+            background: rgba(30, 41, 59, 0.9);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        .heatmap-sidebar .section { padding: 6px 10px; border-bottom: 1px solid rgba(71,85,105,0.25); }
-        .heatmap-sidebar .section:last-child { border-bottom: none; flex: 1; }
-        .heatmap-sidebar .section-title { font-size: 9px; font-weight: 600; color: #94a3b8; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .heatmap-sidebar .section {
+            padding: 6px 10px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.25);
+        }
+        .heatmap-sidebar .section:last-child {
+            border-bottom: none;
+            flex: 1;
+        }
+        .heatmap-sidebar .section-title {
+            font-size: 9px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
         .heatmap-sidebar .zone-btn-sm {
-            display: block; width: 100%; text-align: left; padding: 3px 6px; border-radius: 4px;
-            font-size: 10px; color: #94a3b8; transition: all 0.2s; cursor: pointer;
-            border: 1px solid transparent; margin-bottom: 1px;
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #94a3b8;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: 1px;
         }
-        .heatmap-sidebar .zone-btn-sm:hover { background: rgba(255,255,255,0.04); }
-        .heatmap-sidebar .zone-btn-sm.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #fbbf24; }
-        .heatmap-sidebar .floor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+        .heatmap-sidebar .zone-btn-sm:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .heatmap-sidebar .zone-btn-sm.active {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }
+        .heatmap-sidebar .floor-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+        }
         .heatmap-sidebar .floor-grid .floor-btn {
-            padding: 2px 0; border-radius: 3px; text-align: center; font-size: 10px;
-            background: rgba(30,41,59,0.5); color: #94a3b8; cursor: pointer;
-            transition: all 0.2s; border: 1px solid transparent;
+            padding: 2px 0;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 10px;
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
-        .heatmap-sidebar .floor-grid .floor-btn:hover { background: rgba(245,158,11,0.2); }
-        .heatmap-sidebar .floor-grid .floor-btn.active { background: #f59e0b; color: #0f172a; font-weight: 600; border-color: #f59e0b; }
+        .heatmap-sidebar .floor-grid .floor-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        .heatmap-sidebar .floor-grid .floor-btn.active {
+            background: #f59e0b;
+            color: #0f172a;
+            font-weight: 600;
+            border-color: #f59e0b;
+        }
         .heatmap-sidebar .stat-item-sm {
-            display: flex; justify-content: space-between; padding: 1px 0; font-size: 10px; color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            padding: 1px 0;
+            font-size: 10px;
+            color: #94a3b8;
         }
-        .heatmap-sidebar .stat-item-sm .num { color: #f0f9ff; font-weight: 600; }
-        .heatmap-sidebar .stat-item-sm .num.red { color: #f87171; }
-        .heatmap-sidebar .stat-item-sm .num.orange { color: #fbbf24; }
-        .heatmap-sidebar .stat-bar { width: 100%; height: 3px; background: #1e293b; border-radius: 2px; overflow: hidden; margin-top: 1px; }
-        .heatmap-sidebar .stat-bar .fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-        .heatmap-sidebar .stat-bar .fill.red { background: #ef4444; }
-        .heatmap-sidebar .stat-bar .fill.orange { background: #f59e0b; }
-
+        .heatmap-sidebar .stat-item-sm .num {
+            color: #f0f9ff;
+            font-weight: 600;
+        }
+        .heatmap-sidebar .stat-item-sm .num.red {
+            color: #f87171;
+        }
+        .heatmap-sidebar .stat-item-sm .num.orange {
+            color: #fbbf24;
+        }
+        .heatmap-sidebar .stat-bar {
+            width: 100%;
+            height: 3px;
+            background: #1e293b;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1px;
+        }
+        .heatmap-sidebar .stat-bar .fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        .heatmap-sidebar .stat-bar .fill.red {
+            background: #ef4444;
+        }
+        .heatmap-sidebar .stat-bar .fill.orange {
+            background: #f59e0b;
+        }
         .report-area {
             max-height: 200px;
             overflow-y: auto;
         }
-        .report-area::-webkit-scrollbar { width: 3px; }
-        .report-area::-webkit-scrollbar-track { background: transparent; }
-        .report-area::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+        .report-area::-webkit-scrollbar {
+            width: 3px;
+        }
+        .report-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .report-area::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 3px;
+        }
         .report-item {
             padding: 6px 10px;
             border-radius: 6px;
-            background: rgba(30,41,59,0.4);
+            background: rgba(30, 41, 59, 0.4);
             border-left: 3px solid #3b82f6;
             margin-bottom: 4px;
             font-size: 11px;
         }
-        .report-item .r-time { color: #64748b; font-size: 9px; }
-        .report-item .r-type { font-weight: 600; }
-        .report-item .r-type.urgent { color: #ef4444; }
-        .report-item .r-type.warning { color: #f59e0b; }
-        .report-item .r-type.info { color: #3b82f6; }
-        .report-item .r-content { color: #cbd5e1; margin: 2px 0; }
-        .report-item .r-status { font-size: 9px; padding: 1px 8px; border-radius: 10px; background: rgba(34,197,94,0.1); color: #4ade80; }
-        .report-item .r-status.pending { background: rgba(245,158,11,0.1); color: #fbbf24; }
-
+        .report-item .r-time {
+            color: #64748b;
+            font-size: 9px;
+        }
+        .report-item .r-type {
+            font-weight: 600;
+        }
+        .report-item .r-type.urgent {
+            color: #ef4444;
+        }
+        .report-item .r-type.warning {
+            color: #f59e0b;
+        }
+        .report-item .r-type.info {
+            color: #3b82f6;
+        }
+        .report-item .r-content {
+            color: #cbd5e1;
+            margin: 2px 0;
+        }
+        .report-item .r-status {
+            font-size: 9px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+        }
+        .report-item .r-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+        }
         .btn-logout {
-            background: rgba(239,68,68,0.12);
-            border: 1px solid rgba(239,68,68,0.2);
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.2);
             color: #f87171;
             padding: 5px 16px;
             border-radius: 8px;
@@ -143,12 +435,13 @@
             transition: all 0.3s ease;
         }
         .btn-logout:hover {
-            background: rgba(239,68,68,0.2);
-            border-color: rgba(239,68,68,0.4);
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
             transform: scale(1.02);
         }
-        .btn-logout i { margin-right: 6px; }
-
+        .btn-logout i {
+            margin-right: 6px;
+        }
         .btn-report {
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             border: none;
@@ -160,12 +453,18 @@
             cursor: pointer;
             transition: all 0.25s ease;
         }
-        .btn-report:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
-        .btn-report:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
+        .btn-report:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+        .btn-report:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
         select.report-select {
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(71,85,105,0.3);
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(71, 85, 105, 0.3);
             color: #e2e8f0;
             border-radius: 6px;
             padding: 6px 10px;
@@ -173,12 +472,15 @@
             outline: none;
             width: 100%;
         }
-        select.report-select:focus { border-color: #3b82f6; }
-        select.report-select option { background: #1e293b; }
-
+        select.report-select:focus {
+            border-color: #3b82f6;
+        }
+        select.report-select option {
+            background: #1e293b;
+        }
         textarea.report-textarea {
-            background: rgba(15,23,42,0.5);
-            border: 1px solid rgba(71,85,105,0.2);
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(71, 85, 105, 0.2);
             border-radius: 6px;
             color: #e2e8f0;
             padding: 10px 12px;
@@ -189,17 +491,20 @@
             transition: border 0.2s;
             line-height: 1.6;
         }
-        textarea.report-textarea:focus { border-color: #3b82f6; }
-        textarea.report-textarea::placeholder { color: #475569; }
-
+        textarea.report-textarea:focus {
+            border-color: #3b82f6;
+        }
+        textarea.report-textarea::placeholder {
+            color: #475569;
+        }
         .report-hint {
             font-size: 13px;
             color: #94a3b8;
             margin-bottom: 4px;
         }
         .report-location-input {
-            background: rgba(15,23,42,0.6);
-            border: 1px solid rgba(71,85,105,0.2);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.2);
             border-radius: 6px;
             color: #e2e8f0;
             padding: 6px 10px;
@@ -214,7 +519,6 @@
         #reportCharCount {
             font-size: 13px;
         }
-
         .map3d-launch-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             border: none;
@@ -234,8 +538,9 @@
             transform: scale(1.05);
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
         }
-        .map3d-launch-btn i { font-size: 14px; }
-
+        .map3d-launch-btn i {
+            font-size: 14px;
+        }
         #three-container {
             width: 100%;
             height: 100%;
@@ -245,26 +550,29 @@
             background: radial-gradient(ellipse at center, #0f1a2e, #05080f);
             min-height: 200px;
         }
-        #three-container:active { cursor: grabbing; }
-
+        #three-container:active {
+            cursor: grabbing;
+        }
         .three-overlay {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 11px;
             color: #94a3b8;
             pointer-events: none;
             white-space: nowrap;
             z-index: 5;
         }
-        .three-overlay i { margin-right: 6px; color: #f59e0b; }
-
+        .three-overlay i {
+            margin-right: 6px;
+            color: #f59e0b;
+        }
         .building-popup {
             position: absolute;
             background: rgba(8, 14, 26, 0.96);
@@ -276,7 +584,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             z-index: 10;
         }
         .building-popup.show {
@@ -294,11 +602,13 @@
             margin-top: 4px;
             line-height: 1.5;
         }
-        .building-popup .b-info span { color: #60a5fa; }
+        .building-popup .b-info span {
+            color: #60a5fa;
+        }
         .building-popup .b-status {
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
             font-size: 11px;
             display: flex;
             align-items: center;
@@ -310,11 +620,19 @@
             border-radius: 50%;
             display: inline-block;
         }
-        .building-popup .b-status .dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
-        .building-popup .b-status .dot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: pulse 1.2s infinite; }
-        .building-popup .b-status .dot.yellow { background: #eab308; box-shadow: 0 0 8px #eab308; }
-
-        /* 3D模态框内容布局 */
+        .building-popup .b-status .dot.green {
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+        }
+        .building-popup .b-status .dot.red {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: pulse 1.2s infinite;
+        }
+        .building-popup .b-status .dot.yellow {
+            background: #eab308;
+            box-shadow: 0 0 8px #eab308;
+        }
         #map3dContent {
             flex: 1;
             display: flex;
@@ -339,8 +657,6 @@
             position: relative;
             background: #05080f;
         }
-
-        /* ===== 事故弹窗样式 ===== */
         .incident-modal {
             position: fixed;
             top: 0;
@@ -359,8 +675,14 @@
             display: flex;
         }
         @keyframes fadeInIncident {
-            from { opacity: 0; transform: scale(0.92); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         .incident-modal-box {
             max-width: 520px;
@@ -385,8 +707,13 @@
             animation: shimmer 2s ease-in-out infinite;
         }
         @keyframes shimmer {
-            0%, 100% { background-position: -200% 0; }
-            50% { background-position: 200% 0; }
+            0%,
+            100% {
+                background-position: -200% 0;
+            }
+            50% {
+                background-position: 200% 0;
+            }
         }
         .incident-icon {
             width: 72px;
@@ -402,8 +729,13 @@
             animation: pulseRing 2s ease-in-out infinite;
         }
         @keyframes pulseRing {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
-            50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
         }
         .incident-title {
             font-size: 24px;
@@ -504,10 +836,326 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        /* ========== 上报区域样式 ========== */
+        .report-card {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: 1px solid rgba(71, 85, 105, 0.12);
+            transition: border-color 0.3s;
+        }
+        .report-card:focus-within {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .urgency-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .urgency-tag.critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+        .urgency-tag.critical:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+        .urgency-tag.high {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+        .urgency-tag.high:hover {
+            background: rgba(245, 158, 11, 0.25);
+        }
+        .urgency-tag.normal {
+            background: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        .urgency-tag.normal:hover {
+            background: rgba(59, 130, 246, 0.22);
+        }
+        .urgency-tag.location {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        .urgency-tag.location:hover {
+            background: rgba(16, 185, 129, 0.22);
+        }
+        .urgency-tag.active-tag {
+            transform: scale(1.04);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.04);
+        }
+        .quick-btn {
+            padding: 3px 12px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            border: 1px solid rgba(71, 85, 105, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .quick-btn:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #e2e8f0;
+            border-color: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+        }
+        .quick-btn.fire {
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        .quick-btn.fire:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        .quick-btn.security {
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .quick-btn.security:hover {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+        .quick-btn.injury {
+            border-color: rgba(236, 72, 153, 0.2);
+        }
+        .quick-btn.injury:hover {
+            background: rgba(236, 72, 153, 0.15);
+            border-color: rgba(236, 72, 153, 0.3);
+            color: #f472b6;
+        }
+        .quick-btn.fault {
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .quick-btn.fault:hover {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+        .report-status-badge {
+            font-size: 9px;
+            padding: 1px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .report-status-badge.sent {
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+        }
+        .report-status-badge.pending {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
+            animation: pulse 1.8s infinite;
+        }
+        .report-status-badge.done {
+            background: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+        }
+        .report-item-new {
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.3);
+            border-left: 3px solid #3b82f6;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+        }
+        .report-item-new:hover {
+            background: rgba(30, 41, 59, 0.5);
+        }
+        .report-item-new .r-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .report-item-new .r-type-icon {
+            font-size: 13px;
+        }
+        .report-item-new .r-type-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .report-item-new .r-preview {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 1px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .report-item-new .r-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3px;
+        }
+        .report-item-new .r-time {
+            font-size: 9px;
+            color: #475569;
+        }
+        .report-char-counter {
+            font-size: 12px;
+            color: #475569;
+            transition: color 0.3s;
+        }
+        .report-char-counter.warn {
+            color: #fbbf24;
+        }
+        .report-char-counter.danger {
+            color: #f87171;
+        }
+        .report-submit-loading .btn-report {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .report-submit-loading .btn-report i {
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .report-empty-state {
+            text-align: center;
+            padding: 14px 0;
+            color: #475569;
+            font-size: 11px;
+        }
+        .report-empty-state i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.3;
+        }
+        .quick-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(71, 85, 105, 0.1);
+        }
+        .quick-bar-label {
+            font-size: 10px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 2px;
+        }
+        .quick-bar-label i {
+            font-size: 10px;
+        }
+        .report-form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .report-form-row .report-select-wrap {
+            flex: 1;
+            position: relative;
+        }
+        .report-form-row .report-select-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #475569;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .report-form-row .report-select {
+            padding-left: 32px;
+            height: 34px;
+            font-size: 13px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.15);
+            border-radius: 6px;
+            color: #e2e8f0;
+            width: 100%;
+            outline: none;
+            transition: border 0.2s;
+            appearance: none;
+            cursor: pointer;
+        }
+        .report-form-row .report-select:focus {
+            border-color: #3b82f6;
+        }
+        .report-form-row .report-select option {
+            background: #1e293b;
+        }
+        /* 移除位置选择器相关样式，保留以备万一 */
+        .report-location-wrap {
+            display: none;
+        }
+        .report-textarea-wrap {
+            position: relative;
+        }
+        .report-textarea-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 12px;
+            color: #475569;
+            font-size: 13px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .report-textarea-wrap .report-textarea {
+            padding-left: 32px;
+            min-height: 60px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .report-textarea-wrap .report-textarea:focus {
+            border-color: #3b82f6;
+        }
+        .report-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin: 2px 0 4px 0;
+            padding-left: 4px;
+        }
+        .report-hint i {
+            margin-right: 4px;
+            opacity: 0.6;
+        }
+        /* 适配移动端 */
+        @media (max-width: 768px) {
+            .report-form-row {
+                flex-wrap: wrap;
+            }
+            .report-form-row .report-select-wrap {
+                flex: 1 1 100%;
+            }
+            .report-form-row .report-select-wrap[style*="flex:0 0 110px"] {
+                flex: 1 1 100% !important;
+            }
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col">
 
+    <!-- ===== HEADER ===== -->
     <header class="glass-panel h-14 flex items-center justify-between px-6 z-20 flex-shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-shield-alt text-white text-sm"></i></div>
@@ -523,76 +1171,193 @@
         </div>
     </header>
 
+    <!-- ===== MAIN ===== -->
     <div class="flex-1 flex overflow-hidden p-4 gap-4" id="appContainer">
+        <!-- 左侧 -->
         <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0">
             <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-cyan-400"></i> 监控区域</h2><div class="space-y-1.5" id="zoneMenu"></div></div>
             <div class="p-4 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-orange-400"></i> 应急场景模拟</h2><div class="space-y-1.5" id="scenarioMenu"></div></div>
             <div class="p-4 flex-1"><h2 class="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2"><i class="fas fa-chart-line text-cyan-400"></i> 实时统计</h2><div class="space-y-3"><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">👥 当前区域人数</div><div class="text-2xl font-bold text-white" id="zoneTotal">0</div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">⚠️ 最高风险区域</div><div class="text-sm font-semibold text-red-400" id="hotArea">-</div><div class="w-full bg-slate-700 rounded-full h-1.5 mt-2"><div class="bg-red-500 h-1.5 rounded-full" id="hotBar" style="width:0%"></div></div></div><div class="bg-slate-800/40 rounded-xl p-3"><div class="text-[10px] text-slate-400">📊 平均人群密度</div><div class="text-lg font-bold text-cyan-400" id="avgDensity">0 人/m²</div></div></div></div>
         </aside>
 
+        <!-- 中间监控 -->
         <main class="flex-1 flex flex-col gap-4 min-w-0">
             <div class="glass-card rounded-xl px-4 py-3 flex items-center justify-between flex-shrink-0" id="zoneHeader"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center"><i class="fas fa-video text-cyan-400 text-sm"></i></div><div><div class="text-sm font-semibold text-white" id="zoneName">教学楼区</div><div class="text-[10px] text-slate-400" id="zoneDesc">24路摄像头 · 实时监控</div></div></div><div class="flex items-center gap-4 text-xs"><div><span class="text-slate-400">在线率</span> <span class="text-green-400 font-mono" id="onlineRate">100%</span></div><div><span class="text-slate-400">今日预警</span> <span class="text-orange-400 font-mono" id="todayAlerts">3</span></div></div></div>
             <div class="grid grid-cols-3 gap-3 flex-1 min-h-0" id="monitorGrid"></div>
         </main>
 
+        <!-- 右侧 -->
         <aside class="w-64 glass-panel rounded-2xl flex flex-col overflow-hidden flex-shrink-0">
-            <div class="p-3 border-b border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-bell text-red-400"></i> 实时预警<span class="ml-auto text-[10px] text-red-400 animate-pulse">● LIVE</span></h2></div>
+            <!-- 实时预警 -->
             <div class="flex-1 overflow-y-auto p-3 space-y-2 max-h-[200px]" id="alertList"></div>
 
-            <!-- ===== 消息上报区域 ===== -->
+            <!-- ===== 消息上报 ===== -->
             <div class="p-3 border-b border-slate-700/50" style="border-top: 1px solid rgba(71,85,105,0.25);">
-                <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2 mb-2">
-                    <i class="fas fa-paper-plane text-blue-400"></i> 消息上报
-                    <span class="ml-auto text-xs text-slate-500">→ 校领导端</span>
-                </h2>
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <select id="reportType" class="report-select flex-1">
-                            <option value="异常事件">⚠️ 异常事件</option>
-                            <option value="设备故障">🔧 设备故障</option>
-                            <option value="人员受伤">🏥 人员受伤</option>
-                            <option value="火灾隐患">🔥 火灾隐患</option>
-                            <option value="治安事件">🚔 治安事件</option>
-                            <option value="其他">📋 其他</option>
-                        </select>
-                        <select id="reportUrgency" class="report-select w-28">
-                            <option value="普通">普通</option>
-                            <option value="紧急">紧急</option>
-                            <option value="特别紧急">特别紧急</option>
-                        </select>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                        <i class="fas fa-paper-plane text-blue-400"></i> 消息上报
+                        <span class="text-[9px] text-slate-500 font-normal ml-1">→ 校领导端</span>
+                    </h2>
+                </div>
+
+                <div class="report-card">
+                    <!-- 第一行：类型 + 位置（原紧急程度） -->
+                    <div class="report-form-row">
+                        <div class="report-select-wrap flex-1">
+                            <i class="fas fa-tag"></i>
+                            <select id="reportType" class="report-select">
+                                <option value="异常事件">⚠️ 异常事件</option>
+                                <option value="设备故障">🔧 设备故障</option>
+                                <option value="人员受伤">🏥 人员受伤</option>
+                                <option value="火灾隐患">🔥 火灾隐患</option>
+                                <option value="治安事件">🚔 治安事件</option>
+                                <option value="水电故障">💧 水电故障</option>
+                                <option value="网络故障">📡 网络故障</option>
+                                <option value="电梯困人">🛗 电梯困人</option>
+                                <option value="车辆违停">🚗 车辆违停</option>
+                                <option value="物品丢失">🔍 物品丢失</option>
+                                <option value="噪音扰民">📢 噪音扰民</option>
+                                <option value="设施损坏">🔨 设施损坏</option>
+                                <option value="其他">📋 其他</option>
+                            </select>
+                        </div>
+                        <!-- ★★★ 将“紧急程度”替换为“位置”下拉菜单 ★★★ -->
+                        <div class="report-select-wrap" style="flex:0 0 150px;">
+                            <i class="fas fa-location-dot"></i>
+                            <select id="reportUrgency" class="report-select" style="padding-left:28px;">
+                                <option value="">📍 选择位置</option>
+                                <optgroup label="🏫 教学楼">
+                                    <option value="教学楼一楼北">教学楼一楼北</option>
+                                    <option value="教学楼一楼南">教学楼一楼南</option>
+                                    <option value="教学楼一楼东">教学楼一楼东</option>
+                                    <option value="教学楼一楼西">教学楼一楼西</option>
+                                    <option value="教学楼二楼北">教学楼二楼北</option>
+                                    <option value="教学楼二楼南">教学楼二楼南</option>
+                                    <option value="教学楼二楼东">教学楼二楼东</option>
+                                    <option value="教学楼二楼西">教学楼二楼西</option>
+                                    <option value="教学楼三楼北">教学楼三楼北</option>
+                                    <option value="教学楼三楼南">教学楼三楼南</option>
+                                    <option value="教学楼三楼东">教学楼三楼东</option>
+                                    <option value="教学楼三楼西">教学楼三楼西</option>
+                                    <option value="教学楼四楼北">教学楼四楼北</option>
+                                    <option value="教学楼四楼南">教学楼四楼南</option>
+                                    <option value="教学楼四楼东">教学楼四楼东</option>
+                                    <option value="教学楼四楼西">教学楼四楼西</option>
+                                </optgroup>
+                                <optgroup label="🏠 宿舍生活区">
+                                    <option value="宿舍楼A栋一层">宿舍楼A栋一层</option>
+                                    <option value="宿舍楼A栋二层">宿舍楼A栋二层</option>
+                                    <option value="宿舍楼A栋三层">宿舍楼A栋三层</option>
+                                    <option value="宿舍楼A栋四层">宿舍楼A栋四层</option>
+                                    <option value="宿舍楼B栋一层">宿舍楼B栋一层</option>
+                                    <option value="宿舍楼B栋二层">宿舍楼B栋二层</option>
+                                    <option value="宿舍楼B栋三层">宿舍楼B栋三层</option>
+                                    <option value="宿舍楼B栋四层">宿舍楼B栋四层</option>
+                                </optgroup>
+                                <optgroup label="🍽️ 食堂餐饮区">
+                                    <option value="食堂一楼大厅">食堂一楼大厅</option>
+                                    <option value="食堂二楼包间">食堂二楼包间</option>
+                                    <option value="食堂后厨">食堂后厨</option>
+                                    <option value="食堂南门">食堂南门</option>
+                                    <option value="食堂北门">食堂北门</option>
+                                </optgroup>
+                                <optgroup label="⚽ 体育运动区">
+                                    <option value="操场东侧">操场东侧</option>
+                                    <option value="操场西侧">操场西侧</option>
+                                    <option value="操场南侧">操场南侧</option>
+                                    <option value="操场北侧">操场北侧</option>
+                                    <option value="篮球场">篮球场</option>
+                                    <option value="足球场">足球场</option>
+                                    <option value="看台区">看台区</option>
+                                </optgroup>
+                                <optgroup label="📚 图书馆区">
+                                    <option value="图书馆一楼">图书馆一楼</option>
+                                    <option value="图书馆二楼">图书馆二楼</option>
+                                    <option value="图书馆三楼">图书馆三楼</option>
+                                    <option value="图书馆阅览室">图书馆阅览室</option>
+                                    <option value="图书馆书库">图书馆书库</option>
+                                </optgroup>
+                                <optgroup label="🏢 行政及其他">
+                                    <option value="行政楼大厅">行政楼大厅</option>
+                                    <option value="行政楼办公室">行政楼办公室</option>
+                                    <option value="会议中心">会议中心</option>
+                                    <option value="艺术中心">艺术中心</option>
+                                    <option value="实验中心">实验中心</option>
+                                    <option value="校园大门">校园大门</option>
+                                    <option value="停车场入口">停车场入口</option>
+                                    <option value="校园内其他">校园内其他</option>
+                                </optgroup>
+                                <option value="紧急">🟡 紧急</option>
+                            </select>
+                        </div>
                     </div>
-                    <input type="text" id="reportLocation" class="report-location-input" placeholder="📍 具体位置（如：教学楼3楼东侧走廊）" />
-                    <p class="report-hint">💡 示例：发现火情、设备损坏或可疑人员，请详细描述时间、地点、情况。</p>
-                    <textarea id="reportContent" class="report-textarea" rows="4" maxlength="500" placeholder="请详细描述事件详情、涉及人员、当前状态等信息..."></textarea>
-                    <div class="flex items-center justify-between">
-                        <span class="text-slate-400" id="reportCharCount">0 / 500</span>
-                        <button id="reportSubmitBtn" class="btn-report"><i class="fas fa-upload mr-1"></i>上报</button>
+
+                    <!-- 内容文本域（非必填） -->
+                    <div class="report-textarea-wrap">
+                        <i class="fas fa-pen"></i>
+                        <textarea id="reportContent" class="report-textarea" rows="3" maxlength="500" placeholder="请详细描述事件详情（可选填）…"></textarea>
+                    </div>
+
+                    <!-- 底部：字符计数 + 上报按钮 -->
+                    <div class="flex items-center justify-between mt-1.5">
+                        <div class="flex items-center gap-3">
+                            <span class="report-char-counter" id="reportCharCount">0 / 500</span>
+                            <span class="text-[9px] text-slate-600" id="reportSubmitFeedback"></span>
+                        </div>
+                        <button id="reportSubmitBtn" class="btn-report" style="padding:5px 20px;font-size:13px;">
+                            <i class="fas fa-upload mr-1"></i>上报
+                        </button>
+                    </div>
+
+                    <!-- 快捷上报 -->
+                    <div class="quick-bar">
+                        <span class="quick-bar-label"><i class="fas fa-bolt text-yellow-400"></i>快捷</span>
+                        <button class="quick-btn fire" data-quick="火灾隐患|教学楼三楼南|发现火情，烟雾弥漫，请立即支援！">🔥 火情</button>
+                        <button class="quick-btn security" data-quick="治安事件|操场东侧|发现可疑人员，请派人核查！">🚔 治安</button>
+                        <button class="quick-btn injury" data-quick="人员受伤|足球场|学生运动受伤，需要医疗支援！">🏥 受伤</button>
+                        <button class="quick-btn fault" data-quick="设备故障|实验中心|监控设备离线，请安排检修！">🔧 故障</button>
+                        <button class="quick-btn" data-quick="其他|校园内其他|需要安保支援，请尽快响应！">📋 其他</button>
                     </div>
                 </div>
             </div>
 
+            <!-- 上报记录 -->
             <div class="p-3 flex-1 overflow-hidden" style="border-top: 1px solid rgba(71,85,105,0.15);">
                 <div class="flex items-center justify-between mb-1.5">
-                    <h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2"><i class="fas fa-history text-cyan-400"></i> 上报记录</h2>
-                    <span class="text-[9px] text-slate-500" id="reportCount">0 条</span>
+                    <h2 class="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                        <i class="fas fa-history text-cyan-400"></i> 上报记录
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[9px] text-slate-500" id="reportCount">0 条</span>
+                        <button id="clearReportsBtn" class="text-[9px] text-slate-600 hover:text-slate-400 transition" title="清空记录"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
                 <div class="report-area max-h-[160px] overflow-y-auto" id="reportList">
-                    <div class="text-[10px] text-slate-500 text-center py-4">暂无上报记录</div>
+                    <div class="report-empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <span>暂无上报记录</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- 执勤人员 -->
             <div class="p-3 border-t border-slate-700/50"><h2 class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-cyan-400"></i> 执勤人员</h2><div class="space-y-2" id="teamList"></div></div>
         </aside>
     </div>
 
+    <!-- 紧急按钮 -->
     <button id="emergencyBtn" class="emergency-btn"><i class="fas fa-bell"></i></button>
+
+    <!-- Toast -->
     <div id="toast" class="toast"><div class="flex items-center gap-2"><i class="fas fa-info-circle text-cyan-400"></i><span class="text-sm font-semibold" id="toastTitle">系统通知</span></div><div class="text-xs text-slate-300 mt-1" id="toastMsg">消息内容</div></div>
 
+    <!-- 摄像头弹窗 -->
     <div id="cameraModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[1000] hidden items-center justify-center" onclick="if(event.target===this) closeCameraModal()"><div class="w-[85vw] max-w-5xl glass-panel rounded-2xl overflow-hidden"><div class="p-4 border-b border-cyan-500/30 flex justify-between items-center"><h2 class="text-lg font-bold text-cyan-400"><i class="fas fa-camera mr-2"></i><span id="modalCameraName">监控画面</span></h2><button onclick="closeCameraModal()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/40">✕</button></div><div class="p-6"><div class="aspect-video bg-black rounded-xl overflow-hidden"><img id="modalCameraImg" src="" class="w-full h-full object-cover" style="display:none;"></div><div class="mt-4 text-sm text-slate-300" id="modalCameraDesc"></div></div></div></div>
 
+    <!-- 热力图 -->
     <div id="heatmapModal" class="heatmap-modal"><div id="heatmapContent" style="width:100%; height:100%; display:flex; flex-direction:column;"></div></div>
 
-    <!-- ===== 3D校园地图弹窗 ===== -->
+    <!-- 3D地图 -->
     <div id="map3dModal" class="heatmap-modal">
         <div id="map3dContent">
             <div class="modal-header-bar">
@@ -622,16 +1387,16 @@
         </div>
     </div>
 
-    <!-- ===== 事故弹窗 ===== -->
+    <!-- 事故弹窗 -->
     <div id="incidentModal" class="incident-modal">
         <div class="incident-modal-box">
             <div class="incident-badge">🚨 实时警报</div>
             <div class="incident-icon">🔥</div>
             <div class="incident-title">发现火情事故</div>
-            <div class="incident-subtitle">教学楼区 · 东侧走廊</div>
+            <div class="incident-subtitle">教学楼区 · 三楼南侧</div>
             <div class="incident-detail">
                 <div class="label">📋 事故详情</div>
-                <div class="value">教学楼区东侧走廊 <span class="highlight">烟雾探测器触发</span>，疑似发生火情，<br>请立即前往处置！</div>
+                <div class="value">教学楼三楼南侧区 <span class="highlight">烟雾探测器触发</span>，疑似发生火情，<br>请立即前往处置！</div>
             </div>
             <div class="incident-actions">
                 <button id="incidentGotoBtn" class="btn-primary"><i class="fas fa-video"></i> 跳转到事故地监控</button>
@@ -641,17 +1406,24 @@
         </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- SCRIPT -->
+    <!-- ============================================================ -->
     <script>
         // ==================== 主界面数据 ====================
         const zones = {
-            1: { name: "教学楼区", desc: "24路摄像头", icon: "🏫", cameras: 24, online: 24, alerts: 2, camPrefix: "教学楼", buildingName: "知行教学楼", floors: 4 },
-            2: { name: "宿舍生活区", desc: "32路摄像头", icon: "🏠", cameras: 32, online: 31, alerts: 1, camPrefix: "宿舍楼", buildingName: "明德公寓", floors: 4 },
-            3: { name: "食堂餐饮区", desc: "18路摄像头", icon: "🍽️", cameras: 18, online: 18, alerts: 0, camPrefix: "食堂", buildingName: "思源餐厅", floors: 2 },
-            4: { name: "体育运动区", desc: "16路摄像头", icon: "⚽", cameras: 16, online: 16, alerts: 1, camPrefix: "体育场", buildingName: "健体运动场", floors: 1 },
-            5: { name: "图书馆区", desc: "12路摄像头", icon: "📚", cameras: 12, online: 11, alerts: 2, camPrefix: "图书馆", buildingName: "博雅图书馆", floors: 3 }
+            1: { name: "教学楼区", desc: "24路摄像头", icon: "🏫", cameras: 24, online: 24, alerts: 2, camPrefix: "教学楼",
+                buildingName: "知行教学楼", floors: 4 },
+            2: { name: "宿舍生活区", desc: "32路摄像头", icon: "🏠", cameras: 32, online: 31, alerts: 1, camPrefix: "宿舍楼",
+                buildingName: "明德公寓", floors: 4 },
+            3: { name: "食堂餐饮区", desc: "18路摄像头", icon: "🍽️", cameras: 18, online: 18, alerts: 0, camPrefix: "食堂",
+                buildingName: "思源餐厅", floors: 2 },
+            4: { name: "体育运动区", desc: "16路摄像头", icon: "⚽", cameras: 16, online: 16, alerts: 1, camPrefix: "体育场",
+                buildingName: "健体运动场", floors: 1 },
+            5: { name: "图书馆区", desc: "12路摄像头", icon: "📚", cameras: 12, online: 11, alerts: 2, camPrefix: "图书馆",
+                buildingName: "博雅图书馆", floors: 3 }
         };
 
-        // 视频文件名前缀映射：区域ID → 前缀
         const videoPrefixMap = {
             1: 'jiaoshi',
             2: 'sushe',
@@ -680,6 +1452,7 @@
         const raycaster3d = new THREE.Raycaster();
         const mouse3d = new THREE.Vector2();
 
+        // ==================== Toast ====================
         function showToast(title, msg, type) {
             const t = document.getElementById('toast');
             document.getElementById('toastTitle').innerHTML = title;
@@ -713,13 +1486,11 @@
             document.getElementById('hotArea').innerHTML = `${z.name} 中心区`;
             document.getElementById('hotBar').style.width = `${Math.floor(Math.random()*70+25)}%`; }
 
-        // ★★★ 获取视频文件名（根据区域ID和摄像头序号） ★★★
         function getVideoFileName(zoneId, camIndex) {
             const prefix = videoPrefixMap[zoneId] || 'jiaoshi';
             return prefix + camIndex + '.mp4';
         }
 
-        // ★★★ 生成摄像头媒体内容（全部使用视频） ★★★
         function generateCameraMedia(zoneId, camIndex) {
             const videoFile = getVideoFileName(zoneId, camIndex);
             return `
@@ -760,7 +1531,6 @@
                 </div>`;
             }
             document.getElementById('monitorGrid').innerHTML = h;
-            // 绑定点击事件：点击监控卡片打开弹窗
             document.querySelectorAll('.monitor-card').forEach(c => {
                 c.addEventListener('click', function() {
                     const name = this.dataset.camName;
@@ -772,12 +1542,9 @@
             updateZoneStats();
         }
 
-        // ★★★ 打开摄像头弹窗（使用视频） ★★★
         function openCameraModal(name, zoneId, camIndex) {
             const m = document.getElementById('cameraModal');
             document.getElementById('modalCameraName').innerHTML = `📹 ${name}`;
-
-            // 获取或创建视频元素
             let video = m.querySelector('video');
             if (!video) {
                 video = document.createElement('video');
@@ -789,19 +1556,14 @@
                 const container = m.querySelector('.aspect-video');
                 container.appendChild(video);
             }
-            // 设置视频源
             const videoFile = getVideoFileName(zoneId, camIndex);
             video.innerHTML = `<source src="${videoFile}" type="video/mp4">您的浏览器不支持视频播放`;
             video.load();
             video.style.display = 'block';
-
-            // 隐藏img
             const img = m.querySelector('#modalCameraImg');
             if (img) img.style.display = 'none';
-
             document.getElementById('modalCameraDesc').innerHTML =
                 `📍 位置：${name} | 状态：${currentScenario!=='normal'?'应急模式':'正常监控'} | 时间：${new Date().toLocaleString()}`;
-
             m.classList.remove('hidden');
             m.style.display = 'flex';
         }
@@ -1010,63 +1772,231 @@
         function triggerEmergency() { showToast('🚨 紧急预案启动', '所有安保人员立即就位！请遵循疏散指引！', 'fire'); if (currentScenario ===
                 'normal') setScenario('fire'); }
 
-        // ===== 上报功能 =====
+        // ============================================================
+        // ★★★ 上报功能（位置已集成到下拉菜单，内容非必填） ★★★
+        // ============================================================
+
+        const REPORT_STATUS = {
+            PENDING: 'pending',
+            SENT: 'sent',
+            DONE: 'done'
+        };
+
+        // 快捷上报数据（与新的位置选项匹配）
+        const QUICK_REPORTS = {
+            '火灾隐患|教学楼三楼南|发现火情，烟雾弥漫，请立即支援！': { type: '火灾隐患', location: '教学楼三楼南', content: '发现火情，烟雾弥漫，请立即支援！' },
+            '治安事件|操场东侧|发现可疑人员，请派人核查！': { type: '治安事件', location: '操场东侧', content: '发现可疑人员，请派人核查！' },
+            '人员受伤|足球场|学生运动受伤，需要医疗支援！': { type: '人员受伤', location: '足球场', content: '学生运动受伤，需要医疗支援！' },
+            '设备故障|实验中心|监控设备离线，请安排检修！': { type: '设备故障', location: '实验中心', content: '监控设备离线，请安排检修！' },
+            '其他|校园内其他|需要安保支援，请尽快响应！': { type: '其他', location: '校园内其他', content: '需要安保支援，请尽快响应！' }
+        };
+
+        function getUrgencyClass(urgency) {
+            if (urgency === '紧急') return 'high';
+            if (urgency && urgency !== '') return 'location';
+            return 'normal';
+        }
+
+        function getUrgencyIcon(urgency) {
+            if (urgency === '紧急') return '🟡';
+            if (urgency && urgency !== '') return '📍';
+            return '📍';
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'pending': '<span class="report-status-badge pending">⏳ 发送中</span>',
+                'sent': '<span class="report-status-badge sent">✅ 已送达</span>',
+                'done': '<span class="report-status-badge done">📌 已处理</span>'
+            };
+            return map[status] || map['sent'];
+        }
+
+        function getTypeIcon(type) {
+            const map = {
+                '异常事件': '⚠️',
+                '设备故障': '🔧',
+                '人员受伤': '🏥',
+                '火灾隐患': '🔥',
+                '治安事件': '🚔',
+                '水电故障': '💧',
+                '网络故障': '📡',
+                '电梯困人': '🛗',
+                '车辆违停': '🚗',
+                '物品丢失': '🔍',
+                '噪音扰民': '📢',
+                '设施损坏': '🔨',
+                '其他': '📋'
+            };
+            return map[type] || '📋';
+        }
+
         function submitReport() {
             const type = document.getElementById('reportType').value;
-            const urgency = document.getElementById('reportUrgency').value;
-            const location = document.getElementById('reportLocation').value.trim();
+            const urgency = document.getElementById('reportUrgency').value; // 现在这是位置或"紧急"
             const content = document.getElementById('reportContent').value.trim();
-            if (!content) { showToast('⚠️ 提示', '请填写上报内容', 'warning'); return; }
-            if (content.length < 3) { showToast('⚠️ 提示', '内容至少3个字', 'warning'); return; }
+
+            // 如果既没有选择位置也没有选择紧急，则提示
+            if (!urgency) {
+                showToast('⚠️ 提示', '请选择事件位置或标记为紧急', 'warning');
+                document.getElementById('reportUrgency').focus();
+                return;
+            }
+
+            const finalContent = content || '（无详细描述）';
+
+            const btn = document.getElementById('reportSubmitBtn');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner mr-1"></i>发送中…';
+            btn.disabled = true;
+            document.getElementById('reportSubmitFeedback').textContent = '⏳ 发送中…';
+            document.getElementById('reportSubmitFeedback').style.color = '#fbbf24';
+
             const now = new Date();
             const timeStr = now.toLocaleTimeString();
             const dateStr = now.toLocaleDateString();
-            const urgencyLabel = urgency === '特别紧急' ? '🔴 特别紧急' : urgency === '紧急' ? '🟡 紧急' : '🟢 普通';
-            const fullContent = location ? `【位置】${location}\n【详情】${content}` : content;
+
+            // 确定显示标签
+            let urgencyLabel = '📍 位置';
+            let displayLocation = urgency;
+            if (urgency === '紧急') {
+                urgencyLabel = '🟡 紧急';
+                displayLocation = '紧急';
+            } else {
+                urgencyLabel = `📍 ${urgency}`;
+            }
+
             const report = {
                 id: Date.now(),
                 type: type,
-                urgency: urgency,
-                content: fullContent,
+                urgency: urgency, // 原始值
+                content: finalContent,
+                location: displayLocation,
                 time: timeStr,
                 date: dateStr,
-                status: 'pending'
+                status: REPORT_STATUS.PENDING,
+                timestamp: now.getTime()
             };
+
             reportHistory.unshift(report);
             renderReportList();
+
             document.getElementById('reportContent').value = '';
-            document.getElementById('reportLocation').value = '';
+            // 重置下拉菜单为默认“选择位置”
+            document.getElementById('reportUrgency').value = '';
             document.getElementById('reportCharCount').textContent = '0 / 500';
             document.getElementById('reportCount').textContent = reportHistory.length + ' 条';
-            showToast('✅ 上报成功', `【${type}】已发送至校领导端（${urgencyLabel}）`, 'info');
+
+            showToast('📤 上报中', `【${type}】正在发送至校领导端（${urgencyLabel}）…`, 'info');
+
             setTimeout(() => {
-                report.status = 'sent';
-                renderReportList();
-            }, 1500);
+                const pendingReport = reportHistory.find(r => r.id === report.id);
+                if (pendingReport) {
+                    pendingReport.status = REPORT_STATUS.SENT;
+                    renderReportList();
+                }
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+                document.getElementById('reportSubmitFeedback').textContent = '✅ 已送达';
+                document.getElementById('reportSubmitFeedback').style.color = '#4ade80';
+                showToast('✅ 上报成功', `【${type}】已送达校领导端（${urgencyLabel}）`, 'info');
+                setTimeout(() => {
+                    document.getElementById('reportSubmitFeedback').textContent = '';
+                }, 3000);
+            }, 1200 + Math.random() * 800);
         }
 
         function renderReportList() {
             const container = document.getElementById('reportList');
+            const countEl = document.getElementById('reportCount');
+
             if (reportHistory.length === 0) {
-                container.innerHTML = '<div class="text-[10px] text-slate-500 text-center py-4">暂无上报记录</div>';
+                container.innerHTML = `
+                    <div class="report-empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <span>暂无上报记录</span>
+                    </div>
+                `;
+                countEl.textContent = '0 条';
                 return;
             }
-            const urgencyMap = { '特别紧急': 'urgent', '紧急': 'warning', '普通': 'info' };
-            const statusMap = { 'pending': '⏳ 发送中', 'sent': '✅ 已送达' };
-            container.innerHTML = reportHistory.map(r => `
-                <div class="report-item">
-                    <div class="flex justify-between items-start">
-                        <span class="r-type ${urgencyMap[r.urgency] || 'info'}">${r.type}</span>
-                        <span class="r-status ${r.status === 'pending' ? 'pending' : ''}">${statusMap[r.status] || '已发送'}</span>
+
+            let html = '';
+            reportHistory.forEach(r => {
+                const urgencyClass = getUrgencyClass(r.urgency);
+                const urgencyIcon = getUrgencyIcon(r.urgency);
+                const typeIcon = getTypeIcon(r.type);
+                const statusBadge = getStatusBadge(r.status);
+
+                let contentPreview = r.content;
+                if (contentPreview.length > 36) {
+                    contentPreview = contentPreview.slice(0, 36) + '…';
+                }
+
+                let borderColor = '#3b82f6';
+                if (r.urgency === '紧急') borderColor = '#f59e0b';
+                else if (r.urgency && r.urgency !== '') borderColor = '#10b981';
+
+                html += `
+                    <div class="report-item-new" style="border-left-color:${borderColor};">
+                        <div class="r-header">
+                            <div class="flex items-center gap-1.5">
+                                <span class="r-type-icon">${typeIcon}</span>
+                                <span class="r-type-label">${r.type}</span>
+                                <span class="text-[9px] text-slate-500">${urgencyIcon} ${r.location}</span>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="r-preview">${contentPreview}</div>
+                        <div class="r-footer">
+                            <span class="r-time">${r.date} ${r.time}</span>
+                        </div>
                     </div>
-                    <div class="r-content">${r.content}</div>
-                    <div class="flex justify-between text-[9px] text-slate-500">
-                        <span>${r.date} ${r.time}</span>
-                        <span class="${urgencyMap[r.urgency] === 'urgent' ? 'text-red-400' : urgencyMap[r.urgency] === 'warning' ? 'text-yellow-400' : 'text-slate-400'}">${r.urgency}</span>
-                    </div>
-                </div>
-            `).join('');
-            document.getElementById('reportCount').textContent = reportHistory.length + ' 条';
+                `;
+            });
+
+            container.innerHTML = html;
+            countEl.textContent = reportHistory.length + ' 条';
+            container.scrollTop = 0;
+        }
+
+        function handleQuickReport(key) {
+            const data = QUICK_REPORTS[key];
+            if (!data) return;
+
+            document.getElementById('reportType').value = data.type;
+            // 设置位置下拉菜单
+            const locationSelect = document.getElementById('reportUrgency');
+            let found = false;
+            for (let opt of locationSelect.options) {
+                if (opt.value === data.location) {
+                    locationSelect.value = data.location;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                // 如果预设位置不在选项中，则选中“紧急”或默认
+                locationSelect.value = '紧急';
+            }
+            document.getElementById('reportContent').value = data.content;
+
+            const len = data.content.length;
+            document.getElementById('reportCharCount').textContent = len + ' / 500';
+            document.getElementById('reportContent').focus();
+            showToast('📝 已填充', `快捷上报「${data.type}」已填入表单，点击上报按钮发送`, 'info');
+        }
+
+        function clearReports() {
+            if (reportHistory.length === 0) {
+                showToast('📭 提示', '暂无记录可清空', 'warning');
+                return;
+            }
+            if (confirm('确定要清空所有上报记录吗？')) {
+                reportHistory = [];
+                renderReportList();
+                showToast('🗑️ 已清空', '所有上报记录已清除', 'info');
+            }
         }
 
         // ============================================================
@@ -1074,25 +2004,25 @@
         // ============================================================
         const buildings3d = [
             { name: '知行教学楼', icon: '🏛️', x: -12, z: -6, w: 11, d: 8, h: 9, color: 0x3b82f6, floors: 5,
-            area: '14,000m²', type: '教学' },
+                area: '14,000m²', type: '教学' },
             { name: '明德公寓A', icon: '🏠', x: 10, z: -10, w: 8.5, d: 6.5, h: 7, color: 0x22c55e, floors: 4,
-            area: '9,000m²', type: '宿舍' },
+                area: '9,000m²', type: '宿舍' },
             { name: '明德公寓B', icon: '🏠', x: 10, z: 3, w: 8.5, d: 6.5, h: 7, color: 0x22c55e, floors: 4,
-            area: '9,000m²', type: '宿舍' },
+                area: '9,000m²', type: '宿舍' },
             { name: '思源餐厅', icon: '🍽️', x: -3, z: 12, w: 9.5, d: 6.5, h: 5.5, color: 0xf59e0b, floors: 2,
-            area: '7,000m²', type: '食堂' },
+                area: '7,000m²', type: '食堂' },
             { name: '博雅图书馆', icon: '📚', x: -15, z: 7, w: 6.5, d: 6.5, h: 6.5, color: 0x8b5cf6, floors: 3,
-            area: '5,500m²', type: '图书馆' },
+                area: '5,500m²', type: '图书馆' },
             { name: '健体体育馆', icon: '🏟️', x: 3, z: -16, w: 8.5, d: 9.5, h: 6, color: 0xef4444, floors: 2,
-            area: '8,500m²', type: '体育' },
+                area: '8,500m²', type: '体育' },
             { name: '艺术中心', icon: '🎨', x: -7, z: -16, w: 5.5, d: 5.5, h: 4.5, color: 0xec4899, floors: 3,
-            area: '4,500m²', type: '艺术' },
+                area: '4,500m²', type: '艺术' },
             { name: '实验中心', icon: '🧪', x: -17, z: -3, w: 5.5, d: 5.5, h: 5.5, color: 0x06b6d4, floors: 3,
-            area: '5,000m²', type: '实验' },
+                area: '5,000m²', type: '实验' },
             { name: '行政楼', icon: '🏢', x: 17, z: -3, w: 6, d: 5.5, h: 5.5, color: 0x6366f1, floors: 3,
-            area: '4,800m²', type: '行政' },
+                area: '4,800m²', type: '行政' },
             { name: '会议中心', icon: '🏛️', x: -3, z: -8, w: 5, d: 4, h: 4, color: 0x14b8a6, floors: 2,
-            area: '3,500m²', type: '会议' },
+                area: '3,500m²', type: '会议' },
         ];
 
         if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -1638,6 +2568,7 @@
 
         function animate3d(flowData, flowPoints, ffVel, ffPoints, stars) {
             let time = 0;
+
             function loop() {
                 animFrameId = requestAnimationFrame(loop);
                 time += 0.008;
@@ -1685,6 +2616,7 @@
             is3DInitialized = false;
             let attempts = 0;
             const maxAttempts = 20;
+
             function tryInit() {
                 attempts++;
                 const container = document.getElementById('three-container');
@@ -2337,11 +3269,20 @@
             };
         }
 
-        // ==================== 上报事件绑定 ====================
+        // ============================================================
+        // ★★★ 事件绑定 ★★★
+        // ============================================================
+
         document.getElementById('reportContent').addEventListener('input', function() {
             const len = this.value.length;
-            document.getElementById('reportCharCount').textContent = len + ' / 500';
-            if (len > 500) this.value = this.value.substring(0, 500);
+            const counter = document.getElementById('reportCharCount');
+            counter.textContent = len + ' / 500';
+            if (len > 400) {
+                counter.className = 'report-char-counter warn';
+                if (len > 480) counter.className = 'report-char-counter danger';
+            } else {
+                counter.className = 'report-char-counter';
+            }
         });
 
         document.getElementById('reportSubmitBtn').addEventListener('click', submitReport);
@@ -2353,14 +3294,27 @@
             }
         });
 
-        // ==================== 3D 地图事件绑定 ====================
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const key = this.dataset.quick;
+                if (key) handleQuickReport(key);
+            });
+        });
+
+        document.getElementById('clearReportsBtn').addEventListener('click', clearReports);
+
+        // ============================================================
+        // ★★★ 3D 地图事件绑定 ★★★
+        // ============================================================
         document.getElementById('open3DMapBtn').addEventListener('click', open3DMap);
         document.getElementById('close3DMapModalBtn').addEventListener('click', close3DMap);
         document.getElementById('map3dModal').addEventListener('click', function(e) {
             if (e.target === this) { close3DMap(); }
         });
 
-        // ==================== 初始化 ====================
+        // ============================================================
+        // ★★★ 初始化 ★★★
+        // ============================================================
         buildSidebar();
         renderMonitorGrid();
         renderTeam();
@@ -2372,7 +3326,6 @@
         document.getElementById('openHeatmapBtn').addEventListener('click', openHeatmapModal);
         document.getElementById('emergencyBtn').addEventListener('click', triggerEmergency);
 
-        // 窗口尺寸变化时重新调整3D
         window.addEventListener('resize', function() {
             if (is3DInitialized && renderer3d && camera3d) {
                 const container = document.getElementById('three-container');
@@ -2389,23 +3342,21 @@
         });
 
         // ============================================================
-        // ★★★ 事故弹窗逻辑（新增） ★★★
+        // ★★★ 事故弹窗 ★★★
         // ============================================================
         window.addEventListener('load', function() {
             const now = new Date();
             document.getElementById('incidentTime').textContent = '⏱ 事发时间：' + now.toLocaleTimeString();
             setTimeout(function() {
                 document.getElementById('incidentModal').classList.add('active');
-                showToast('🚨 事故警报', '教学楼区东侧走廊发生火情，请立即查看！', 'fire');
+                showToast('🚨 事故警报', '教学楼三楼南侧区发生火情，请立即查看！', 'fire');
             }, 300);
         });
 
         document.getElementById('incidentGotoBtn').addEventListener('click', function() {
             document.getElementById('incidentModal').classList.remove('active');
-            // 跳转到教学楼区
             switchZone(1);
             setTimeout(function() {
-                // 使用 openCameraModal 直接打开教学楼-1 的视频
                 openCameraModal('教学楼区 · 摄像头1', 1, 1);
                 showToast('📹 已跳转', '正在查看事故地监控画面（教学楼区 · 摄像头1）', 'info');
             }, 200);
@@ -2423,13 +3374,10 @@
             }
         });
 
-        console.log('✅ 智慧安保指挥中心已启动 | 视频映射已加载');
-        console.log('📹 视频文件映射规则:');
-        console.log('  教学楼区 → jiaoshi1.mp4 ~ jiaoshi6.mp4');
-        console.log('  宿舍生活区 → sushe1.mp4 ~ sushe6.mp4');
-        console.log('  食堂餐饮区 → shitang1.mp4 ~ shitang6.mp4');
-        console.log('  体育运动区 → caochang1.mp4 ~ caochang6.mp4');
-        console.log('  图书馆区 → tushuguan1.mp4 ~ tushuguan6.mp4');
+        console.log('✅ 智慧安保指挥中心已启动 | “紧急程度”已替换为“位置”下拉菜单');
+        console.log('📋 位置选项包含：教学楼各楼层及方向、宿舍楼、食堂、运动场、图书馆、行政楼等');
+        console.log('🟡 “紧急”作为独立选项保留在列表末尾');
+        console.log('🚨 启动弹窗已更新为：教学楼三楼南侧区发生火灾');
     </script>
 </body>
 </html>

@@ -85,14 +85,12 @@ body {
 </head>
 <body>
 <div class="login-container">
-    <!-- 这里已改为新名称 -->
     <h2 class="system-title">小学多场景应急系统</h2>
 
     <div class="form-item">
         <label>选择登录角色</label>
         <select id="roleSelect">
             <option value="">请选择角色</option>
-            <option value="admin">系统管理员</option>
             <option value="leader">校领导</option>
             <option value="security">安保监控员</option>
             <option value="teacher">班主任/老师</option>
@@ -112,7 +110,6 @@ body {
     <button class="login-btn" onclick="loginCheck()">立即登录</button>
 
     <div class="tip-text">
-        管理员：admin / 123456<br>
         校领导：leader / 123456<br>
         安保：security / 123456<br>
         班主任：teacher / 123456
@@ -134,10 +131,7 @@ function loginCheck(){
         return;
     }
 
-    if(role==="admin" && user==="admin" && pwd==="123456"){
-        window.location.href = "admin.html";
-    }
-    else if(role==="leader" && user==="leader" && pwd==="123456"){
+    if(role==="leader" && user==="leader" && pwd==="123456"){
         window.location.href = "leader.html";
     }
     else if(role==="security" && user==="security" && pwd==="123456"){

@@ -2,1601 +2,406 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>校园应急管理系统 · 教师端</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+        :root {
+            --bg-deep: #070d1f;
+            --panel-bg: rgba(16, 24, 48, 0.75);
+            --border-subtle: rgba(148, 163, 184, 0.06);
+            --text-primary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-gold: #fbbf24;
         }
-        body {
-            background: #070d1f;
-            color: #e2e8f0;
-            height: 100vh;
-            overflow: hidden;
-            font-size: 15px;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(30, 41, 59, 0.2);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3b82f6;
-            border-radius: 4px;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Microsoft YaHei',system-ui,-apple-system,sans-serif; }
+        body { background:var(--bg-deep); color:var(--text-primary); height:100vh; overflow:hidden; font-size:15px; }
+        ::-webkit-scrollbar { width:4px; height:4px; }
+        ::-webkit-scrollbar-track { background:rgba(30,41,59,0.15); border-radius:4px; }
+        ::-webkit-scrollbar-thumb { background:var(--accent-blue); border-radius:4px; }
 
-        .glass-panel {
-            background: rgba(20, 30, 55, 0.7);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-        }
-        .glass-card {
-            background: rgba(20, 30, 55, 0.45);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(148, 163, 184, 0.05);
-            transition: border-color 0.3s;
-        }
-        .glass-card:hover {
-            border-color: rgba(148, 163, 184, 0.1);
-        }
+        .glass-panel { background:var(--panel-bg); backdrop-filter:blur(16px); border:1px solid var(--border-subtle); box-shadow:0 4px 32px rgba(0,0,0,0.45); border-radius:10px; }
+        .glass-card { background:rgba(16,24,48,0.5); backdrop-filter:blur(10px); border:1px solid var(--border-subtle); border-radius:8px; transition:border-color 0.3s; }
+        .glass-card:hover { border-color:rgba(148,163,184,0.12); }
 
-        .nav-item {
-            transition: all 0.25s ease;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-            color: #94a3b8;
-            font-size: 14px;
-            padding: 10px 14px;
-        }
-        .nav-item:hover {
-            background: rgba(59, 130, 246, 0.05);
-            color: #e2e8f0;
-        }
-        .nav-item.active {
-            background: rgba(59, 130, 246, 0.08);
-            border-left-color: #3b82f6;
-            color: #60a5fa;
-        }
-        .nav-item .badge-dot {
-            width: 7px;
-            height: 7px;
-            background: #ef4444;
-            border-radius: 50%;
-            animation: pulse-dot 2s infinite;
-            display: inline-block;
-            margin-left: auto;
-        }
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.3;
-                transform: scale(0.7);
-            }
-        }
-        .nav-item .icon {
-            font-size: 16px;
-            width: 24px;
-            text-align: center;
-        }
+        .nav-item { transition:all 0.25s; cursor:pointer; border-left:3px solid transparent; color:var(--text-muted); font-size:14px; padding:12px 16px; border-radius:6px; display:flex; align-items:center; gap:10px; white-space:nowrap; }
+        .nav-item:hover { background:rgba(59,130,246,0.06); color:var(--text-primary); }
+        .nav-item.active { background:rgba(59,130,246,0.1); border-left-color:var(--accent-blue); color:#60a5fa; font-weight:600; }
+        .nav-item .badge-dot { width:8px; height:8px; background:var(--accent-red); border-radius:50%; animation:pulse-dot 2s infinite; margin-left:auto; }
+        @keyframes pulse-dot { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.25; transform:scale(0.6); } }
 
-        .page-panel {
-            display: none;
-            animation: fadeSlide 0.3s ease;
-            height: 100%;
-            flex-direction: column;
-            padding: 8px 12px 8px 12px;
-        }
-        .page-panel.active {
-            display: flex;
-        }
-        @keyframes fadeSlide {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .page-panel { display:none; animation:fadeSlide 0.3s; height:100%; flex-direction:column; padding:8px 12px; }
+        .page-panel.active { display:flex; }
+        @keyframes fadeSlide { from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .status-normal {
-            background: #10b981;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-        }
-        .status-critical {
-            background: #ef4444;
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
-            animation: pulse 1s infinite;
-        }
-        .status-warning {
-            background: #eab308;
-            box-shadow: 0 0 16px rgba(234, 179, 8, 0.3);
-            animation: pulse 1.2s infinite;
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.85);
-            }
-        }
+        .status-dot { width:10px; height:10px; border-radius:50%; }
+        .status-normal { background:var(--accent-green); box-shadow:0 0 14px rgba(16,185,129,0.4); }
+        .status-critical { background:var(--accent-red); box-shadow:0 0 18px rgba(239,68,68,0.5); animation:pulse 0.9s infinite; }
+        @keyframes pulse { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.4; transform:scale(0.8); } }
 
-        .student-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 5px;
-            flex: 1;
-            align-content: start;
-            overflow-y: auto;
-            padding: 4px 0;
-        }
-        .student-box {
-            background: rgba(10, 22, 50, 0.3);
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            border-radius: 6px;
-            padding: 6px 2px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s;
-            color: #c8d8f0;
-            user-select: none;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-        .student-box:hover {
-            border-color: rgba(59, 130, 246, 0.2);
-            background: rgba(59, 130, 246, 0.06);
-        }
-        .student-box.checked {
-            background: rgba(16, 185, 129, 0.12);
-            border-color: #10b981;
-            color: #34d399;
-        }
-        .student-box.checked::after {
-            content: " ✓";
-            font-weight: 700;
-            font-size: 12px;
-        }
+        .student-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(90px,1fr)); gap:5px; flex:1; align-content:start; overflow-y:auto; padding:2px 0; }
+        .student-box { background:rgba(10,20,44,0.4); border:1px solid rgba(148,163,184,0.06); border-radius:5px; padding:6px 4px; text-align:center; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.15s; color:#c8d8f0; height:38px; display:flex; align-items:center; justify-content:center; white-space:nowrap; }
+        .student-box:hover { border-color:rgba(59,130,246,0.3); background:rgba(59,130,246,0.1); }
+        .student-box.checked { background:rgba(16,185,129,0.16); border-color:var(--accent-green); color:#34d399; font-weight:600; }
+        .student-box.checked::after { content:" ✓"; font-weight:700; font-size:13px; }
 
-        .stat-card {
-            background: rgba(10, 22, 50, 0.2);
-            border: 1px solid rgba(148, 163, 184, 0.04);
-            border-radius: 6px;
-            padding: 6px 10px;
-            text-align: center;
-            flex: 1;
-        }
-        .stat-card .num {
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stat-card .num.green {
-            background: linear-gradient(135deg, #34d399, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stat-card .num.orange {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stat-card .label {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            flex-shrink: 0;
-        }
+        .stat-card { background:rgba(10,20,44,0.25); border:1px solid rgba(148,163,184,0.04); border-radius:6px; padding:6px 10px; text-align:center; flex:1; }
+        .stat-card .num { font-size:24px; font-weight:700; background:linear-gradient(135deg,#60a5fa,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .stat-card .num.green { background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .stat-card .num.orange { background:linear-gradient(135deg,#fbbf24,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .stat-card .label { font-size:12px; color:var(--text-muted); }
 
-        .class-btn-group {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .class-btn {
-            padding: 4px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(10, 22, 50, 0.3);
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            color: #94a3b8;
-            user-select: none;
-        }
-        .class-btn:hover {
-            background: rgba(59, 130, 246, 0.06);
-            border-color: rgba(59, 130, 246, 0.15);
-        }
-        .class-btn.active {
-            background: rgba(59, 130, 246, 0.15);
-            border-color: #3b82f6;
-            color: #60a5fa;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.08);
-        }
+        .btn { padding:7px 18px; border:none; border-radius:6px; font-size:14px; font-weight:600; color:#fff; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 2px 14px rgba(59,130,246,0.2); white-space:nowrap; }
+        .btn:hover { transform:translateY(-1px); box-shadow:0 4px 22px rgba(59,130,246,0.3); }
+        .btn-success { background:linear-gradient(135deg,#10b981,#059669); }
+        .btn-outline { background:transparent; border:1px solid rgba(148,163,184,0.15); box-shadow:none; color:var(--text-muted); }
+        .btn-outline:hover { background:rgba(148,163,184,0.06); border-color:rgba(148,163,184,0.25); color:var(--text-primary); }
 
-        .disaster-btn-group {
-            display: flex;
-            gap: 8px;
-        }
-        .disaster-btn {
-            padding: 5px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            background: rgba(10, 22, 50, 0.3);
-            border: 2px solid rgba(148, 163, 184, 0.06);
-            color: #94a3b8;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .disaster-btn:hover {
-            transform: translateY(-1px);
-        }
-        .disaster-btn.active-normal {
-            border-color: #10b981;
-            color: #34d399;
-            background: rgba(16, 185, 129, 0.08);
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.08);
-        }
-        .disaster-btn.active-fire {
-            border-color: #ef4444;
-            color: #f87171;
-            background: rgba(239, 68, 68, 0.08);
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.08);
-            animation: fire-glow 1.5s ease-in-out infinite;
-        }
-        .disaster-btn.active-earthquake {
-            border-color: #f59e0b;
-            color: #fbbf24;
-            background: rgba(245, 158, 11, 0.08);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.08);
-            animation: quake-glow 1.2s ease-in-out infinite;
-        }
-        @keyframes fire-glow {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.08);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(239, 68, 68, 0.25);
-            }
-        }
-        @keyframes quake-glow {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(245, 158, 11, 0.08);
-                transform: translateY(0);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(245, 158, 11, 0.2);
-                transform: translateY(-2px);
-            }
-        }
+        .class-btn { padding:6px 14px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; background:rgba(10,20,44,0.35); border:1px solid rgba(148,163,184,0.06); color:var(--text-muted); white-space:nowrap; }
+        .class-btn.active { background:rgba(59,130,246,0.18); border-color:var(--accent-blue); color:#60a5fa; box-shadow:0 0 20px rgba(59,130,246,0.15); }
+        .class-btn-group { display:flex; flex-wrap:wrap; gap:6px; }
 
-        .form-control {
-            width: 100%;
-            padding: 6px 12px;
-            background: rgba(10, 22, 50, 0.3);
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            border-radius: 5px;
-            color: #e2e8f0;
-            font-size: 13px;
-            transition: all 0.2s;
-            outline: none;
-        }
-        .form-control:focus {
-            border-color: rgba(59, 130, 246, 0.15);
-            background: rgba(10, 22, 50, 0.5);
-        }
-        .form-control::placeholder {
-            color: #4a6a8a;
-        }
-        .form-control[readonly] {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%236a8aaa' d='M4 6L0 3h8z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            padding-right: 26px;
-        }
-        select.form-control option {
-            background: #0a1628;
-            color: #e2e8f0;
-        }
-        .form-group {
-            margin-bottom: 5px;
-        }
-        .form-group label {
-            font-size: 11px;
-            color: #94a3b8;
-            display: block;
-            margin-bottom: 2px;
-            font-weight: 500;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        textarea.form-control {
-            min-height: 44px;
-            resize: none;
-        }
+        .disaster-btn-group { display:flex; gap:8px; flex-wrap:nowrap; }
+        .disaster-btn { padding:6px 16px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.25s; background:rgba(10,20,44,0.35); border:2px solid rgba(148,163,184,0.06); color:var(--text-muted); display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .disaster-btn.active-normal { border-color:var(--accent-green); color:#34d399; background:rgba(16,185,129,0.1); }
+        .disaster-btn.active-fire { border-color:var(--accent-red); color:#f87171; background:rgba(239,68,68,0.1); animation:fire-glow 1.4s infinite; }
+        @keyframes fire-glow { 0%,100%{ box-shadow:0 0 20px rgba(239,68,68,0.1); } 50%{ box-shadow:0 0 40px rgba(239,68,68,0.3); } }
 
-        .btn {
-            padding: 6px 18px;
-            border: none;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.15);
-        }
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 2px 12px rgba(16, 185, 129, 0.12);
-        }
-        .btn-success:hover {
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.18);
-        }
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 2px 12px rgba(245, 158, 11, 0.12);
-        }
-        .btn-warning:hover {
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.18);
-        }
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12);
-        }
-        .btn-danger:hover {
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.18);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            box-shadow: none;
-            color: #94a3b8;
-        }
-        .btn-outline:hover {
-            background: rgba(148, 163, 184, 0.04);
-            border-color: rgba(148, 163, 184, 0.2);
-            color: #e2e8f0;
-            box-shadow: none;
-        }
-        .btn-sm {
-            padding: 3px 12px;
-            font-size: 11px;
-        }
-        .btn-auto-rotate {
-            padding: 4px 12px;
-            font-size: 11px;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 5px;
-            color: #60a5fa;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-auto-rotate:hover {
-            background: rgba(59, 130, 246, 0.25);
-        }
-        .btn-auto-rotate.active {
-            background: rgba(59, 130, 246, 0.25);
-            border-color: #3b82f6;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
-        }
+        .form-control { width:100%; padding:6px 12px; background:rgba(10,20,44,0.4); border:1px solid rgba(148,163,184,0.08); border-radius:5px; color:var(--text-primary); font-size:14px; outline:none; }
+        .form-control:focus { border-color:rgba(59,130,246,0.25); }
+        select.form-control { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cpath fill='%236a8aaa' d='M5 7L0 2h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:30px; }
+        .form-group { margin-bottom:5px; } .form-group label { font-size:12px; color:var(--text-muted); }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-        .cmd-item {
-            background: rgba(10, 22, 50, 0.15);
-            border: 1px solid rgba(148, 163, 184, 0.04);
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 4px;
-            transition: all 0.2s;
-        }
-        .cmd-item:hover {
-            border-color: rgba(148, 163, 184, 0.08);
-            background: rgba(10, 22, 50, 0.25);
-        }
-        .cmd-tag {
-            display: inline-block;
-            padding: 0 10px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 500;
-            line-height: 18px;
-        }
-        .tag-urgent {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.06);
-        }
-        .tag-danger {
-            background: rgba(239, 68, 68, 0.08);
-            color: #f87171;
-        }
-        .tag-warning {
-            background: rgba(234, 179, 8, 0.08);
-            color: #fbbf24;
-        }
-        .tag-info {
-            background: rgba(59, 130, 246, 0.08);
-            color: #60a5fa;
-        }
-        .tag-normal {
-            background: rgba(16, 185, 129, 0.06);
-            color: #34d399;
-        }
+        .cmd-tag { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:600; }
+        .tag-urgent { background:rgba(239,68,68,0.15); color:#f87171; }
 
-        /* ===== 3D地图容器 ===== */
-        #three-container {
-            width: 100%;
-            height: 100%;
-            min-height: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: radial-gradient(ellipse at center, #0a1428, #050a18);
-            position: relative;
-        }
-        #three-container canvas {
-            display: block;
-            width: 100% !important;
-            height: 100% !important;
-        }
+        #three-container { width:100%; height:100%; border-radius:8px; overflow:hidden; background:radial-gradient(ellipse at center,#0b162e,#040a18); position:relative; cursor:grab; }
+        .map-overlay-bar { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(10,20,44,0.9); backdrop-filter:blur(10px); padding:5px 18px; border-radius:18px; font-size:13px; border:1px solid rgba(148,163,184,0.08); pointer-events:none; z-index:10; display:flex; align-items:center; gap:12px; }
+        .badge-sm { padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; }
+        .route-step-bar { background:rgba(10,20,44,0.85); backdrop-filter:blur(8px); border-radius:8px; padding:5px 14px; display:flex; align-items:center; gap:4px; font-size:13px; flex-wrap:wrap; justify-content:center; }
 
-        /* ===== 覆盖层 ===== */
-        .map-overlay {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 22, 50, 0.88);
-            backdrop-filter: blur(10px);
-            padding: 5px 16px;
-            border-radius: 14px;
-            font-size: 12px;
-            color: #e2e8f0;
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            pointer-events: none;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .map-overlay .badge {
-            display: inline-block;
-            padding: 1px 10px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 700;
-        }
-        .map-overlay .badge-normal {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-        }
-        .map-overlay .badge-fire {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            animation: fire-glow 1.5s infinite;
-        }
-        .map-overlay .badge-earthquake {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-            animation: quake-glow 1.2s infinite;
-        }
-        .map-overlay .legend {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 9px;
-            font-weight: 400;
-            color: #94a3b8;
-        }
-        .map-overlay .legend .dot {
-            width: 16px;
-            height: 3px;
-            border-radius: 2px;
-            display: inline-block;
-        }
-        .map-overlay .legend .dot.green {
-            background: #10b981;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-        .map-overlay .legend .dot.red {
-            background: #ef4444;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-        }
-        .map-overlay .legend .dot.orange {
-            background: #f59e0b;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-        }
-        .map-overlay .legend .dot.purple {
-            background: #8b5cf6;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
-        }
-        .map-overlay .legend .dot.gold {
-            background: #fbbf24;
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-        }
+        .toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:6px; max-width:360px; }
+        .toast { padding:10px 18px; border-radius:8px; background:rgba(10,20,44,0.94); backdrop-filter:blur(14px); border:1px solid rgba(148,163,184,0.08); color:var(--text-primary); font-size:14px; animation:slideInToast 0.3s; display:flex; align-items:center; gap:8px; border-left:3px solid var(--accent-blue); }
+        @keyframes slideInToast { from{ opacity:0; transform:translateX(18px); } to{ opacity:1; transform:translateX(0); } }
 
-        /* ===== 底部步骤指引 ===== */
-        .route-guide-bar {
-            background: rgba(10, 22, 50, 0.88);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(148, 163, 184, 0.04);
-            border-radius: 8px;
-            padding: 4px 12px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 11px;
-            color: #e2e8f0;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .route-guide-bar .step {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            color: #94a3b8;
-            font-size: 10px;
-            padding: 2px 4px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .route-guide-bar .step .num {
-            background: rgba(59, 130, 246, 0.12);
-            color: #60a5fa;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            font-weight: 700;
-            flex-shrink: 0;
-            transition: all 0.3s;
-        }
-        .route-guide-bar .step .arrow {
-            color: #475569;
-            margin: 0 1px;
-            font-size: 8px;
-        }
-        .route-guide-bar .step.active-step {
-            background: rgba(59, 130, 246, 0.1);
-            color: #e2e8f0;
-        }
-        .route-guide-bar .step.active-step .num {
-            background: #3b82f6;
-            color: #fff;
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
-        }
-        .route-guide-bar .step .loc {
-            font-size: 7px;
-            color: #64748b;
-            max-width: 50px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .route-guide-bar .step .label-text {
-            font-size: 9px;
-            color: #c8d8f0;
-        }
-
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-width: 360px;
-        }
-        .toast {
-            padding: 10px 18px;
-            border-radius: 8px;
-            background: rgba(10, 22, 50, 0.94);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(148, 163, 184, 0.06);
-            color: #e2e8f0;
-            font-size: 13px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-left: 3px solid #3b82f6;
-        }
-        .toast.success {
-            border-left-color: #10b981;
-        }
-        .toast.error {
-            border-left-color: #ef4444;
-        }
-        .toast.warning {
-            border-left-color: #eab308;
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(16px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        .loading-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #94a3b8;
-            font-size: 13px;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-        .loading-indicator .spinner {
-            width: 28px;
-            height: 28px;
-            border: 2.5px solid rgba(148, 163, 184, 0.1);
-            border-top: 2.5px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ===== 弹窗样式 ===== */
-        .alert-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeInOverlay 0.5s ease;
-        }
-        .alert-overlay.hidden {
-            display: none;
-        }
-        @keyframes fadeInOverlay {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .alert-box {
-            background: linear-gradient(145deg, #1a1a3e, #0d0d2b);
-            border: 2px solid #ef4444;
-            border-radius: 20px;
-            padding: 40px 48px;
-            max-width: 520px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(239, 68, 68, 0.25);
-            animation: slideUpAlert 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .alert-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.06), transparent 70%);
-            animation: pulseAlert 3s ease-in-out infinite;
-        }
-        @keyframes pulseAlert {
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-        }
-        @keyframes slideUpAlert {
-            from {
-                transform: translateY(40px) scale(0.95);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-        .alert-box .icon-wrap {
-            width: 72px;
-            height: 72px;
-            background: rgba(239, 68, 68, 0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 36px;
-            color: #ef4444;
-            animation: bellRing 1s ease-in-out 3;
-            position: relative;
-            z-index: 1;
-        }
-        @keyframes bellRing {
-            0%,
-            100% {
-                transform: rotate(0);
-            }
-            25% {
-                transform: rotate(-12deg);
-            }
-            75% {
-                transform: rotate(12deg);
-            }
-        }
-        .alert-box .title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #f87171;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-        .alert-box .subtitle {
-            font-size: 15px;
-            color: #fca5a5;
-            margin-bottom: 6px;
-            position: relative;
-            z-index: 1;
-        }
-        .alert-box .divider {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, #ef4444, transparent);
-            margin: 12px auto;
-            border-radius: 2px;
-            position: relative;
-            z-index: 1;
-        }
-        .alert-box .msg {
-            font-size: 15px;
-            color: #e2e8f0;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        .alert-box .msg strong {
-            color: #fbbf24;
-        }
-        .alert-box .btn-confirm {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: none;
-            padding: 12px 40px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
-            position: relative;
-            z-index: 1;
-        }
-        .alert-box .btn-confirm:hover {
-            transform: scale(1.04);
-            box-shadow: 0 6px 30px rgba(239, 68, 68, 0.5);
-        }
-        .alert-box .btn-confirm:active {
-            transform: scale(0.96);
-        }
-        .alert-box .badge-disaster {
-            display: inline-block;
-            padding: 3px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            margin-bottom: 6px;
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 56px !important;
-            }
-            .sidebar .label {
-                display: none;
-            }
-            .sidebar .nav-item {
-                padding: 10px 0 !important;
-                justify-content: center;
-            }
-            .sidebar .nav-item .icon {
-                font-size: 18px;
-                width: 28px;
-            }
-            .main-area {
-                padding: 4px 6px !important;
-            }
-            .form-row {
-                grid-template-columns: 1fr !important;
-            }
-            .student-grid {
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            }
-            .student-box {
-                font-size: 12px;
-                height: 32px;
-            }
-            body {
-                font-size: 13px;
-            }
-            .class-btn {
-                font-size: 11px;
-                padding: 3px 10px;
-            }
-            .disaster-btn {
-                font-size: 11px;
-                padding: 4px 12px;
-            }
-            .map-overlay {
-                font-size: 10px;
-                padding: 4px 12px;
-                gap: 6px;
-                top: 6px;
-            }
-            .map-overlay .legend {
-                font-size: 8px;
-                gap: 4px;
-            }
-            .map-overlay .legend .dot {
-                width: 12px;
-            }
-            .route-guide-bar {
-                font-size: 9px;
-                padding: 4px 8px;
-                gap: 2px;
-            }
-            .route-guide-bar .step {
-                font-size: 8px;
-                padding: 1px 3px;
-            }
-            .route-guide-bar .step .num {
-                width: 14px;
-                height: 14px;
-                font-size: 7px;
-            }
-            .route-guide-bar .step .loc {
-                font-size: 6px;
-                max-width: 35px;
-            }
-            .route-guide-bar .step .label-text {
-                font-size: 8px;
-            }
-            .alert-box {
-                padding: 28px 24px;
-                max-width: 420px;
-            }
-            .alert-box .title {
-                font-size: 18px;
-            }
-            .alert-box .msg {
-                font-size: 13px;
-            }
-        }
-        @media (max-width: 640px) {
-            .top-header .brand-text {
-                font-size: 13px !important;
-            }
-            .top-header .time-display {
-                display: none;
-            }
-            .top-header .user-badge span {
-                display: none;
-            }
-            .sidebar {
-                width: 44px !important;
-            }
-            .sidebar .nav-item .icon {
-                font-size: 14px !important;
-                width: 20px;
-            }
-            .student-grid {
-                grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
-                gap: 3px;
-            }
-            .student-box {
-                font-size: 10px;
-                height: 26px;
-                padding: 2px;
-            }
-            .stat-card .num {
-                font-size: 16px;
-            }
-            .stats-row {
-                gap: 3px;
-            }
-            .stat-card {
-                padding: 4px 6px;
-            }
-            .stat-card .label {
-                font-size: 8px;
-            }
-            .page-panel {
-                padding: 4px 6px 4px 6px;
-            }
-            .glass-card {
-                padding: 6px 8px !important;
-            }
-            .cmd-item {
-                padding: 5px 8px;
-            }
-            .cmd-item .cmd-title {
-                font-size: 11px;
-            }
-            .cmd-item .cmd-content {
-                font-size: 10px;
-            }
-            .btn {
-                font-size: 11px;
-                padding: 4px 12px;
-            }
-            body {
-                font-size: 12px;
-            }
-            .class-btn {
-                font-size: 10px;
-                padding: 2px 8px;
-            }
-            .class-btn-group {
-                gap: 3px;
-            }
-            .disaster-btn {
-                font-size: 10px;
-                padding: 3px 10px;
-            }
-            .disaster-btn-group {
-                gap: 4px;
-            }
-            .map-overlay {
-                font-size: 8px;
-                padding: 3px 8px;
-                gap: 4px;
-                top: 4px;
-            }
-            .map-overlay .badge {
-                font-size: 7px;
-                padding: 0 6px;
-            }
-            .map-overlay .legend {
-                font-size: 7px;
-                gap: 3px;
-            }
-            .map-overlay .legend .dot {
-                width: 10px;
-                height: 2px;
-            }
-            .route-guide-bar {
-                font-size: 7px;
-                padding: 3px 6px;
-                gap: 2px;
-            }
-            .route-guide-bar .step {
-                font-size: 7px;
-                padding: 1px 2px;
-            }
-            .route-guide-bar .step .num {
-                width: 12px;
-                height: 12px;
-                font-size: 6px;
-            }
-            .route-guide-bar .step .loc {
-                font-size: 5px;
-                max-width: 25px;
-            }
-            .route-guide-bar .step .arrow {
-                font-size: 5px;
-            }
-            .route-guide-bar .step .label-text {
-                font-size: 7px;
-            }
-            .alert-box {
-                padding: 20px 16px;
-                max-width: 340px;
-                border-radius: 14px;
-            }
-            .alert-box .icon-wrap {
-                width: 52px;
-                height: 52px;
-                font-size: 26px;
-                margin-bottom: 10px;
-            }
-            .alert-box .title {
-                font-size: 16px;
-            }
-            .alert-box .msg {
-                font-size: 12px;
-            }
-            .alert-box .btn-confirm {
-                padding: 10px 28px;
-                font-size: 14px;
-            }
-        }
-
-        .flex-1 {
-            flex: 1;
-        }
-        .flex-shrink-0 {
-            flex-shrink: 0;
-        }
-        .min-h-0 {
-            min-height: 0;
-        }
-        .gap-6 {
-            gap: 6px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .mt-6 {
-            margin-top: 6px;
-        }
-        .mb-6 {
-            margin-bottom: 6px;
-        }
-        .text-muted {
-            color: #94a3b8;
-        }
-        .text-xs {
-            font-size: 12px;
-        }
-        .text-sm {
-            font-size: 14px;
-        }
-        .scroll-y {
-            overflow-y: auto;
-            flex: 1;
-            min-height: 0;
-        }
+        .alert-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.78); backdrop-filter:blur(10px); z-index:9999; display:flex; align-items:center; justify-content:center; }
+        .alert-overlay.hidden { display:none; }
+        .alert-box { background:linear-gradient(145deg,#1a1a40,#0d0d2d); border:2px solid var(--accent-red); border-radius:18px; padding:40px 48px; max-width:520px; text-align:center; box-shadow:0 0 55px rgba(239,68,68,0.25); }
+        .btn-alert-confirm { background:linear-gradient(135deg,#ef4444,#dc2626); border:none; padding:12px 40px; border-radius:12px; font-size:16px; font-weight:700; color:#fff; cursor:pointer; margin-top:10px; }
+        .btn-alert-acknowledge { background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); padding:10px 32px; border-radius:10px; font-size:15px; font-weight:600; color:#fbbf24; cursor:pointer; margin-top:10px; transition:all 0.2s; }
+        .btn-alert-acknowledge:hover { background:rgba(245,158,11,0.25); }
     </style>
 </head>
 <body>
-
-    <!-- ===== 顶部导航 ===== -->
-    <header class="glass-panel h-14 flex items-center justify-between px-6 z-20 flex-shrink-0">
+    <header class="glass-panel h-14 flex items-center justify-between px-6 mx-1 mt-1">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
-                <i class="fas fa-shield-alt text-white text-sm"></i>
-            </div>
-            <span class="text-base font-bold text-white tracking-tight brand-text">校园应急 · <span class="text-blue-400">教师端</span></span>
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-shield-alt text-white text-sm"></i></div>
+            <span class="text-base font-bold text-white">校园应急 · <span class="text-blue-400">教师端</span></span>
         </div>
         <div class="flex items-center gap-5">
-            <div class="flex items-center gap-2" id="statusBadge">
-                <span class="status-dot status-normal" id="statusDot"></span>
-                <span class="text-sm text-slate-300" id="statusText">系统正常</span>
-            </div>
-            <div class="h-5 w-px bg-slate-700/50"></div>
-            <div class="text-right hidden sm:block">
-                <div class="text-sm font-mono text-cyan-400" id="currentTime">--:--:--</div>
-                <div class="text-[10px] text-slate-500" id="currentDate">----年--月--日</div>
-            </div>
-            <div class="flex items-center gap-2 user-badge">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">张</div>
-                <span class="text-sm text-slate-300 hidden sm:inline">张老师</span>
-            </div>
+            <span class="status-dot status-normal" id="statusDot"></span>
+            <span class="text-sm text-slate-300" id="statusText">系统正常</span>
+            <div class="text-right hidden sm:block"><div class="text-sm font-mono text-cyan-400" id="currentTime"></div><div class="text-[10px] text-slate-500" id="currentDate"></div></div>
+            <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">张</div><span class="text-sm text-slate-300 hidden sm:inline">张老师</span></div>
         </div>
     </header>
 
-    <!-- ===== 弹窗 ===== -->
-    <div class="alert-overlay" id="alertOverlay">
+    <div class="alert-overlay hidden" id="alertOverlay">
         <div class="alert-box">
-            <div class="icon-wrap"><i class="fas fa-bell"></i></div>
-            <div class="badge-disaster" id="alertDisasterType">🚨 紧急事件</div>
-            <div class="title" id="alertTitle">⚠️ 教学楼区域火情预警</div>
-            <div class="divider"></div>
-            <div class="msg" id="alertMessage">
-                <strong>📍 火灾警报已触发！</strong><br>
-                请老师根据收到的疏散路线，立即组织本班学生有序撤离。
+            <div style="font-size:34px; color:#ef4444; margin-bottom:16px;"><i class="fas fa-bell"></i></div>
+            <div style="background:rgba(239,68,68,0.15); color:#f87171; padding:3px 14px; border-radius:16px; display:inline-block; margin-bottom:8px;">🚨 紧急事件</div>
+            <div style="font-size:22px; font-weight:700; color:#f87171;" id="alertTitle">⚠️ 教学楼三楼南侧区发生火灾</div>
+            <div style="font-size:16px; color:#e2e8f0; margin:16px 0;" id="alertMessage">
+                <strong>📍 教学楼三楼南侧区火灾警报！</strong><br>请老师立即按照疏散路线组织学生撤离至操场集结点。
             </div>
-            <button class="btn-confirm" id="alertConfirmBtn">
-                <i class="fas fa-check-circle"></i> 我已收到，立即执行
-            </button>
+            <div class="flex flex-col gap-2">
+                <button class="btn-alert-acknowledge" id="alertAcknowledgeBtn"><i class="fas fa-check"></i> 消息已确认</button>
+                <button class="btn-alert-confirm" id="alertConfirmBtn"><i class="fas fa-check-circle"></i> 我已收到，立即执行</button>
+            </div>
         </div>
     </div>
 
-    <!-- ===== 主体 ===== -->
     <div class="flex-1 flex overflow-hidden p-2 gap-2" style="height:calc(100vh - 56px);">
-
-        <!-- ===== 左侧导航 ===== -->
         <aside class="w-48 glass-panel rounded-lg flex flex-col overflow-hidden flex-shrink-0 sidebar">
             <div class="p-3 border-b border-slate-700/30">
-                <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-2">
-                    <i class="fas fa-grip-lines text-cyan-400"></i> 功能
-                </div>
+                <div class="text-xs font-semibold text-slate-400 mb-2"><i class="fas fa-grip-lines text-cyan-400"></i> 功能</div>
                 <div class="space-y-0.5" id="navMenu">
-                    <div class="nav-item active rounded-md flex items-center gap-3" data-page="receive">
-                        <span class="icon text-cyan-400"><i class="fas fa-inbox"></i></span>
-                        <span class="label">指令接收</span>
-                        <span class="badge-dot"></span>
-                    </div>
-                    <div class="nav-item rounded-md flex items-center gap-3" data-page="rollcall">
-                        <span class="icon text-green-400"><i class="fas fa-clipboard-list"></i></span>
-                        <span class="label">学生点名</span>
-                    </div>
-                    <div class="nav-item rounded-md flex items-center gap-3" data-page="report">
-                        <span class="icon text-orange-400"><i class="fas fa-upload"></i></span>
-                        <span class="label">情况上报</span>
-                    </div>
-                    <div class="nav-item rounded-md flex items-center gap-3" data-page="route">
-                        <span class="icon text-purple-400"><i class="fas fa-map"></i></span>
-                        <span class="label">疏散路线</span>
-                    </div>
+                    <div class="nav-item active" data-page="receive"><span class="icon text-cyan-400"><i class="fas fa-inbox"></i></span><span class="label">指令接收</span><span class="badge-dot"></span></div>
+                    <div class="nav-item" data-page="rollcall"><span class="icon text-green-400"><i class="fas fa-clipboard-list"></i></span><span class="label">学生点名</span></div>
+                    <div class="nav-item" data-page="report"><span class="icon text-orange-400"><i class="fas fa-upload"></i></span><span class="label">情况上报</span></div>
+                    <div class="nav-item" data-page="route"><span class="icon text-purple-400"><i class="fas fa-map"></i></span><span class="label">疏散路线</span></div>
                 </div>
             </div>
         </aside>
 
-        <!-- ===== 主内容区 ===== -->
-        <main class="flex-1 flex flex-col gap-2 min-w-0 main-area">
-
-            <!-- 页面1：指令接收 -->
+        <main class="flex-1 flex flex-col gap-2 min-w-0">
             <div class="page-panel active" id="page-receive">
-                <div class="flex items-center justify-between flex-shrink-0 mb-1">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-inbox text-cyan-400 text-lg"></i>
-                        <span class="text-base font-semibold text-white">指令接收中心</span>
-                        <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/10">● 实时</span>
-                    </div>
-                    <button class="btn btn-outline btn-sm" onclick="showToast('info','已刷新')"><i class="fas fa-sync-alt"></i> 刷新</button>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3"><i class="fas fa-inbox text-cyan-400 text-xl"></i><span class="text-base font-semibold text-white">指令接收中心</span><span class="text-xs bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full">● 实时</span></div>
+                    <div class="flex gap-2"><button class="btn btn-outline btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> 全部已读</button><button class="btn btn-outline btn-sm" onclick="showToast('info','已刷新')"><i class="fas fa-sync-alt"></i> 刷新</button></div>
                 </div>
-                <div class="flex-1 flex flex-col gap-2 min-h-0 overflow-hidden">
-                    <div class="glass-card rounded-lg p-3 border-l-2 border-red-500/30 flex-shrink-0">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-red-400"><i class="fas fa-bell mr-1"></i> 最新紧急指令</span>
-                            <span class="text-xs text-slate-500">2026-06-30 10:20</span>
-                        </div>
-                        <div class="text-base font-semibold text-white mt-1">🚨 教学楼区域火情预警</div>
-                        <div class="text-sm text-slate-300 mt-1 leading-relaxed">请立即组织本班学生沿指定疏散路线撤离至操场安全区域，完成点名后第一时间上报本班情况。</div>
-                        <div class="flex gap-2 mt-1.5">
-                            <span class="cmd-tag tag-urgent">紧急</span>
-                            <span class="cmd-tag tag-danger">火情</span>
+                <div class="flex-1 flex flex-col gap-3 min-h-0 overflow-hidden">
+                    <div class="glass-card rounded-lg p-4 border-l-4 border-red-500/40" id="emergencyCard">
+                        <div class="flex justify-between"><span class="text-base font-bold text-red-400">🔴 最新紧急指令</span><span class="text-sm text-slate-400">2026-07-01 09:35</span></div>
+                        <div class="text-lg font-semibold text-white mt-1">🚨 教学楼三楼南侧区发生火灾</div>
+                        <div class="text-base text-slate-200 mt-2">📍 教学楼三楼南侧区已触发火灾警报！请老师立即按照疏散路线组织学生有序撤离至操场，确保安全。</div>
+                        <div class="flex gap-3 mt-3 items-center">
+                            <span class="cmd-tag tag-urgent">🔴 紧急</span>
+                            <span class="cmd-tag" style="background:rgba(239,68,68,0.1);color:#f87171;">火情</span>
+                            <button class="btn btn-outline btn-sm ml-auto" id="emergencyConfirmBtn" onclick="confirmEmergency()">确认</button>
                         </div>
                     </div>
-                    <div class="glass-card rounded-lg p-3 flex-1 flex flex-col min-h-0">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-sm font-semibold text-slate-300"><i class="fas fa-clock-rotate-left text-slate-500 mr-2"></i> 历史指令</span>
-                            <span class="text-xs text-slate-500">共 4 条</span>
-                        </div>
-                        <div class="scroll-y space-y-1">
-                            <div class="cmd-item">
-                                <div class="flex justify-between"><span class="text-sm font-medium text-white">🌧️ 明日大暴雨预警</span><span class="text-xs text-slate-500">06-29 16:30</span></div>
-                                <div class="text-xs text-slate-300 mt-1">请通知本班学生注意上下学安全，远离积水区域。</div>
-                                <div class="mt-1"><span class="cmd-tag tag-warning">天气</span></div>
-                            </div>
-                            <div class="cmd-item">
-                                <div class="flex justify-between"><span class="text-sm font-medium text-white">🩹 三楼走廊学生意外摔倒</span><span class="text-xs text-slate-500">06-28 09:15</span></div>
-                                <div class="text-xs text-slate-300 mt-1">请附近教师立即前往现场查看，联系校医。</div>
-                                <div class="mt-1"><span class="cmd-tag tag-warning">处置</span></div>
-                            </div>
-                            <div class="cmd-item">
-                                <div class="flex justify-between"><span class="text-sm font-medium text-white">🔧 高空坠物风险排查</span><span class="text-xs text-slate-500">06-27 14:10</span></div>
-                                <div class="text-xs text-slate-300 mt-1">请提醒学生远离教学楼外墙区域。</div>
-                                <div class="mt-1"><span class="cmd-tag tag-info">排查</span></div>
-                            </div>
-                            <div class="cmd-item">
-                                <div class="flex justify-between"><span class="text-sm font-medium text-white">📢 课间安全纪律强调</span><span class="text-xs text-slate-500">06-26 08:30</span></div>
-                                <div class="text-xs text-slate-300 mt-1">加强课间管理，禁止追逐打闹。</div>
-                                <div class="mt-1"><span class="cmd-tag tag-normal">常规</span></div>
-                            </div>
+                    <div class="glass-card rounded-lg p-4 flex-1 flex flex-col min-h-0">
+                        <div class="flex justify-between mb-3"><span class="text-base font-semibold text-slate-200">历史指令记录</span><span class="text-sm text-slate-400">共 8 条</span></div>
+                        <div class="scroll-y space-y-2 pr-1">
+                            <div class="cmd-item"><div class="flex justify-between"><span class="text-base font-medium text-white">🌧️ 暴雨橙色预警</span><span class="text-sm text-slate-400">06-30</span></div><div class="text-sm text-slate-300 mt-1">未来3小时暴雨，请班主任通知家长，已在校学生暂留教室。</div></div>
+                            <div class="cmd-item"><div class="flex justify-between"><span class="text-base font-medium text-white">🩹 课间意外受伤处理</span><span class="text-sm text-slate-400">06-29</span></div><div class="text-sm text-slate-300 mt-1">学生走廊摔倒疑似骨折，请附近教师联系校医并拨打120。</div></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 页面2：学生点名 -->
             <div class="page-panel" id="page-rollcall">
-                <div class="flex items-center justify-between flex-shrink-0 mb-1 flex-wrap gap-2">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-clipboard-list text-green-400 text-lg"></i>
-                        <span class="text-base font-semibold text-white">学生点名确认</span>
-                    </div>
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div class="class-btn-group" id="classBtnGroup">
-                            <button class="class-btn" data-class="class1">四1班</button>
-                            <button class="class-btn" data-class="class2">四2班</button>
-                            <button class="class-btn active" data-class="class3">四3班</button>
-                            <button class="class-btn" data-class="class4">四4班</button>
-                            <button class="class-btn" data-class="class5">五1班</button>
-                        </div>
-                        <div class="flex gap-1">
-                            <button class="btn btn-outline btn-sm" onclick="resetRollcall()"><i class="fas fa-undo"></i> 重置</button>
-                            <button class="btn btn-outline btn-sm" onclick="markAllPresent()"><i class="fas fa-check-double"></i> 全部</button>
-                        </div>
+                <div class="flex items-center justify-between mb-2 flex-wrap gap-3">
+                    <div class="flex items-center gap-3"><i class="fas fa-clipboard-list text-green-400 text-xl"></i><span class="text-base font-semibold text-white">学生点名确认</span></div>
+                    <div class="class-btn-group" id="classBtnGroup"></div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline btn-sm" onclick="resetRollcall()"><i class="fas fa-undo"></i> 重置</button>
+                        <button class="btn btn-outline btn-sm" onclick="markAllPresent()"><i class="fas fa-check-double"></i> 全到</button>
                     </div>
                 </div>
-                <div class="flex-1 flex flex-col gap-2 min-h-0 overflow-hidden">
-                    <div class="stats-row">
-                        <div class="stat-card"><div class="label">总人数</div><div class="num" id="totalCount">45</div></div>
-                        <div class="stat-card"><div class="label">已点名</div><div class="num green" id="checkedCount">0</div></div>
-                        <div class="stat-card"><div class="label">未点名</div><div class="num orange" id="uncheckedCount">45</div></div>
-                        <div class="stat-card"><div class="label">出勤率</div><div class="num" id="attendanceRate">0%</div></div>
-                    </div>
-                    <div class="glass-card rounded-lg p-2 flex-1 flex flex-col min-h-0">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs text-slate-400"><i class="fas fa-users text-slate-500 mr-2"></i> 点击姓名标记已到</span>
-                            <span class="text-xs text-slate-500" id="studentCountLabel">共 45 人</span>
-                        </div>
-                        <div class="student-grid" id="studentList"></div>
-                    </div>
-                    <div class="flex-shrink-0">
-                        <button class="btn btn-success" onclick="completeRollcall()"><i class="fas fa-check-circle"></i> 确认点名并上报</button>
-                    </div>
+                <div class="stats-row mb-2"><div class="stat-card"><div class="label">总人数</div><div class="num" id="totalCount">45</div></div><div class="stat-card"><div class="label">已点名</div><div class="num green" id="checkedCount">0</div></div><div class="stat-card"><div class="label">未点名</div><div class="num orange" id="uncheckedCount">45</div></div><div class="stat-card"><div class="label">出勤率</div><div class="num" id="attendanceRate">0%</div></div></div>
+                <div class="glass-card rounded-lg p-3 flex-1 flex flex-col min-h-0">
+                    <div class="text-sm text-slate-400 mb-2">点击姓名标记已到 <span class="float-right" id="studentCountLabel">共 45 人</span></div>
+                    <div class="student-grid" id="studentList"></div>
                 </div>
+                <button class="btn btn-success mt-2" onclick="completeRollcall()"><i class="fas fa-check-circle"></i> 确认点名并上报</button>
             </div>
 
-            <!-- 页面3：情况上报 -->
             <div class="page-panel" id="page-report">
-                <div class="flex items-center justify-between flex-shrink-0 mb-1">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-upload text-orange-400 text-lg"></i>
-                        <span class="text-base font-semibold text-white">本班应急情况上报</span>
-                        <span class="text-xs bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/10">即时上报</span>
+                <div class="flex items-center justify-between mb-2"><div class="flex items-center gap-3"><i class="fas fa-upload text-orange-400 text-xl"></i><span class="text-base font-semibold text-white">本班应急情况上报</span></div><button class="btn btn-outline btn-sm" onclick="document.getElementById('reportForm').reset()"><i class="fas fa-eraser"></i> 清空</button></div>
+                <form id="reportForm" onsubmit="submitReport(event)" class="flex-1 flex flex-col gap-3 min-h-0">
+                    <div class="glass-card rounded-lg p-4 flex-1 overflow-y-auto">
+                        <div class="form-row"><div class="form-group"><label>所在班级</label><select class="form-control" id="reportClassSelect"></select></div><div class="form-group"><label>上报人</label><input class="form-control" value="张老师" readonly></div></div>
+                        <div class="form-row"><div class="form-group"><label>班级状态</label><select class="form-control"><option>✅ 已全部安全撤离</option><option>🚶 撤离中</option><option>⚠️ 有学生滞留</option></select></div><div class="form-group"><label>安全集结人数</label><input type="number" class="form-control" id="reportArrived" placeholder="实到人数" min="0"></div></div>
+                        <div class="form-row mt-2"><div class="form-group"><label>受困/未撤离人数</label><input type="number" class="form-control" id="reportStranded" placeholder="0" min="0"></div><div class="form-group"><label>是否需要支援</label><select class="form-control"><option>暂不需要</option><option>需要医疗支援</option><option>需要消防支援</option><option>需要安保支援</option></select></div></div>
+                        <div class="border-t border-slate-700/30 pt-3 mt-2"><span class="text-sm font-semibold text-slate-300"><i class="fas fa-camera mr-1"></i>现场情况描述</span><textarea class="form-control mt-1" rows="2" placeholder="请简要描述现场情况，如烟雾、秩序等"></textarea></div>
+                        <div class="border-t border-slate-700/30 pt-3 mt-2"><span class="text-sm font-semibold text-slate-300"><i class="fas fa-paperclip mr-1"></i>现场图片/视频</span><div class="flex gap-2 mt-1"><label class="btn btn-outline btn-sm cursor-pointer"><i class="fas fa-upload"></i> 上传照片<input type="file" accept="image/*" style="display:none" multiple></label><label class="btn btn-outline btn-sm cursor-pointer"><i class="fas fa-video"></i> 上传视频<input type="file" accept="video/*" style="display:none"></label></div></div>
+                        <div class="border-t border-slate-700/30 pt-3 mt-2"><span class="text-sm font-semibold text-slate-300"><i class="fas fa-user-injured text-red-400 mr-1"></i>学生伤情记录</span><button type="button" id="addInjuryBtn" class="btn btn-outline btn-sm ml-2"><i class="fas fa-plus"></i> 添加</button><div id="injuryContainer" class="space-y-2 mt-2"></div></div>
                     </div>
-                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('reportForm').reset(); document.getElementById('injuryContainer').innerHTML = '';"><i class="fas fa-eraser"></i> 清空</button>
-                </div>
-                <form id="reportForm" onsubmit="submitReport(event)" class="flex-1 flex flex-col gap-2 min-h-0 overflow-hidden">
-                    <div class="glass-card rounded-lg p-3 flex-1 flex flex-col gap-2 min-h-0 overflow-y-auto">
-                        <div class="form-row">
-                            <div class="form-group"><label>所在班级 *</label>
-                                <select class="form-control" required><option>四年级3班</option><option>四年级1班</option><option>四年级2班</option><option>四年级4班</option><option>五年级1班</option></select>
-                            </div>
-                            <div class="form-group"><label>上报人 *</label>
-                                <input type="text" class="form-control" value="张老师" readonly>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>班级整体状态 *</label>
-                                <select class="form-control" required>
-                                    <option>✅ 已全部安全撤离至集结点</option>
-                                    <option>🚶 撤离中，部分学生未到达</option>
-                                    <option>⚠️ 有学生滞留教室/楼道</option>
-                                    <option>🚧 通道受阻，无法正常撤离</option>
-                                    <option>🆘 现场出现紧急异常情况</option>
-                                </select>
-                            </div>
-                            <div class="form-group"><label>已安全集结人数 *</label>
-                                <input type="number" class="form-control" placeholder="实到人数" id="reportArrived" min="0" max="45" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>滞留 / 未到人数</label>
-                                <input type="number" class="form-control" id="reportMissing" value="0" min="0" readonly>
-                            </div>
-                            <div class="form-group"><label>滞留原因</label>
-                                <select class="form-control"><option>无滞留人员</option><option>行动缓慢</option><option>身体不适</option><option>现场拥堵</option><option>其他</option></select>
-                            </div>
-                        </div>
-                        <div class="border-t border-slate-700/30 pt-2 mt-1">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-user-injured text-red-400 text-sm"></i>
-                                    <span class="text-sm font-semibold text-slate-300">学生伤情记录</span>
-                                </div>
-                                <button type="button" id="addInjuryBtn" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> 添加伤情</button>
-                            </div>
-                            <div id="injuryContainer" class="space-y-1"></div>
-                            <div class="text-xs text-slate-500 mt-1">* 如有多个学生受伤，请逐一添加</div>
-                        </div>
-                        <div class="border-t border-slate-700/30 pt-2 mt-1">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <i class="fas fa-exclamation-triangle text-yellow-400 text-sm"></i>
-                                <span class="text-sm font-semibold text-slate-300">安全隐患（可选）</span>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group"><label>隐患位置</label>
-                                    <input type="text" class="form-control" placeholder="如：3楼东侧楼梯口">
-                                </div>
-                                <div class="form-group"><label>隐患类型</label>
-                                    <select class="form-control">
-                                        <option>消防通道堵塞</option><option>电路/电器隐患</option>
-                                        <option>墙体/地面破损</option><option>消防设施过期</option>
-                                        <option>高空坠物风险</option><option>其他</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex-shrink-0">
-                        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> 提交上报</button>
-                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> 提交上报</button>
                 </form>
             </div>
 
-            <!-- ============================================================ -->
-            <!-- 页面4：疏散路线（简化版） -->
-            <!-- ============================================================ -->
             <div class="page-panel" id="page-route">
-                <div class="flex items-center justify-between flex-shrink-0 mb-1 flex-wrap gap-2">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-route text-purple-400 text-lg"></i>
-                        <span class="text-base font-semibold text-white">逃生路线 · 简化导航</span>
-                        <span class="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/10">三层 · 四3班</span>
+                <div class="flex items-center justify-between mb-2 flex-wrap gap-3">
+                    <div class="flex items-center gap-3"><i class="fas fa-route text-purple-400 text-xl"></i><span class="text-base font-semibold text-white">3D校园疏散导航</span><span class="text-xs bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full">三层·四年级3班</span></div>
+                    <div class="disaster-btn-group" id="disasterBtnGroup">
+                        <button class="disaster-btn active-normal" data-disaster="normal"><i class="fas fa-check-circle"></i> 正常</button>
+                        <button class="disaster-btn" data-disaster="fire"><i class="fas fa-fire text-red-400"></i> 火灾</button>
+                        <button class="disaster-btn" data-disaster="earthquake"><i class="fas fa-mountain text-yellow-400"></i> 地震</button>
                     </div>
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div class="disaster-btn-group" id="disasterBtnGroup">
-                            <button class="disaster-btn active-normal" data-disaster="normal">
-                                <i class="fas fa-check-circle"></i> 正常
-                            </button>
-                            <button class="disaster-btn" data-disaster="fire">
-                                <i class="fas fa-fire text-red-400"></i> 火灾
-                            </button>
-                            <button class="disaster-btn" data-disaster="earthquake">
-                                <i class="fas fa-mountain text-yellow-400"></i> 地震
-                            </button>
-                        </div>
-                        <button id="autoRotateBtn" class="btn-auto-rotate"><i class="fas fa-rotate-right"></i> 旋转</button>
+                    <div class="flex gap-2">
+                        <button id="autoRotateBtn" class="btn btn-outline btn-sm"><i class="fas fa-sync-alt"></i> 旋转</button>
                         <button id="resetViewBtn" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> 复位</button>
-                        <span class="text-xs text-slate-500"><i class="fas fa-mouse-pointer mr-1"></i>拖拽</span>
+                        <button id="topViewBtn" class="btn btn-outline btn-sm"><i class="fas fa-arrow-down"></i> 俯视</button>
                     </div>
                 </div>
-                <div class="flex-1 flex flex-col gap-1.5 min-h-0 overflow-hidden">
-                    <div class="glass-card rounded-lg p-1 flex-1 min-h-0" style="position:relative;">
-                        <div id="three-container">
-                            <div class="loading-indicator" id="loadingIndicator">
-                                <div class="spinner"></div>
-                                <span>加载3D场景...</span>
-                            </div>
-                        </div>
-                        <div class="map-overlay" id="mapOverlay">
-                            <span id="mapStatusText">🏫 四3班 → 主楼梯 → 操场</span>
-                            <span class="badge badge-normal" id="mapStatusBadge">● 正常</span>
-                            <span class="legend">
-                                <span><span class="dot green" id="legendMainDot"></span> 主路线</span>
-                                <span><span class="dot purple"></span> 备用</span>
-                                <span><span class="dot gold"></span> 本班</span>
-                            </span>
+                <div class="flex-1 flex flex-col gap-2 min-h-0">
+                    <div class="glass-card rounded-lg flex-1 relative">
+                        <div id="three-container"><div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div>加载3D校园...</div></div>
+                        <div class="map-overlay-bar" id="mapOverlayBar">
+                            <span id="mapStatusLabel">🏫 四年级3班 → 主楼梯 → 操场</span>
+                            <span class="badge-sm badge-normal-sm" id="mapStatusBadgeSm">● 正常</span>
                         </div>
                     </div>
-                    <!-- 底部简化的步骤指引 -->
-                    <div class="route-guide-bar" id="routeGuideBar">
-                        <span class="step active-step" data-step="0"><span class="num">1</span><span class="label-text">四3班</span><span class="loc">(3F西)</span></span>
-                        <span class="step"><span class="arrow">→</span></span>
-                        <span class="step" data-step="1"><span class="num">2</span><span class="label-text">走廊</span><span class="loc">(3F)</span></span>
-                        <span class="step"><span class="arrow">→</span></span>
-                        <span class="step" data-step="2"><span class="num">3</span><span class="label-text">主楼梯</span><span class="loc">(↓)</span></span>
-                        <span class="step"><span class="arrow">→</span></span>
-                        <span class="step" data-step="3"><span class="num">4</span><span class="label-text">大厅</span><span class="loc">(1F)</span></span>
-                        <span class="step"><span class="arrow">→</span></span>
-                        <span class="step" data-step="4"><span class="num" style="background:#10b981;color:#fff;">5</span><span class="label-text" style="color:#34d399;">操场</span><span class="loc">(集结点)</span></span>
+                    <div class="route-step-bar" id="routeStepBar">
+                        <span class="step-item active-step"><span class="step-num">1</span> 四年级3班</span>
+                        <span>→</span><span class="step-item"><span class="step-num">2</span> 走廊</span>
+                        <span>→</span><span class="step-item"><span class="step-num">3</span> 主楼梯</span>
+                        <span>→</span><span class="step-item"><span class="step-num">4</span> 大厅</span>
+                        <span>→</span><span class="step-item"><span class="step-num" style="background:#10b981;color:#fff;">5</span> 操场</span>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
-    <!-- ===== Toast ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== Three.js ===== -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js">
-    </script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        // ================================================================
-        // 1. 基础功能
-        // ================================================================
-        function updateClock() {
-            const n = new Date();
-            document.getElementById('currentTime').textContent = n.toLocaleTimeString();
-            document.getElementById('currentDate').textContent = n.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long',
-                day: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        function updateClock() { const n=new Date(); document.getElementById('currentTime').textContent=n.toLocaleTimeString('zh-CN',{hour12:false}); document.getElementById('currentDate').textContent=n.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'}); }
+        setInterval(updateClock,1000); updateClock();
 
-        function showToast(type, message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-            toast.innerHTML =
-                `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span><span class="ml-auto cursor-pointer text-slate-500 hover:text-white transition" onclick="this.parentElement.remove()">✕</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(12px)';
-                    setTimeout(() => { if (toast.parentElement) toast.remove(); }, 300);
-                }
-            }, 3800);
-        }
+        function showToast(type,msg){ const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className=`toast ${type}`; t.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span><span>${msg}</span>`; c.appendChild(t); setTimeout(()=>{ if(t.parentElement) t.remove(); },4000); }
+        function markAllRead(){ document.querySelectorAll('.cmd-item.unread').forEach(e=>e.classList.remove('unread')); showToast('success','已全部标记已读'); }
 
-        // ================================================================
-        // 2. 弹窗逻辑
-        // ================================================================
         let alertShown = false;
+        let emergencyConfirmed = false;
 
-        function showAlert(disasterType, title, message) {
+        function confirmEmergency() {
+            if (emergencyConfirmed) return;
+            emergencyConfirmed = true;
+            const btn = document.getElementById('emergencyConfirmBtn');
+            btn.innerHTML = '<i class="fas fa-check"></i> 已确认';
+            btn.disabled = true;
+            showToast('success', '紧急指令已确认');
+            // 同时设置全局灾害状态为火灾
+            setDisasterState('fire');
+        }
+
+        function acknowledgeAlert() {
+            document.getElementById('alertOverlay').classList.add('hidden');
+            if (!emergencyConfirmed) confirmEmergency();
+            showToast('info', '消息已确认，请尽快执行疏散');
+            setDisasterState('fire');
+        }
+
+        function showAlert() {
             if (alertShown) return;
             alertShown = true;
-
-            const overlay = document.getElementById('alertOverlay');
-            document.getElementById('alertDisasterType').textContent = disasterType;
-            document.getElementById('alertTitle').textContent = title;
-            document.getElementById('alertMessage').innerHTML = message;
-
-            overlay.classList.remove('hidden');
-
-            document.getElementById('alertConfirmBtn').addEventListener('click', function() {
-                overlay.classList.add('hidden');
-                showToast('info', '✅ 已确认，请按照疏散路线组织学生撤离！');
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                document.querySelector('.nav-item[data-page="route"]').classList.add('active');
-                document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-route').classList.add('active');
-                setTimeout(() => {
-                    if (typeof initThreeScene === 'function') {
-                        initThreeScene();
-                    }
-                }, 400);
-            });
+            document.getElementById('alertOverlay').classList.remove('hidden');
         }
 
-        setTimeout(() => {
-            showAlert(
-                '🚨 紧急事件',
-                '⚠️ 教学楼区域火情预警',
-                '<strong>📍 火灾警报已触发！</strong><br>请老师根据收到的疏散路线，立即组织本班学生有序撤离。<br><br><span style="color:#fbbf24;font-size:13px;">📢 疏散路线已生成，请点击"确认"查看</span>'
-            );
-        }, 800);
+        // 全局灾害状态
+        let currentDisaster = 'normal';
 
-        // ================================================================
-        // 3. 导航切换
-        // ================================================================
+        function setDisasterState(disaster) {
+            currentDisaster = disaster;
+            // 更新顶部状态
+            if (disaster === 'fire') {
+                document.getElementById('statusDot').className = 'status-dot status-critical';
+                document.getElementById('statusText').textContent = '🔥 火灾应急';
+            } else {
+                document.getElementById('statusDot').className = 'status-dot status-normal';
+                document.getElementById('statusText').textContent = '系统正常';
+            }
+            // 同步灾害按钮
+            document.querySelectorAll('.disaster-btn').forEach(btn => {
+                btn.classList.remove('active-normal', 'active-fire', 'active-earthquake');
+                if (btn.dataset.disaster === disaster) {
+                    if (disaster === 'normal') btn.classList.add('active-normal');
+                    else if (disaster === 'fire') btn.classList.add('active-fire');
+                    else if (disaster === 'earthquake') btn.classList.add('active-earthquake');
+                }
+            });
+            // 如果路线页面活跃且场景已初始化，立即更新路线
+            if (document.getElementById('page-route').classList.contains('active') && isInit) {
+                updateDisasterRoute(disaster);
+            }
+        }
+
+        document.getElementById('alertConfirmBtn').addEventListener('click', function() {
+            document.getElementById('alertOverlay').classList.add('hidden');
+            if (!emergencyConfirmed) confirmEmergency();
+            showToast('info', '✅ 已确认，切换到火灾疏散路线');
+            setDisasterState('fire');
+
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('.nav-item[data-page="route"]').classList.add('active');
+            document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-route').classList.add('active');
+            setTimeout(initThreeScene, 400);
+        });
+
+        document.getElementById('alertAcknowledgeBtn').addEventListener('click', acknowledgeAlert);
+
+        setTimeout(showAlert, 1500);
+
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
                 const page = this.dataset.page;
                 document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-' + page).classList.add('active');
+                document.getElementById('page-'+page).classList.add('active');
                 if (page === 'route') {
-                    setTimeout(() => {
-                        if (typeof initThreeScene === 'function') {
-                            initThreeScene();
-                        }
-                    }, 350);
+                    setTimeout(initThreeScene, 400);
                 }
             });
         });
 
-        // ================================================================
-        // 4. 点名系统（精简）
-        // ================================================================
+        const classOrder = ['class1_1','class1_2','class2_1','class2_2','class3_1','class3_2','class4_1','class4_2','class4_3','class4_4','class5_1','class5_2','class6_1'];
+        function generateNames(count) {
+            const surnames = ['李','王','张','刘','陈','杨','赵','黄','周','吴','徐','孙','胡','朱','高','林','何','郭','马','罗','梁','宋','郑','谢','韩','唐','冯','于','董','萧','程','曹','袁','邓','许','傅','沈','曾','彭','吕','苏','卢','蒋','蔡','贾','丁','魏','薛','叶','阎','余','潘','杜','戴','夏','钟','汪','田','任','姜','范','方','石','姚','谭','廖','邹','熊','金','陆','郝','孔','白','崔','康','毛','邱','秦','江','史','顾','侯','邵','孟','龙','万','段','雷','钱','汤','尹','黎','易','常','武','乔','贺','赖','龚','文'];
+            const names = ['伟','芳','娜','秀英','敏','静','丽','强','磊','洋','勇','艳','杰','娟','涛','明','超','秀兰','霞','平','刚','桂英','文','华','飞','玉兰','桂兰','斌','玲','萍','红','鑫','慧','建','云','俊','兰','凤','洁','梅','瑞','春','海','燕','琳','雪','婷','宇','浩','然','博','文','泽','睿','轩','哲','涵','琪','瑶','晨','曦','铭','鹏','程','皓','阳','晖','彤','萱','怡'];
+            const list = [];
+            for (let i=0; i<count; i++) {
+                const s = surnames[Math.floor(Math.random() * surnames.length)];
+                const n1 = names[Math.floor(Math.random() * names.length)];
+                const n2 = Math.random() > 0.5 ? names[Math.floor(Math.random() * names.length)] : '';
+                list.push(s + n1 + (n2 || ''));
+            }
+            return list;
+        }
+
         const classData = {
-            class1: { name: '四年级1班', students: ['赵一鸣', '钱思涵', '孙浩宇', '李明熙', '周雨桐', '吴子轩', '郑欣怡', '王浩然', '陈雨萱',
-                    '刘子涵', '张俊豪', '林静怡', '黄宇轩', '杨欣妍', '赵子豪', '周雨萌', '吴俊杰', '郑欣瑶', '王宇航', '陈思琪',
-                    '刘宇轩', '张雨桐', '林浩宇', '黄欣怡', '杨子涵', '赵雨彤', '周浩然', '吴欣妍', '郑宇豪', '王雨萱', '陈俊豪',
-                    '刘欣怡', '张子轩', '林雨桐', '黄宇豪', '杨欣瑶', '赵俊杰', '周雨涵', '吴浩然', '郑思琪', '王宇轩', '陈雨桐',
-                    '刘浩宇', '张欣怡', '林子豪'
-                ] },
-            class2: { name: '四年级2班', students: ['高诗涵', '唐浩宇', '曹欣妍', '邓子轩', '许雨桐', '傅俊豪', '沈欣怡', '曾浩然', '彭雨萱',
-                    '吕子涵', '苏俊杰', '卢欣瑶', '蒋宇航', '蔡雨彤', '贾浩宇', '丁欣妍', '魏子轩', '薛雨桐', '叶俊豪', '阎欣怡',
-                    '余浩然', '夏雨萱', '方子涵', '石俊杰', '任欣瑶', '姚宇航', '廖雨彤', '邹浩宇', '熊欣妍', '金子轩', '陆雨桐',
-                    '孔俊豪', '白欣怡', '崔浩然', '毛雨萱', '邱子涵', '秦俊杰', '江欣瑶', '史宇航', '顾雨彤'
-                ] },
-            class3: { name: '四年级3班', students: ['李浩宇', '王梓晨', '张馨予', '刘浩然', '陈子涵', '杨雨桐', '黄俊豪', '周欣悦', '吴雨泽',
-                    '郑欣怡', '林宇轩', '高雨萱', '邓博文', '钟欣妍', '彭子豪', '蒋欣悦', '蔡宇恒', '潘欣妍', '余子涵', '戴俊豪',
-                    '方欣悦', '宋宇轩', '毛子涵', '万俊豪', '崔欣悦', '熊子涵', '江俊豪', '侯欣悦', '贺子轩', '雷俊豪', '龙欣悦',
-                    '黎子涵', '肖俊豪', '钱欣悦', '汤子涵', '尹俊豪', '易欣悦', '常子涵', '武俊豪', '乔欣悦', '贺子轩', '龚俊豪',
-                    '文欣悦', '樊子涵', '牛俊豪'
-                ] },
-            class4: { name: '四年级4班', students: ['欧阳雪', '慕容枫', '令狐冲', '李慕白', '王小川', '张一辰', '刘若曦', '陈思远', '杨雨晴',
-                    '赵子龙', '周若琳', '吴子骞', '郑心怡', '王浩宇', '林梦瑶', '张子轩', '刘雨桐', '陈俊豪', '杨欣妍', '赵宇航',
-                    '周雨彤', '吴俊杰', '郑欣瑶', '王宇航', '林雨萱', '张俊豪', '刘欣怡', '陈浩然', '杨雨萌', '赵子涵', '周欣悦',
-                    '吴雨泽', '郑子轩', '王雨桐', '林浩宇', '张欣妍', '刘宇航', '陈雨萱', '杨俊豪', '赵欣怡'
-                ] },
-            class5: { name: '五年级1班', students: ['韩雨桐', '沈俊豪', '陆欣妍', '范子轩', '白雨萱', '曾浩然', '魏欣怡', '冯宇豪', '邓雨桐',
-                    '许俊杰', '傅欣瑶', '蒋宇航', '沈雨彤', '韩浩宇', '陆欣怡', '范子豪', '白欣妍', '曾雨萱', '魏浩然', '冯宇桐',
-                    '邓俊豪', '许欣瑶', '傅宇航', '蒋雨彤', '沈浩宇', '陆欣怡', '范子豪', '白欣妍', '曾雨萱', '魏浩然', '冯宇桐',
-                    '邓俊豪', '许欣瑶', '傅宇航', '蒋雨彤', '沈浩宇', '陆欣怡', '范子豪', '白欣妍', '曾雨萱'
-                ] }
+            class1_1: { name:'一年级1班', students: generateNames(42) },
+            class1_2: { name:'一年级2班', students: generateNames(43) },
+            class2_1: { name:'二年级1班', students: generateNames(44) },
+            class2_2: { name:'二年级2班', students: generateNames(45) },
+            class3_1: { name:'三年级1班', students: generateNames(46) },
+            class3_2: { name:'三年级2班', students: generateNames(44) },
+            class4_1: { name:'四年级1班', students: ['赵一鸣','钱思涵','孙浩宇','李明熙','周雨桐','吴子轩','郑欣怡','王浩然','陈雨萱','刘子涵','张俊豪','林静怡','黄宇轩','杨欣妍','赵子豪','周雨萌','吴俊杰','郑欣瑶','王宇航','陈思琪','刘宇轩','张雨桐','林浩宇','黄欣怡','杨子涵','赵雨彤','周浩然','吴欣妍','郑宇豪','王雨萱','陈俊豪','刘欣怡','张子轩','林雨桐','黄宇豪','杨欣瑶','赵俊杰','周雨涵','吴浩然','郑思琪','王宇轩','陈雨桐','刘浩宇','张欣怡','林子豪'] },
+            class4_2: { name:'四年级2班', students: ['高诗涵','唐浩宇','曹欣妍','邓子轩','许雨桐','傅俊豪','沈欣怡','曾浩然','彭雨萱','吕子涵','苏俊杰','卢欣瑶','蒋宇航','蔡雨彤','贾浩宇','丁欣妍','魏子轩','薛雨桐','叶俊豪','阎欣怡','余浩然','夏雨萱','方子涵','石俊杰','任欣瑶','姚宇航','廖雨彤','邹浩宇','熊欣妍','金子轩','陆雨桐','孔俊豪','白欣怡','崔浩然','毛雨萱','邱子涵','秦俊杰','江欣瑶','史宇航','顾雨彤'] },
+            class4_3: { name:'四年级3班', students: ['李浩宇','王梓晨','张馨予','刘浩然','陈子涵','杨雨桐','黄俊豪','周欣悦','吴雨泽','郑欣怡','林宇轩','高雨萱','邓博文','钟欣妍','彭子豪','蒋欣悦','蔡宇恒','潘欣妍','余子涵','戴俊豪','方欣悦','宋宇轩','毛子涵','万俊豪','崔欣悦','熊子涵','江俊豪','侯欣悦','贺子轩','雷俊豪','龙欣悦','黎子涵','肖俊豪','钱欣悦','汤子涵','尹俊豪','易欣悦','常子涵','武俊豪','乔欣悦','贺子轩','龚俊豪','文欣悦','樊子涵','牛俊豪'] },
+            class4_4: { name:'四年级4班', students: ['欧阳雪','慕容枫','令狐冲','李慕白','王小川','张一辰','刘若曦','陈思远','杨雨晴','赵子龙','周若琳','吴子骞','郑心怡','王浩宇','林梦瑶','张子轩','刘雨桐','陈俊豪','杨欣妍','赵宇航','周雨彤','吴俊杰','郑欣瑶','王宇航','林雨萱','张俊豪','刘欣怡','陈浩然','杨雨萌','赵子涵','周欣悦','吴雨泽','郑子轩','王雨桐','林浩宇','张欣妍','刘宇航','陈雨萱','杨俊豪','赵欣怡'] },
+            class5_1: { name:'五年级1班', students: generateNames(44) },
+            class5_2: { name:'五年级2班', students: generateNames(45) },
+            class6_1: { name:'六年级1班', students: generateNames(42) }
         };
-        let currentClass = 'class3';
+
+        let currentClass = 'class4_3';
         let rollcallData = {};
 
-        function getClassStudents(c) { return classData[c]?.students || []; }
+        function getClassStudents(key) { return classData[key]?.students || []; }
+        function getClassName(key) { return classData[key]?.name || key; }
+
+        function buildClassButtons() {
+            const container = document.getElementById('classBtnGroup');
+            container.innerHTML = '';
+            classOrder.forEach(key => {
+                const cls = classData[key];
+                if (!cls) return;
+                const btn = document.createElement('button');
+                btn.className = `class-btn ${key === currentClass ? 'active' : ''}`;
+                btn.dataset.class = key;
+                btn.textContent = cls.name;
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentClass = key;
+                    renderStudentList();
+                    const reportSelect = document.getElementById('reportClassSelect');
+                    if (reportSelect) reportSelect.value = key;
+                    showToast('info', `切换到 ${cls.name}`);
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        function buildReportSelect() {
+            const select = document.getElementById('reportClassSelect');
+            select.innerHTML = '';
+            classOrder.forEach(key => {
+                const cls = classData[key];
+                if (!cls) return;
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = cls.name;
+                if (key === currentClass) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
 
         function renderStudentList() {
             const container = document.getElementById('studentList');
@@ -1611,10 +416,7 @@
                 div.dataset.index = idx;
                 if (rollcallData[currentClass]?.[idx]) div.classList.add('checked');
                 div.onclick = function() {
-                    const i = parseInt(this.dataset.index);
-                    if (!rollcallData[currentClass]) rollcallData[currentClass] = new Array(students.length).fill(
-                    false);
-                    rollcallData[currentClass][i] = !rollcallData[currentClass][i];
+                    rollcallData[currentClass][idx] = !rollcallData[currentClass][idx];
                     this.classList.toggle('checked');
                     updateStats();
                 };
@@ -1625,899 +427,171 @@
 
         function updateStats() {
             const students = getClassStudents(currentClass);
-            const data = rollcallData[currentClass] || new Array(students.length).fill(false);
-            const total = students.length,
-                checked = data.filter(v => v).length,
-                rate = total > 0 ? Math.round((checked / total) * 100) : 0;
+            const data = rollcallData[currentClass] || [];
+            const total = students.length;
+            const checked = data.filter(v => v).length;
             document.getElementById('totalCount').textContent = total;
             document.getElementById('checkedCount').textContent = checked;
             document.getElementById('uncheckedCount').textContent = total - checked;
-            document.getElementById('attendanceRate').textContent = rate + '%';
+            document.getElementById('attendanceRate').textContent = total ? Math.round(checked/total*100)+'%' : '0%';
         }
 
         function completeRollcall() {
-            const students = getClassStudents(currentClass);
-            const data = rollcallData[currentClass] || new Array(students.length).fill(false);
-            const checked = data.filter(v => v).length;
-            if (checked === 0) { showToast('warning', '⚠️ 请至少标记一名学生已到'); return; }
-            showToast('success', `✅ ${classData[currentClass]?.name} 点名完成！实到 ${checked}/${students.length}`);
+            const checked = (rollcallData[currentClass] || []).filter(v => v).length;
+            if (!checked) showToast('warning', '请至少标记一名学生');
+            else showToast('success', `${getClassName(currentClass)} 点名完成，实到 ${checked}/${getClassStudents(currentClass).length}`);
         }
-
         function resetRollcall() {
-            const students = getClassStudents(currentClass);
-            rollcallData[currentClass] = new Array(students.length).fill(false);
+            rollcallData[currentClass] = new Array(getClassStudents(currentClass).length).fill(false);
             renderStudentList();
-            showToast('info', '🔄 已重置');
+            showToast('info', '已重置');
         }
-
         function markAllPresent() {
-            const students = getClassStudents(currentClass);
-            rollcallData[currentClass] = new Array(students.length).fill(true);
+            rollcallData[currentClass] = new Array(getClassStudents(currentClass).length).fill(true);
             renderStudentList();
-            showToast('success', '✔️ 全部标记已到');
+            showToast('success', '全部标记已到');
         }
 
-        document.querySelectorAll('.class-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentClass = this.dataset.class;
-                if (!rollcallData[currentClass]) {
-                    const students = getClassStudents(currentClass);
-                    rollcallData[currentClass] = new Array(students.length).fill(false);
-                }
-                renderStudentList();
-                showToast('info', `切换到 ${classData[currentClass]?.name}`);
-            });
-        });
+        buildClassButtons();
+        buildReportSelect();
         renderStudentList();
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const arrived = document.getElementById('reportArrived');
-            const missing = document.getElementById('reportMissing');
-            if (arrived && missing) {
-                arrived.addEventListener('input', function() {
-                    const val = parseInt(this.value) || 0;
-                    const total = parseInt(document.getElementById('totalCount')?.textContent) || 45;
-                    missing.value = Math.max(0, total - val);
-                });
-            }
+        document.getElementById('reportClassSelect')?.addEventListener('change', function() {
+            currentClass = this.value;
+            document.querySelectorAll('.class-btn').forEach(b => b.classList.toggle('active', b.dataset.class === currentClass));
+            renderStudentList();
         });
 
-        document.getElementById('addInjuryBtn').addEventListener('click', function() {
-            const container = document.getElementById('injuryContainer');
-            const entry = document.createElement('div');
-            entry.className = 'injury-entry flex gap-2 items-center mb-1';
-            entry.innerHTML = `
-                <input type="text" placeholder="姓名" class="form-control flex-1" style="font-size:12px; padding:4px 8px;">
-                <input type="text" placeholder="伤情描述" class="form-control flex-1" style="font-size:12px; padding:4px 8px;">
-                <select class="form-control" style="width:70px; font-size:12px; padding:4px 6px;">
-                    <option>轻微</option><option>中等</option><option>严重</option>
-                </select>
-                <button type="button" class="btn btn-danger btn-sm remove-injury" style="padding:2px 8px; height:30px;"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(entry);
-            entry.querySelector('.remove-injury').addEventListener('click', function() { entry.remove(); });
+        document.getElementById('addInjuryBtn')?.addEventListener('click', () => {
+            const c = document.getElementById('injuryContainer');
+            const d = document.createElement('div');
+            d.className = 'flex gap-2 items-center mb-1';
+            d.innerHTML = `<input placeholder="姓名" class="form-control flex-1"><input placeholder="伤情" class="form-control flex-1"><select class="form-control" style="width:70px"><option>轻微</option><option>中等</option><option>严重</option></select><button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+            c.appendChild(d);
         });
 
         function submitReport(e) {
             e.preventDefault();
+            const cls = document.getElementById('reportClassSelect').value;
             const arrived = document.getElementById('reportArrived').value;
-            if (!arrived || parseInt(arrived) < 0) { showToast('error', '❌ 请填写已安全集结人数'); return; }
-            const injuries = [];
-            document.querySelectorAll('.injury-entry').forEach(entry => {
-                const inputs = entry.querySelectorAll('input');
-                const select = entry.querySelector('select');
-                if (inputs[0]?.value || inputs[1]?.value) {
-                    injuries.push({ name: inputs[0]?.value || '未知', desc: inputs[1]?.value || '未描述',
-                        severity: select?.value || '轻微' });
-                }
-            });
-            let msg = '📤 本班情况已上报';
-            if (injuries.length > 0) msg += `，共记录 ${injuries.length} 名学生伤情`;
-            showToast('success', msg);
+            if (!arrived || parseInt(arrived) < 0) { showToast('error', '请填写安全集结人数'); return; }
+            showToast('success', `📤 ${getClassName(cls)} 情况已上报`);
         }
 
-        // ================================================================
-        // 5. Three.js 3D 简化路线
-        // ================================================================
-        let threeScene = null,
-            threeRenderer = null, threeCamera = null, threeControls = null;
-        let routeGroup = null,
-            flowParticles = null;
-        let currentDisaster = 'normal',
-            animFrame = null;
-        let flowPositions = [];
-        let isInitialized = false;
-        let isAutoRotate = false;
-        let activeStepIndex = 0;
+        // ========== 3D 场景 ==========
+        let scene, camera, renderer, controls, routeGroup, flowGroup;
+        let animFrame, flowPositions = [], isInit = false, autoRotate = false;
+        const FLOOR_H = 3.0, BUILD_W = 16, BUILD_D = 12, BUILD_H = FLOOR_H * 3 + 0.5;
 
-        const FLOOR_HEIGHT = 2.8;
-        const FLOOR_Y = [0, FLOOR_HEIGHT, FLOOR_HEIGHT * 2];
-
-        // ===== 简化路线配置 =====
-        const disasterConfig = {
-            normal: {
-                color: 0x10b981,
-                colorStr: '#10b981',
-                label: '🏫 四3班 → 主楼梯 → 操场',
-                badge: '● 正常',
-                badgeClass: 'badge-normal',
-                // 简化路径：四3班 → 走廊 → 主楼梯 → 大厅 → 操场
-                path: [
-                    [-4.5, 2.6, -3.0],
-                    [-2.0, 2.6, -1.5],
-                    [0.0, 2.6, -0.5],
-                    [5.0, 2.6, -0.5],
-                    [5.0, 1.4, -1.5],
-                    [5.0, 0.8, 0.0],
-                    [5.0, 0.0, 1.5],
-                    [3.0, -0.15, 2.5],
-                    [8.0, -0.15, 4.5],
-                    [13.0, -0.15, 6.0]
-                ],
-                nodeNames: ['四3班(3F)', '走廊(3F)', '主楼梯(↓)', '大厅(1F)', '操场'],
-                tubeRadius: 0.22,
-                emissiveIntensity: 0.9,
-            },
-            fire: {
-                color: 0xef4444,
-                colorStr: '#ef4444',
-                label: '🔥 火灾 · 紧急撤离',
-                badge: '● 火灾应急',
-                badgeClass: 'badge-fire',
-                path: [
-                    [-4.5, 2.6, -3.0],
-                    [-1.0, 2.6, -1.5],
-                    [3.0, 2.6, -0.5],
-                    [5.0, 2.6, -0.5],
-                    [5.0, 1.4, -1.5],
-                    [5.0, 0.8, 0.0],
-                    [5.0, 0.0, 1.5],
-                    [3.0, -0.15, 2.5],
-                    [8.0, -0.15, 4.5],
-                    [13.0, -0.15, 6.0]
-                ],
-                nodeNames: ['四3班(3F)', '走廊(3F)', '主楼梯(↓)', '大厅(1F)', '操场'],
-                tubeRadius: 0.24,
-                emissiveIntensity: 1.4,
-                pulse: true,
-            },
-            earthquake: {
-                color: 0xf59e0b,
-                colorStr: '#f59e0b',
-                label: '🌍 地震 · 走备用楼梯',
-                badge: '● 地震避险',
-                badgeClass: 'badge-earthquake',
-                path: [
-                    [-4.5, 2.6, -3.0],
-                    [-5.0, 2.6, -2.0],
-                    [-5.0, 1.4, -0.5],
-                    [-5.0, 0.8, 1.0],
-                    [-5.0, 0.0, 2.5],
-                    [-2.0, -0.15, 3.5],
-                    [13.0, -0.15, 6.0]
-                ],
-                nodeNames: ['四3班(3F)', '备用楼梯(↓)', '大厅(1F)', '操场'],
-                tubeRadius: 0.22,
-                emissiveIntensity: 1.2,
-                pulse: true,
-            }
-        };
-
-        function updateStepHighlight(particleProgress) {
-            const steps = document.querySelectorAll('.route-guide-bar .step[data-step]');
-            if (!steps.length) return;
-            const totalSteps = steps.length;
-            const idx = Math.min(Math.floor(particleProgress * totalSteps), totalSteps - 1);
-            if (idx !== activeStepIndex) {
-                activeStepIndex = idx;
-                steps.forEach((step, i) => {
-                    step.classList.toggle('active-step', i === idx);
-                });
-            }
-        }
-
-        // ================================================================
-        // 6. Three.js 场景初始化
-        // ================================================================
         function initThreeScene() {
             const container = document.getElementById('three-container');
-            if (!container) return;
+            if (!container || !THREE) return;
+            const w = container.clientWidth || 700, h = container.clientHeight || 450;
 
-            if (typeof THREE === 'undefined') {
-                document.getElementById('loadingIndicator').style.display = 'flex';
-                setTimeout(initThreeScene, 500);
+            if (isInit && renderer && scene) {
+                // 场景已存在，只需更新路线到当前灾害状态
+                updateDisasterRoute(currentDisaster);
+                // 确保相机尺寸正确
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
                 return;
             }
 
-            const rect = container.getBoundingClientRect();
-            if (rect.width < 10 || rect.height < 10) {
-                document.getElementById('loadingIndicator').style.display = 'flex';
-                setTimeout(initThreeScene, 300);
-                return;
+            if (isInit && renderer) { 
+                renderer.dispose(); 
+                while (container.firstChild) container.removeChild(container.firstChild); 
+                scene = null; 
+                if (animFrame) cancelAnimationFrame(animFrame); 
+                isInit = false; 
             }
 
-            document.getElementById('loadingIndicator').style.display = 'none';
+            scene = new THREE.Scene(); scene.background = new THREE.Color(0x060d1f); scene.fog = new THREE.Fog(0x060d1f, 35, 70);
+            camera = new THREE.PerspectiveCamera(35, w/h, 0.1, 120); camera.position.set(12, 16, 24); camera.lookAt(0, 4.5, 0);
+            renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(w, h); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.shadowMap.enabled = true; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.4; container.appendChild(renderer.domElement);
+            scene.add(new THREE.AmbientLight(0x3a4a6a, 1));
+            const dirLight = new THREE.DirectionalLight(0xfff5e8, 2.8); dirLight.position.set(18, 28, 12); scene.add(dirLight);
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x0a1420, roughness: 0.9 })); ground.rotation.x = -Math.PI/2; ground.position.y = -0.35; scene.add(ground);
+            const building = new THREE.Group(); scene.add(building);
+            const shell = new THREE.Mesh(new THREE.BoxGeometry(BUILD_W, BUILD_H, BUILD_D), new THREE.MeshStandardMaterial({ color: 0x1a3055, transparent: true, opacity: 0.12, side: THREE.DoubleSide })); shell.position.y = BUILD_H/2 - 0.2; building.add(shell);
+            const corridorMat = new THREE.MeshStandardMaterial({ color: 0x4a90d9, emissive: 0x112233, emissiveIntensity: 0.3, transparent: true, opacity: 0.25, side: THREE.DoubleSide });
+            [0, FLOOR_H, FLOOR_H*2].forEach(y => { const corridor = new THREE.Mesh(new THREE.PlaneGeometry(2.8, BUILD_D-2), corridorMat); corridor.rotation.x = -Math.PI/2; corridor.position.set(0, y+0.08, 0); building.add(corridor); });
+            const stairStepMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x3b82f6, emissiveIntensity: 0.4, transparent: true, opacity: 0.5 });
+            for (let floor = 0; floor < 3; floor++) { for (let step = 0; step < 4; step++) { const stepMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 1.2), stairStepMat); stepMesh.position.set(6.5, FLOOR_H*floor + 0.2 + step*0.7, -3); building.add(stepMesh); } }
+            const backStairMat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, emissive: 0x8b5cf6, emissiveIntensity: 0.3, transparent: true, opacity: 0.4 });
+            for (let floor = 0; floor < 3; floor++) { for (let step = 0; step < 4; step++) { const stepMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 1.2), backStairMat); stepMesh.position.set(-6.5, FLOOR_H*floor + 0.2 + step*0.7, -3); building.add(stepMesh); } }
+            const exitSignMat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 1 });
+            [-6.5, 6.5].forEach(x => { [0, FLOOR_H, FLOOR_H*2].forEach(y => { const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.4), exitSignMat); sign.position.set(x, y+1.6, BUILD_D/2-0.5); building.add(sign); }); });
 
-            if (isInitialized && threeRenderer) {
-                threeRenderer.dispose();
-                while (container.firstChild) container.removeChild(container.firstChild);
-                threeScene = null;
-                threeRenderer = null;
-                threeCamera = null;
-                threeControls = null;
-                if (animFrame) { cancelAnimationFrame(animFrame);
-                    animFrame = null; }
-                isInitialized = false;
-            }
+            const classLayout = [
+                { x: -4.5, z: -3.2, y: FLOOR_H*2, label: '四年级1班', color: 0x1e3a5f, order: 1 },
+                { x: 4.5, z: -3.2, y: FLOOR_H*2, label: '四年级2班', color: 0x1e3a5f, order: 2 },
+                { x: -4.5, z: 3.2, y: FLOOR_H*2, label: '★ 四年级3班', color: 0xfbbf24, order: 3, highlight: true },
+                { x: 4.5, z: 3.2, y: FLOOR_H*2, label: '四年级4班', color: 0x1e3a5f, order: 4 },
+                { x: -4.5, z: -3.2, y: FLOOR_H, label: '三年级1班', color: 0x1a3455 },
+                { x: 4.5, z: -3.2, y: FLOOR_H, label: '三年级2班', color: 0x1a3455 },
+                { x: -4.5, z: 3.2, y: FLOOR_H, label: '三年级3班', color: 0x1a3455 },
+                { x: 4.5, z: 3.2, y: FLOOR_H, label: '三年级4班', color: 0x1a3455 },
+                { x: -4.5, z: -3.2, y: 0, label: '二年级1班', color: 0x162d48 },
+                { x: 4.5, z: -3.2, y: 0, label: '二年级2班', color: 0x162d48 },
+            ];
+            classLayout.forEach(c => {
+                const mat = new THREE.MeshStandardMaterial({ color: c.highlight ? 0xfbbf24 : c.color, emissive: c.highlight ? 0xfbbf24 : 0, emissiveIntensity: c.highlight ? 0.5 : 0, roughness: 0.3 });
+                const room = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.35, 3.2), mat); room.position.set(c.x, c.y+0.1, c.z); building.add(room);
+                const canvas = document.createElement('canvas'); canvas.width = 200; canvas.height = 50;
+                const ctx = canvas.getContext('2d'); ctx.fillStyle = 'rgba(8,18,40,0.85)'; ctx.roundRect(10,6,180,38,10); ctx.fill();
+                ctx.fillStyle = c.highlight ? '#fbbf24' : '#c8d8f0'; ctx.font = c.highlight ? 'bold 18px Inter' : '14px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(c.label, 100, 25);
+                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, depthTest: false })); sprite.position.set(c.x, c.y+0.6, c.z); sprite.scale.set(3.2, 0.8, 1); building.add(sprite);
+            });
 
-            const width = rect.width || container.clientWidth || 600;
-            const height = rect.height || container.clientHeight || 400;
+            routeGroup = new THREE.Group(); scene.add(routeGroup); flowGroup = new THREE.Group(); scene.add(flowGroup);
+            if (typeof THREE.OrbitControls === 'function') { controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.target.set(0, 4.5, 0); controls.update(); }
 
-            console.log('初始化3D场景(简化路线), 尺寸:', width, 'x', height);
+            // 使用当前全局状态决定初始路线
+            updateDisasterRoute(currentDisaster);
+            isInit = true;
 
-            try {
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x070d1f);
-                scene.fog = new THREE.Fog(0x070d1f, 35, 60);
-                threeScene = scene;
-
-                const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
-                camera.position.set(8, 16, 20);
-                camera.lookAt(0, 1.0, 0);
-                threeCamera = camera;
-
-                const renderer = new THREE.WebGLRenderer({
-                    antialias: true,
-                    alpha: false,
-                    powerPreference: "high-performance"
-                });
-                renderer.setSize(width, height);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                renderer.shadowMap.enabled = true;
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                renderer.toneMappingExposure = 1.3;
-                renderer.setClearColor(0x070d1f);
-                container.appendChild(renderer.domElement);
-                threeRenderer = renderer;
-
-                // 光照
-                const ambient = new THREE.AmbientLight(0x404060, 0.9);
-                scene.add(ambient);
-                const dirLight = new THREE.DirectionalLight(0xffeedd, 2.5);
-                dirLight.position.set(15, 30, 10);
-                dirLight.castShadow = true;
-                dirLight.shadow.mapSize.width = 1024;
-                dirLight.shadow.mapSize.height = 1024;
-                scene.add(dirLight);
-                const fillLight = new THREE.DirectionalLight(0x4488ff, 0.5);
-                fillLight.position.set(-10, 8, -10);
-                scene.add(fillLight);
-                const rimLight = new THREE.DirectionalLight(0x8888ff, 0.3);
-                rimLight.position.set(0, -5, 15);
-                scene.add(rimLight);
-
-                // 建筑外壳
-                const buildingWidth = 14;
-                const buildingDepth = 10;
-                const buildingHeight = FLOOR_HEIGHT * 3 + 0.5;
-
-                const floorMat = new THREE.MeshStandardMaterial({
-                    color: 0x0a1a2a,
-                    transparent: true,
-                    opacity: 0.15,
-                    roughness: 0.7,
-                    metalness: 0.2,
-                    side: THREE.DoubleSide,
-                });
-                const baseFloor = new THREE.Mesh(new THREE.PlaneGeometry(buildingWidth, buildingDepth), floorMat);
-                baseFloor.rotation.x = -Math.PI / 2;
-                baseFloor.position.set(0, -0.2, 0);
-                scene.add(baseFloor);
-
-                const wireframeMat = new THREE.LineBasicMaterial({
-                    color: 0x3a5a8a,
-                    transparent: true,
-                    opacity: 0.3,
-                });
-                const boxGeo = new THREE.BoxGeometry(buildingWidth, buildingHeight, buildingDepth);
-                const edges = new THREE.EdgesGeometry(boxGeo);
-                const wireframe = new THREE.LineSegments(edges, wireframeMat);
-                wireframe.position.set(0, buildingHeight / 2 - 0.2, 0);
-                scene.add(wireframe);
-
-                // 楼层板
-                const floorColors = [0x0d1a33, 0x122a44, 0x183a55];
-                FLOOR_Y.forEach((y, fi) => {
-                    const floorMat2 = new THREE.MeshStandardMaterial({
-                        color: floorColors[fi],
-                        transparent: true,
-                        opacity: 0.2,
-                        roughness: 0.7,
-                        metalness: 0.1,
-                        side: THREE.DoubleSide,
-                    });
-                    const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(buildingWidth - 1, buildingDepth - 1),
-                        floorMat2);
-                    floorMesh.rotation.x = -Math.PI / 2;
-                    floorMesh.position.set(0, y + 0.05, 0);
-                    scene.add(floorMesh);
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 128;
-                    canvas.height = 40;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = 'rgba(10,22,50,0.7)';
-                    ctx.roundRect(4, 4, 120, 32, 8);
-                    ctx.fill();
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = 'bold 14px Inter, sans-serif';
-                    const labels = ['一层', '二层', '三层'];
-                    ctx.fillText(labels[fi], 64, 22);
-                    const tex = new THREE.CanvasTexture(canvas);
-                    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-                        map: tex,
-                        transparent: true,
-                        depthTest: false,
-                        sizeAttenuation: true
-                    }));
-                    sprite.position.set(-5.0, y + 0.3, 4.0);
-                    sprite.scale.set(1.8, 0.5, 1);
-                    scene.add(sprite);
-                });
-
-                // 教室布局（走廊两侧，简化）
-                const classroomData = [
-                    // 三层
-                    { y: FLOOR_HEIGHT * 2, z: -2.5, label: '四1班', x: -4.0, color: 0x1a3a6a },
-                    { y: FLOOR_HEIGHT * 2, z: -2.5, label: '四2班', x: 4.0, color: 0x1a3a6a },
-                    { y: FLOOR_HEIGHT * 2, z: 1.5, label: '★ 四3班', x: -4.0, color: 0xfbbf24, highlight: true },
-                    { y: FLOOR_HEIGHT * 2, z: 1.5, label: '四4班', x: 4.0, color: 0x1a3a6a },
-                    // 二层
-                    { y: FLOOR_HEIGHT, z: -2.5, label: '三1班', x: -4.0, color: 0x1a3a6a },
-                    { y: FLOOR_HEIGHT, z: -2.5, label: '三2班', x: 4.0, color: 0x1a3a6a },
-                    { y: FLOOR_HEIGHT, z: 1.5, label: '三3班', x: -4.0, color: 0x1a3a6a },
-                    { y: FLOOR_HEIGHT, z: 1.5, label: '三4班', x: 4.0, color: 0x1a3a6a },
-                    // 一层
-                    { y: 0, z: -2.5, label: '二1班', x: -4.0, color: 0x1a3a6a },
-                    { y: 0, z: -2.5, label: '二2班', x: 4.0, color: 0x1a3a6a },
-                    { y: 0, z: 1.5, label: '大厅', x: 0, color: 0x2a4a7a, isHall: true },
-                    { y: 0, z: 1.5, label: '🚪 安全出口', x: 4.0, color: 0x10b981, isExit: true },
-                ];
-
-                classroomData.forEach((c) => {
-                    const w = 1.6,
-                        d = 1.0,
-                        h = 0.2;
-                    const mat = new THREE.MeshStandardMaterial({
-                        color: c.highlight ? 0xfbbf24 : c.isExit ? 0x10b981 : c.isHall ? 0x2a4a7a : c.color,
-                        emissive: c.highlight ? 0xfbbf24 : c.isExit ? 0x10b981 : 0x000000,
-                        emissiveIntensity: c.highlight ? 0.5 : c.isExit ? 0.3 : 0,
-                        transparent: !c.highlight && !c.isExit && !c.isHall,
-                        opacity: c.highlight ? 1.0 : c.isExit ? 0.8 : c.isHall ? 0.5 : 0.3,
-                        roughness: c.highlight ? 0.2 : 0.5,
-                        metalness: c.highlight ? 0.6 : 0.1,
-                    });
-                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-                    mesh.position.set(c.x, c.y + 0.08, c.z);
-                    mesh.castShadow = true;
-                    mesh.receiveShadow = true;
-                    scene.add(mesh);
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 140;
-                    canvas.height = 40;
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, 140, 40);
-                    ctx.fillStyle = c.highlight ? 'rgba(251,191,36,0.2)' : c.isExit ? 'rgba(16,185,129,0.15)' :
-                        c.isHall ? 'rgba(42,74,122,0.15)' : 'rgba(10,22,50,0.5)';
-                    ctx.roundRect(4, 4, 132, 32, 8);
-                    ctx.fill();
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = c.highlight ? '#fbbf24' : c.isExit ? '#34d399' : c.isHall ? '#94a3b8' : '#c8d8f0';
-                    ctx.font = c.highlight ? 'bold 16px Inter, sans-serif' : '12px Inter, sans-serif';
-                    ctx.fillText(c.label, 70, 22);
-                    const tex = new THREE.CanvasTexture(canvas);
-                    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-                        map: tex,
-                        transparent: true,
-                        depthTest: false,
-                        sizeAttenuation: true
-                    }));
-                    sprite.position.set(c.x, c.y + 0.5, c.z);
-                    sprite.scale.set(c.highlight ? 2.2 : 1.8, 0.6, 1);
-                    scene.add(sprite);
-
-                    if (c.highlight || c.isExit) {
-                        const edgeMat = new THREE.LineBasicMaterial({
-                            color: c.highlight ? 0xfbbf24 : 0x10b981,
-                            transparent: true,
-                            opacity: 0.8,
-                        });
-                        const edge = new THREE.LineSegments(
-                            new THREE.EdgesGeometry(new THREE.BoxGeometry(w + 0.08, h + 0.04, d + 0.08)),
-                            edgeMat
-                        );
-                        edge.position.copy(mesh.position);
-                        scene.add(edge);
-                    }
-                });
-
-                // 楼梯标记
-                const stairPositions = [
-                    { x: 5.0, y: FLOOR_HEIGHT * 2 + 0.1, z: -1.5, label: '主楼梯', color: 0x3b82f6 },
-                    { x: 5.0, y: FLOOR_HEIGHT + 0.1, z: -1.5, label: '主楼梯', color: 0x3b82f6 },
-                    { x: 5.0, y: 0.1, z: -1.5, label: '主楼梯', color: 0x3b82f6 },
-                    { x: -5.0, y: FLOOR_HEIGHT * 2 + 0.1, z: -1.5, label: '备用楼梯', color: 0x8b5cf6 },
-                    { x: -5.0, y: FLOOR_HEIGHT + 0.1, z: -1.5, label: '备用楼梯', color: 0x8b5cf6 },
-                    { x: -5.0, y: 0.1, z: -1.5, label: '备用楼梯', color: 0x8b5cf6 },
-                ];
-                stairPositions.forEach(s => {
-                    const mat = new THREE.MeshStandardMaterial({
-                        color: s.color,
-                        transparent: true,
-                        opacity: 0.25,
-                        roughness: 0.4,
-                        emissive: s.color,
-                        emissiveIntensity: 0.08,
-                    });
-                    const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.15, 0.6), mat);
-                    mesh.position.set(s.x, s.y, s.z);
-                    scene.add(mesh);
-
-                    const glowMat2 = new THREE.MeshStandardMaterial({
-                        color: s.color,
-                        transparent: true,
-                        opacity: 0.08,
-                        emissive: s.color,
-                        emissiveIntensity: 0.3,
-                    });
-                    const glowMesh = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), glowMat2);
-                    glowMesh.rotation.x = -Math.PI / 2;
-                    glowMesh.position.set(s.x, s.y - 0.05, s.z);
-                    scene.add(glowMesh);
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 70;
-                    canvas.height = 24;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = 'rgba(10,22,50,0.6)';
-                    ctx.roundRect(2, 2, 66, 20, 6);
-                    ctx.fill();
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = s.color === 0x3b82f6 ? '#60a5fa' : '#a78bfa';
-                    ctx.font = 'bold 9px Inter, sans-serif';
-                    ctx.fillText(s.label, 35, 13);
-                    const tex = new THREE.CanvasTexture(canvas);
-                    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-                        map: tex,
-                        transparent: true,
-                        depthTest: false,
-                        sizeAttenuation: true
-                    }));
-                    sprite.position.set(s.x, s.y + 0.5, s.z);
-                    sprite.scale.set(1.2, 0.4, 1);
-                    scene.add(sprite);
-                });
-
-                // 操场
-                const field = new THREE.Mesh(
-                    new THREE.RingGeometry(1.8, 2.8, 32),
-                    new THREE.MeshStandardMaterial({
-                        color: 0x10b981,
-                        transparent: true,
-                        opacity: 0.15,
-                        side: THREE.DoubleSide
-                    })
-                );
-                field.rotation.x = -Math.PI / 2;
-                field.position.set(13, -0.15, 6);
-                scene.add(field);
-
-                const fCanvas = document.createElement('canvas');
-                fCanvas.width = 140;
-                fCanvas.height = 44;
-                const fctx = fCanvas.getContext('2d');
-                fctx.fillStyle = 'rgba(16,185,129,0.85)';
-                fctx.font = 'bold 16px Inter, sans-serif';
-                fctx.textAlign = 'center';
-                fctx.textBaseline = 'middle';
-                fctx.fillText('⛳ 操场集结点', 70, 24);
-                const fLabel = new THREE.Sprite(new THREE.SpriteMaterial({
-                    map: new THREE.CanvasTexture(fCanvas),
-                    transparent: true,
-                    depthTest: false
-                }));
-                fLabel.position.set(13, 0.6, 6);
-                fLabel.scale.set(2.8, 0.7, 1);
-                scene.add(fLabel);
-
-                // 路线组
-                routeGroup = new THREE.Group();
-                scene.add(routeGroup);
-                flowParticles = new THREE.Group();
-                scene.add(flowParticles);
-
-                // 控制器
-                if (typeof THREE.OrbitControls === 'function') {
-                    threeControls = new THREE.OrbitControls(camera, renderer.domElement);
-                    threeControls.enableDamping = true;
-                    threeControls.dampingFactor = 0.08;
-                    threeControls.autoRotate = false;
-                    threeControls.target.set(0, 1.0, 0);
-                    threeControls.minDistance = 4;
-                    threeControls.maxDistance = 40;
-                    threeControls.maxPolarAngle = Math.PI / 2.1;
-                    threeControls.update();
-                }
-
-                // 初始化路线
-                updateDisasterRoute('normal');
-                isInitialized = true;
-
-                // 动画
-                function animate() {
-                    animFrame = requestAnimationFrame(animate);
-
-                    if (threeControls && typeof threeControls.update === 'function') {
-                        threeControls.update();
-                    }
-
-                    if (flowParticles && flowParticles.children.length > 0) {
-                        const speed = currentDisaster === 'fire' ? 0.022 : currentDisaster === 'earthquake' ? 0.018 :
-                            0.012;
-                        flowParticles.children.forEach((particle, i) => {
-                            if (particle.userData.offset !== undefined) {
-                                particle.userData.offset = (particle.userData.offset + speed) % 1;
-                                const idx = Math.floor(particle.userData.offset * (flowPositions.length - 1));
-                                const nextIdx = Math.min(idx + 1, flowPositions.length - 1);
-                                const frac = (particle.userData.offset * (flowPositions.length - 1)) - idx;
-                                if (flowPositions[idx] && flowPositions[nextIdx]) {
-                                    const p1 = flowPositions[idx];
-                                    const p2 = flowPositions[nextIdx];
-                                    particle.position.x = p1.x + (p2.x - p1.x) * frac;
-                                    particle.position.y = p1.y + (p2.y - p1.y) * frac + 0.15;
-                                    particle.position.z = p1.z + (p2.z - p1.z) * frac;
-                                }
-                                const s = 0.7 + 0.4 * Math.sin(Date.now() / 300 + i * 1.7);
-                                particle.scale.set(s, s, s);
-                            }
-                        });
-                        if (flowParticles.children.length > 0) {
-                            const first = flowParticles.children[0];
-                            if (first.userData.offset !== undefined) {
-                                updateStepHighlight(first.userData.offset);
-                            }
-                        }
-                    }
-
-                    if (routeGroup && (currentDisaster === 'fire' || currentDisaster === 'earthquake')) {
-                        const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 350);
-                        routeGroup.children.forEach(child => {
-                            if (child.isMesh && child.material && child.material.opacity !== undefined &&
-                                child.userData.isMainTube) {
-                                child.material.opacity = 0.75 + 0.2 * pulse;
-                            }
-                        });
-                    }
-
-                    if (threeRenderer && threeScene && threeCamera) {
-                        threeRenderer.render(threeScene, threeCamera);
-                    }
-                }
-                animate();
-
-                const ro = new ResizeObserver(() => {
-                    const w = container.clientWidth,
-                        h = container.clientHeight;
-                    if (w > 10 && h > 10 && threeCamera && threeRenderer) {
-                        threeCamera.aspect = w / h;
-                        threeCamera.updateProjectionMatrix();
-                        threeRenderer.setSize(w, h);
-                    }
-                });
-                ro.observe(container);
-                window._threeResizeObserver = ro;
-                window._threeContainer = container;
-
-                console.log('✅ 简化路线场景初始化成功');
-
-            } catch (error) {
-                console.error('3D场景初始化失败:', error);
-                document.getElementById('loadingIndicator').style.display = 'flex';
-                document.getElementById('loadingIndicator').innerHTML =
-                    '<span style="color:#ef4444;">❌ 加载失败，请刷新重试</span>';
-            }
+            function animate() { animFrame = requestAnimationFrame(animate); if (controls) controls.update(); if (flowGroup.children.length && flowPositions.length > 1) { const speed = currentDisaster === 'fire' ? 0.03 : currentDisaster === 'earthquake' ? 0.025 : 0.018; flowGroup.children.forEach((p, i) => { p.userData.offset = (p.userData.offset + speed) % 1; const idx = Math.floor(p.userData.offset * (flowPositions.length - 1)); const nxt = Math.min(idx + 1, flowPositions.length - 1); const f = (p.userData.offset * (flowPositions.length - 1)) - idx; if (flowPositions[idx] && flowPositions[nxt]) p.position.lerpVectors(flowPositions[idx], flowPositions[nxt], f); }); } renderer.render(scene, camera); }
+            animate();
         }
 
-        // ===== 更新路线 =====
-        function updateDisasterRoute(disasterType) {
+        function updateDisasterRoute(type) {
             if (!routeGroup) return;
-            currentDisaster = disasterType;
+            const configs = { normal: { color: 0x10b981, label: '🏫 四年级3班 → 主楼梯 → 操场', badge: '● 正常', badgeClass: 'badge-normal-sm', path: [[-4.5, FLOOR_H*2+0.3, 3.2], [-1.5, FLOOR_H*2+0.3, 2.2], [2.5, FLOOR_H*2+0.3, -0.5], [6.5, FLOOR_H*2+0.3, -3], [6.5, FLOOR_H+0.3, -3], [6.5, 0.3, -3], [3.5, 0.3, -0.8], [1.5, -0.1, 1.5], [16, -0.1, 8]] }, fire: { color: 0xef4444, label: '🔥 火灾·紧急撤离', badge: '● 火灾应急', badgeClass: 'badge-fire-sm', path: [[-4.5, FLOOR_H*2+0.3, 3.2], [-1, FLOOR_H*2+0.3, 1.8], [3, FLOOR_H*2+0.3, -0.3], [6.5, FLOOR_H*2+0.3, -3], [6.5, FLOOR_H+0.3, -3], [6.5, 0.3, -3], [3.5, 0.3, -0.6], [1.5, -0.1, 1.8], [16, -0.1, 8]] }, earthquake: { color: 0xf59e0b, label: '🌍 地震·走备用楼梯', badge: '● 地震避险', badgeClass: 'badge-earthquake-sm', path: [[-4.5, FLOOR_H*2+0.3, 3.2], [-6.5, FLOOR_H*2+0.3, -0.5], [-6.5, FLOOR_H*2+0.3, -3], [-6.5, FLOOR_H+0.3, -3], [-6.5, 0.3, -3], [-3.5, 0.3, -1], [-1.5, -0.1, 1.5], [16, -0.1, 8]] } };
+            const cfg = configs[type];
+            [routeGroup, flowGroup].forEach(g => { while (g.children.length) g.remove(g.children[0]); }); flowPositions = [];
+            const pts = cfg.path.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+            const arrowGroup = new THREE.Group();
+            for (let i = 0; i < pts.length - 1; i++) { const start = pts[i], end = pts[Math.min(i+1, pts.length-1)]; const dir = new THREE.Vector3().copy(end).sub(start); if (dir.length() < 0.3) continue; const mid = new THREE.Vector3().copy(start).add(dir.clone().multiplyScalar(0.5)); const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.7, 8), new THREE.MeshStandardMaterial({ color: cfg.color, emissive: cfg.color, emissiveIntensity: 1.8 })); arrow.position.copy(mid); arrow.position.y += 0.35; arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize()); arrowGroup.add(arrow); }
+            routeGroup.add(arrowGroup);
+            const particleMat = new THREE.MeshStandardMaterial({ color: cfg.color, emissive: cfg.color, emissiveIntensity: 2.5 });
+            for (let i = 0; i < 45; i++) { const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6), particleMat); sphere.userData.offset = i / 45; flowGroup.add(sphere); }
+            flowPositions = pts.map(p => p.clone());
+            const last = pts[pts.length-1]; const endSphere = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16), new THREE.MeshStandardMaterial({ color: cfg.color, emissive: cfg.color, emissiveIntensity: 2.2 })); endSphere.position.copy(last); endSphere.position.y += 0.5; routeGroup.add(endSphere);
 
-            while (routeGroup.children.length > 0) {
-                const c = routeGroup.children[0];
-                if (c.geometry) c.geometry.dispose();
-                if (c.material) c.material.dispose();
-                routeGroup.remove(c);
-            }
-            while (flowParticles.children.length > 0) {
-                const c = flowParticles.children[0];
-                if (c.geometry) c.geometry.dispose();
-                if (c.material) c.material.dispose();
-                flowParticles.remove(c);
-            }
-            flowPositions = [];
-
-            const config = disasterConfig[disasterType];
-            if (!config) return;
-
-            document.getElementById('mapStatusText').textContent = config.label;
-            const badge = document.getElementById('mapStatusBadge');
-            badge.textContent = config.badge;
-            badge.className = `badge ${config.badgeClass}`;
-            document.getElementById('legendMainDot').className =
-                `dot ${disasterType === 'normal' ? 'green' : disasterType === 'fire' ? 'red' : 'orange'}`;
-
-            const dot = document.getElementById('statusDot'),
-                st = document.getElementById('statusText');
-            if (disasterType === 'fire') {
-                dot.className = 'status-dot status-critical';
-                st.textContent = '🔥 火灾应急';
-                st.className = 'text-sm text-red-400 font-semibold';
-            } else if (disasterType === 'earthquake') {
-                dot.className = 'status-dot status-warning';
-                st.textContent = '🌍 地震应急';
-                st.className = 'text-sm text-yellow-400 font-semibold';
-            } else {
-                dot.className = 'status-dot status-normal';
-                st.textContent = '系统正常';
-                st.className = 'text-sm text-slate-300';
-            }
-
-            document.querySelectorAll('.disaster-btn').forEach(btn => {
-                btn.className = 'disaster-btn';
-                if (btn.dataset.disaster === disasterType) {
-                    if (disasterType === 'normal') btn.classList.add('active-normal');
-                    else if (disasterType === 'fire') btn.classList.add('active-fire');
-                    else if (disasterType === 'earthquake') btn.classList.add('active-earthquake');
-                }
-            });
-
-            // 构建简化路径
-            const pts = config.path.map(p => new THREE.Vector3(p[0], p[1], p[2]));
-            const curve = new THREE.CatmullRomCurve3(pts);
-
-            const tubeGeo = new THREE.TubeGeometry(curve, 50, config.tubeRadius, 16, false);
-            const tubeMat = new THREE.MeshStandardMaterial({
-                color: config.color,
-                emissive: config.color,
-                emissiveIntensity: config.emissiveIntensity,
-                transparent: true,
-                opacity: 0.92,
-                roughness: 0.1,
-                metalness: 0.0,
-            });
-            const tube = new THREE.Mesh(tubeGeo, tubeMat);
-            tube.userData.isMainTube = true;
-            tube.castShadow = true;
-            routeGroup.add(tube);
-
-            const glowMat = new THREE.MeshStandardMaterial({
-                color: config.color,
-                emissive: config.color,
-                emissiveIntensity: config.emissiveIntensity * 0.5,
-                transparent: true,
-                opacity: 0.12,
-                side: THREE.BackSide,
-            });
-            const glow = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, config.tubeRadius * 2.8, 8, false), glowMat);
-            routeGroup.add(glow);
-
-            // 简化节点标记
-            const arrowMat = new THREE.MeshStandardMaterial({
-                color: config.color,
-                emissive: config.color,
-                emissiveIntensity: config.emissiveIntensity * 0.7,
-            });
-
-            const keyIndices = [0, 3, 6, 8];
-            keyIndices.forEach(idx => {
-                if (idx < pts.length) {
-                    const p = pts[idx];
-                    const dotM = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.22, 12, 12),
-                        new THREE.MeshStandardMaterial({
-                            color: config.color,
-                            emissive: config.color,
-                            emissiveIntensity: config.emissiveIntensity * 0.8,
-                        })
-                    );
-                    dotM.position.copy(p);
-                    dotM.position.y += 0.2;
-                    routeGroup.add(dotM);
-                }
-            });
-
-            // 方向箭头
-            for (let i = 1; i < pts.length; i++) {
-                const start = pts[i - 1],
-                    end = pts[i];
-                const dir = new THREE.Vector3().copy(end).sub(start);
-                const len = dir.length();
-                if (len > 0.3) {
-                    const mid = new THREE.Vector3().copy(start).add(dir.clone().multiplyScalar(0.5));
-                    const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.4, 8), arrowMat);
-                    arrow.position.copy(mid);
-                    arrow.position.y += 0.2;
-                    const up = new THREE.Vector3(0, 1, 0);
-                    arrow.quaternion.setFromUnitVectors(up, dir.clone().normalize());
-                    routeGroup.add(arrow);
-                    flowPositions.push(start.clone());
-                }
-            }
-            flowPositions.push(pts[pts.length - 1].clone());
-
-            // 终点
-            const endMat = new THREE.MeshStandardMaterial({
-                color: config.color,
-                emissive: config.color,
-                emissiveIntensity: config.emissiveIntensity * 1.5,
-                transparent: true,
-                opacity: 0.98,
-            });
-            const endSphere = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), endMat);
-            const last = pts[pts.length - 1];
-            endSphere.position.copy(last);
-            endSphere.position.y += 0.3;
-            routeGroup.add(endSphere);
-
-            const ring = new THREE.Mesh(
-                new THREE.RingGeometry(0.4, 0.65, 28),
-                new THREE.MeshStandardMaterial({
-                    color: config.color,
-                    emissive: config.color,
-                    emissiveIntensity: config.emissiveIntensity * 0.4,
-                    transparent: true,
-                    opacity: 0.2,
-                    side: THREE.DoubleSide
-                })
-            );
-            ring.position.copy(last);
-            ring.position.y += 0.05;
-            ring.rotation.x = -Math.PI / 2;
-            routeGroup.add(ring);
-
-            // 粒子
-            const particleMat = new THREE.MeshStandardMaterial({
-                color: config.color,
-                emissive: config.color,
-                emissiveIntensity: config.emissiveIntensity * 1.8,
-            });
-            for (let i = 0; i < 35; i++) {
-                const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), particleMat);
-                sphere.userData.offset = i / 35;
-                flowParticles.add(sphere);
-            }
-
-            console.log(`✅ 简化路线已更新: ${disasterType}`);
+            document.getElementById('mapStatusLabel').textContent = cfg.label;
+            const badge = document.getElementById('mapStatusBadgeSm');
+            badge.textContent = cfg.badge;
+            badge.className = `badge-sm ${cfg.badgeClass}`;
+            currentDisaster = type; // 保持同步
         }
 
-        // ================================================================
-        // 7. 事件绑定
-        // ================================================================
-        document.querySelectorAll('.disaster-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        document.querySelectorAll('.disaster-btn').forEach(b => {
+            b.addEventListener('click', function() {
                 const disaster = this.dataset.disaster;
-                if (typeof updateDisasterRoute === 'function') {
-                    updateDisasterRoute(disaster);
-                    showToast('info', `切换到 ${disaster === 'normal' ? '日常' : disaster === 'fire' ? '火灾应急' : '地震避险'} 路线`);
-                }
+                setDisasterState(disaster);
+                if (isInit) updateDisasterRoute(disaster);
             });
         });
+        document.getElementById('resetViewBtn')?.addEventListener('click', () => { if (controls) { controls.target.set(0,4.5,0); camera.position.set(12,16,24); controls.update(); } });
+        document.getElementById('topViewBtn')?.addEventListener('click', () => { camera.position.set(0,24,1); controls.target.set(0,4.5,0); controls.update(); });
+        document.getElementById('autoRotateBtn')?.addEventListener('click', function() { if (controls) { autoRotate = !autoRotate; controls.autoRotate = autoRotate; this.classList.toggle('active', autoRotate); } });
 
-        document.getElementById('resetViewBtn')?.addEventListener('click', function() {
-            if (threeControls) {
-                threeControls.target.set(0, 1.0, 0);
-                threeControls.update();
-                showToast('info', '视角已复位');
-            }
-        });
+        if (!CanvasRenderingContext2D.prototype.roundRect) { CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) { this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y); this.closePath(); return this; }; }
 
-        document.getElementById('autoRotateBtn')?.addEventListener('click', function() {
-            if (threeControls) {
-                isAutoRotate = !isAutoRotate;
-                threeControls.autoRotate = isAutoRotate;
-                threeControls.autoRotateSpeed = 1.5;
-                this.classList.toggle('active');
-                this.innerHTML = isAutoRotate ?
-                    '<i class="fas fa-pause"></i> 停止' :
-                    '<i class="fas fa-rotate-right"></i> 旋转';
-                showToast('info', isAutoRotate ? '自动旋转已开启' : '自动旋转已停止');
-            }
-        });
-
-        // ================================================================
-        // 8. roundRect polyfill
-        // ================================================================
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (r > w / 2) r = w / 2;
-                if (r > h / 2) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                this.closePath();
-                return this;
-            };
-        }
-
-        // ================================================================
-        // 9. 初始化
-        // ================================================================
-        function waitForThree() {
-            if (typeof THREE !== 'undefined') {
-                console.log('Three.js 已加载');
-                setTimeout(() => { initThreeScene(); }, 300);
-                return;
-            }
-            console.log('等待 Three.js...');
-            setTimeout(waitForThree, 500);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(waitForThree, 600);
-        });
-
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            setTimeout(waitForThree, 400);
-        }
-
-        document.querySelector('.nav-item[data-page="route"]')?.addEventListener('click', function() {
-            setTimeout(() => {
-                if (!isInitialized) {
-                    initThreeScene();
-                } else {
-                    const c = document.getElementById('three-container');
-                    if (c && threeRenderer) {
-                        const w = c.clientWidth,
-                            h = c.clientHeight;
-                        if (w > 10 && h > 10 && threeCamera) {
-                            threeCamera.aspect = w / h;
-                            threeCamera.updateProjectionMatrix();
-                            threeRenderer.setSize(w, h);
-                        }
-                    }
-                }
-            }, 500);
-        });
-
-        showToast('info', '👋 欢迎回来，张老师！');
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.toast').forEach(t => {
-                    t.style.opacity = '0';
-                    t.style.transform = 'translateX(12px)';
-                    setTimeout(() => { if (t.parentElement) t.remove(); }, 300);
-                });
-            }
-        });
-
-        console.log('🏫 校园应急管理系统 · 教师端 已启动');
-        console.log('📌 疏散路线已简化：从班级→走廊→楼梯→大厅→操场，仅5步');
+        setTimeout(() => { if (document.getElementById('page-route').classList.contains('active')) initThreeScene(); }, 800);
+        showToast('info', '👋 欢迎，张老师！火灾应急预案已联动。');
     </script>
 </body>
 </html>
